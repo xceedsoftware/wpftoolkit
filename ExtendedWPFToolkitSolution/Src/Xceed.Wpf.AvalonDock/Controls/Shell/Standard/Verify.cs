@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -33,24 +33,8 @@ namespace Standard
   using System.IO;
   using System.Threading;
 
-  /// <summary>
-  /// A static class for retail validated assertions.
-  /// Instead of breaking into the debugger an exception is thrown.
-  /// </summary>
   internal static class Verify
   {
-    /// <summary>
-    /// Ensure that the current thread's apartment state is what's expected.
-    /// </summary>
-    /// <param name="requiredState">
-    /// The required apartment state for the current thread.
-    /// </param>
-    /// <param name="message">
-    /// The message string for the exception to be thrown if the state is invalid.
-    /// </param>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown if the calling thread's apartment state is not the same as the requiredState.
-    /// </exception>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsApartmentState( ApartmentState requiredState, string message )
@@ -61,11 +45,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Ensure that an argument is neither null nor empty.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [SuppressMessage( "Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength" )]
     [DebuggerStepThrough]
@@ -86,11 +65,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Ensure that an argument is neither null nor does it consist only of whitespace.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [SuppressMessage( "Microsoft.Performance", "CA1820:TestForEmptyStringsUsingStringLength" )]
     [DebuggerStepThrough]
@@ -111,10 +85,6 @@ namespace Standard
       }
     }
 
-    /// <summary>Verifies that an argument is not null.</summary>
-    /// <typeparam name="T">Type of the object to validate.  Must be a class.</typeparam>
-    /// <param name="obj">The object to validate.</param>
-    /// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsNotDefault<T>( T obj, string name ) where T : struct
@@ -125,10 +95,6 @@ namespace Standard
       }
     }
 
-    /// <summary>Verifies that an argument is not null.</summary>
-    /// <typeparam name="T">Type of the object to validate.  Must be a class.</typeparam>
-    /// <param name="obj">The object to validate.</param>
-    /// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsNotNull<T>( T obj, string name ) where T : class
@@ -139,10 +105,6 @@ namespace Standard
       }
     }
 
-    /// <summary>Verifies that an argument is null.</summary>
-    /// <typeparam name="T">Type of the object to validate.  Must be a class.</typeparam>
-    /// <param name="obj">The object to validate.</param>
-    /// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsNull<T>( T obj, string name ) where T : class
@@ -173,11 +135,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Verifies the specified statement is true.  Throws an ArgumentException if it's not.
-    /// </summary>
-    /// <param name="statement">The statement to be verified as true.</param>
-    /// <param name="name">Name of the parameter to include in the ArgumentException.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsTrue( bool statement, string name )
@@ -188,12 +145,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Verifies the specified statement is true.  Throws an ArgumentException if it's not.
-    /// </summary>
-    /// <param name="statement">The statement to be verified as true.</param>
-    /// <param name="name">Name of the parameter to include in the ArgumentException.</param>
-    /// <param name="message">The message to include in the ArgumentException.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void IsTrue( bool statement, string name, string message )
@@ -251,12 +202,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Verifies that the specified value is within the expected range.  The assertion fails if it isn't.
-    /// </summary>
-    /// <param name="lowerBoundInclusive">The lower bound inclusive value.</param>
-    /// <param name="value">The value to verify.</param>
-    /// <param name="upperBoundExclusive">The upper bound exclusive value.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [DebuggerStepThrough]
     public static void BoundedInteger( int lowerBoundInclusive, int value, int upperBoundExclusive, string parameterName )

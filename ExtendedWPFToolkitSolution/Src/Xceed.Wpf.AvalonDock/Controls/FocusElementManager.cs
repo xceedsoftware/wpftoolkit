@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -117,11 +117,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     }
 
-    /// <summary>
-    /// Get the input element that was focused before user left the layout element
-    /// </summary>
-    /// <param name="model">Element to look for</param>
-    /// <returns>Input element </returns>
     internal static IInputElement GetLastFocusedElement( ILayoutElement model )
     {
       IInputElement objectWithFocus;
@@ -132,11 +127,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
 
-    /// <summary>
-    /// Get the last window handle focused before user left the element passed as argument
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
     internal static IntPtr GetLastWindowHandle( ILayoutElement model )
     {
       IntPtr handleWithFocus;
@@ -146,10 +136,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return IntPtr.Zero;
     }
 
-    /// <summary>
-    /// Given a layout element tries to set the focus of the keyword where it was before user moved to another element
-    /// </summary>
-    /// <param name="model"></param>
     internal static void SetFocusOnLastElement( ILayoutElement model )
     {
       bool focused = false;

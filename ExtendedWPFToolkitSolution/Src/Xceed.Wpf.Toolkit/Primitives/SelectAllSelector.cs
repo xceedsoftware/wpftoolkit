@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -63,6 +63,36 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
 
     #endregion // SelectAllText
+
+    #region IsAllItemsSelectedContentActive
+
+    public static readonly DependencyProperty IsAllItemsSelectedContentActiveProperty = DependencyProperty.Register( "IsAllItemsSelectedContentActive", typeof( bool ), typeof( SelectAllSelector ), new UIPropertyMetadata( false, OnIsAllItemsSelectedContentActiveChanged ) );
+    public bool IsAllItemsSelectedContentActive
+    {
+      get
+      {
+        return ( bool )GetValue( IsAllItemsSelectedContentActiveProperty );
+      }
+      set
+      {
+        SetValue( IsAllItemsSelectedContentActiveProperty, value );
+      }
+    }
+
+    private static void OnIsAllItemsSelectedContentActiveChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var selector = o as SelectAllSelector;
+      if( selector != null )
+      {
+        selector.OnIsAllItemsSelectedContentActiveChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+      }
+    }
+
+    protected virtual void OnIsAllItemsSelectedContentActiveChanged( bool oldValue, bool newValue )
+    {
+    }
+
+    #endregion //IsAllItemsSelectedContentActive
 
     #region IsSelectAllActive
 

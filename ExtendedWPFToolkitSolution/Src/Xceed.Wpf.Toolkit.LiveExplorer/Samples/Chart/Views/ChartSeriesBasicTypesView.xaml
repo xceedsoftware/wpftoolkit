@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -25,7 +42,7 @@
                 Title="Chart Series Basic Types">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>A series contains DataPoint objects and are layed out in an area (Area class) of a chart. They can be displayed with predefined layouts, such as column (bar), line, area, or pie, or they can be displayed using a custom layout (not implemented in this sample).</Run>
+            <Run>A series contains DataPoint objects and are laid out in an area (Area class) of a chart. They can be displayed with predefined layouts, such as column (bar), line, area, or pie, or they can be displayed using a custom layout (not implemented in this sample).</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />

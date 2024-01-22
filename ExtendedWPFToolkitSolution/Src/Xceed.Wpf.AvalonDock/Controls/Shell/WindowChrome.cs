@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -150,7 +150,6 @@ namespace Microsoft.Windows.Shell
             ( d, e ) => ( ( WindowChrome )d )._OnPropertyChangedThatRequiresRepaint() ),
         value => ( double )value >= 0d );
 
-    /// <summary>The extent of the top of the window to treat as the caption.</summary>
     public double CaptionHeight
     {
       get
@@ -237,10 +236,6 @@ namespace Microsoft.Windows.Shell
 
     #region ShowSystemMenu
 
-    /// <summary>
-    /// Gets or sets the ShowSystemMenu property.  This dependency property 
-    /// indicates if the system menu should be shown at right click on the caption.
-    /// </summary>
     public bool ShowSystemMenu
     {
       get;

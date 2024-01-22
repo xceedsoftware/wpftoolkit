@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -89,18 +89,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Documents
 
-    /// <summary>
-    /// Documents Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey DocumentsPropertyKey = DependencyProperty.RegisterReadOnly( "Documents", typeof( IEnumerable<LayoutDocumentItem> ), typeof( NavigatorWindow ),
             new FrameworkPropertyMetadata( null ) );
 
     public static readonly DependencyProperty DocumentsProperty = DocumentsPropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the Documents property.  This dependency property 
-    /// indicates the list of documents.
-    /// </summary>
     public LayoutDocumentItem[] Documents
     {
       get
@@ -113,18 +106,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Anchorables
 
-    /// <summary>
-    /// Anchorables Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey AnchorablesPropertyKey = DependencyProperty.RegisterReadOnly( "Anchorables", typeof( IEnumerable<LayoutAnchorableItem> ), typeof( NavigatorWindow ),
             new FrameworkPropertyMetadata( ( IEnumerable<LayoutAnchorableItem> )null ) );
 
     public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the Anchorables property.  This dependency property 
-    /// indicates the list of anchorables.
-    /// </summary>
     public IEnumerable<LayoutAnchorableItem> Anchorables
     {
       get
@@ -137,16 +123,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region SelectedDocument
 
-    /// <summary>
-    /// SelectedDocument Dependency Property
-    /// </summary>
     public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register( "SelectedDocument", typeof( LayoutDocumentItem ), typeof( NavigatorWindow ),
             new FrameworkPropertyMetadata( ( LayoutDocumentItem )null, new PropertyChangedCallback( OnSelectedDocumentChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the SelectedDocument property.  This dependency property 
-    /// indicates the selected document.
-    /// </summary>
     public LayoutDocumentItem SelectedDocument
     {
       get
@@ -159,17 +138,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Handles changes to the SelectedDocument property.
-    /// </summary>
     private static void OnSelectedDocumentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( NavigatorWindow )d ).OnSelectedDocumentChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the SelectedDocument property.
-    /// </summary>
     protected virtual void OnSelectedDocumentChanged( DependencyPropertyChangedEventArgs e )
     {
       if( _internalSetSelectedDocument )
@@ -187,16 +160,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region SelectedAnchorable
 
-    /// <summary>
-    /// SelectedAnchorable Dependency Property
-    /// </summary>
     public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register( "SelectedAnchorable", typeof( LayoutAnchorableItem ), typeof( NavigatorWindow ),
             new FrameworkPropertyMetadata( ( LayoutAnchorableItem )null, new PropertyChangedCallback( OnSelectedAnchorableChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the SelectedAnchorable property.  This dependency property 
-    /// indicates the selected anchorable.
-    /// </summary>
     public LayoutAnchorableItem SelectedAnchorable
     {
       get
@@ -209,17 +175,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Handles changes to the SelectedAnchorable property.
-    /// </summary>
     private static void OnSelectedAnchorableChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( NavigatorWindow )d ).OnSelectedAnchorableChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the SelectedAnchorable property.
-    /// </summary>
     protected virtual void OnSelectedAnchorableChanged( DependencyPropertyChangedEventArgs e )
     {
       if( _internalSetSelectedAnchorable )
@@ -480,21 +440,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Internal Methods
 
-    /// <summary>
-    /// Provides a secure method for setting the Anchorables property.  
-    /// This dependency property indicates the list of anchorables.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetAnchorables( IEnumerable<LayoutAnchorableItem> value )
     {
       this.SetValue( AnchorablesPropertyKey, value );
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the Documents property.  
-    /// This dependency property indicates the list of documents.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetDocuments( LayoutDocumentItem[] value )
     {
       this.SetValue( DocumentsPropertyKey, value );

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -47,21 +47,11 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Convert a point in device independent pixels (1/96") to a point in the system coordinates.
-    /// </summary>
-    /// <param name="logicalPoint">A point in the logical coordinate system.</param>
-    /// <returns>Returns the parameter converted to the system's coordinates.</returns>
     public static Point LogicalPixelsToDevice( Point logicalPoint )
     {
       return _transformToDevice.Transform( logicalPoint );
     }
 
-    /// <summary>
-    /// Convert a point in system coordinates to a point in device independent pixels (1/96").
-    /// </summary>
-    /// <param name="logicalPoint">A point in the physical coordinate system.</param>
-    /// <returns>Returns the parameter converted to the device independent coordinate system.</returns>
     public static Point DevicePixelsToLogical( Point devicePoint )
     {
       return _transformToDip.Transform( devicePoint );

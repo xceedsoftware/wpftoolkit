@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -166,9 +166,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the IsSelected property.
-    /// </summary>
     protected virtual void OnIsSelectedChanged( bool oldValue, bool newValue )
     {
       this.UpdateContainedFloatingWindowTaskbarTitle( newValue );
@@ -214,9 +211,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       }
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the IsActive property.
-    /// </summary>
     protected virtual void OnIsActiveChanged( bool oldValue, bool newValue )
     {
       if( newValue )
@@ -721,10 +715,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Public Methods
 
-    /// <summary>
-    /// Close the content
-    /// </summary>
-    /// <remarks>Please note that usually the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
     public abstract void Close();
 
     public System.Xml.Schema.XmlSchema GetSchema()
@@ -851,9 +841,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       return string.Compare( Title, other.Title );
     }
 
-    /// <summary>
-    /// Float the content in a popup window
-    /// </summary>
     public void Float()
     {
       if( PreviousContainer != null &&
@@ -886,9 +873,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       Root.CollectGarbage();
     }
 
-    /// <summary>
-    /// Dock the content as document
-    /// </summary>
     public void DockAsDocument()
     {
       var root = Root as LayoutRoot;
@@ -951,9 +935,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       IsActive = true;
     }
 
-    /// <summary>
-    /// Re-dock the content to its previous container
-    /// </summary>
     public void Dock()
     {
       Root.Manager.RaisePreviewDockEvent( this );
@@ -1006,10 +987,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Internal Methods
 
-    /// <summary>
-    /// Test if the content can be closed
-    /// </summary>
-    /// <returns></returns>
     internal bool TestCanClose()
     {
       CancelEventArgs args = new CancelEventArgs();
@@ -1060,12 +1037,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         // Check if LayoutContent is inside a FloatingWindowControl
         // And set the correct title for Taskbar Title
-        var root = Root;
+        var root = this.Root;
 
-        if( root != null )
+        if( (root != null) && (root.Manager != null) )
         {
           var lfwc = root.Manager.FloatingWindows;
-          var containedFloatingWindowControl = lfwc.FirstOrDefault( f => f.Model.Descendents().OfType<LayoutContent>().Where( l => l.ContentId == this.ContentId ).FirstOrDefault() != null );
+          var containedFloatingWindowControl = lfwc.FirstOrDefault( f => (f.Model != null) && f.Model.Descendents().OfType<LayoutContent>().Where( l => l.ContentId == this.ContentId ).FirstOrDefault() != null );
 
           if( containedFloatingWindowControl != null )
           {
@@ -1087,18 +1064,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Events
 
-    /// <summary>
-    /// Event fired when the content is closed (i.e. removed definitely from the layout)
-    /// </summary>
     public event EventHandler Closed;
 
-    /// <summary>
-    /// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
-    /// </summary>
-    /// <remarks>Please note that LayoutAnchorable also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close 
-    /// an anchorable the user should click the 'Close' menu item from the context menu. When an LayoutAnchorable is hidden its visibility changes to false and
-    /// IsHidden property is set to true.
-    /// Hanlde the Hiding event for the LayoutAnchorable to cancel the hide operation.</remarks>
     public event EventHandler<CancelEventArgs> Closing;
 
 

@@ -25,20 +25,20 @@
                  Title="PropertyGrid Binding to Structs">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            When the SelectedObject contains properties of type Struct youmay find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value.  Meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.
+            When the SelectedObject contains properties of type Struct you may find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value, meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.
         </Paragraph>
     </local:DemoView.Description>
 
    <local:DemoView.Resources>
       <conv:DimensionsConverter x:Key="DimensionsConverter" />
    </local:DemoView.Resources>
-
+   
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
-
+      
       <TextBlock Text="The solution to this problem is to create a custom editor and provide an IValueConverter to handle the proper conversion of the Struct values." TextWrapping="Wrap" />
       <xctk:PropertyGrid x:Name="_propertyGrid" Grid.Row="1" Width="450" MaxHeight="250" Margin="10">
          <xctk:PropertyGrid.EditorDefinitions>

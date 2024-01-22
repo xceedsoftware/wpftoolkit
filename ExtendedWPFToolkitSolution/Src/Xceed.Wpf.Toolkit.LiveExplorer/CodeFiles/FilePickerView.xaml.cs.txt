@@ -26,7 +26,18 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.FilePicker.Views
     public FilePickerView()
     {
       InitializeComponent();
+#if !OPEN_SOURCE
+      _filePicker.SelectedFiles.CollectionChanged += this.SelectedFiles_CollectionChanged;
+#endif
     }
 
+#if !OPEN_SOURCE
+    private void SelectedFiles_CollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    {
+      //Refresh PrimitiveTypeCollectionControl.ItemsSource to be up to date with FilePicker.SelectedFiles.
+      _primitiveTypeCollectionControl.ItemsSource = null;
+      _primitiveTypeCollectionControl.ItemsSource = _filePicker.SelectedFiles;
+    }
+#endif
   }
 }

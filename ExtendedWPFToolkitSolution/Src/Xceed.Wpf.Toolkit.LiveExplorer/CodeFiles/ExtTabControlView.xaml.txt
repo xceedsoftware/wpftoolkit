@@ -26,6 +26,7 @@
     <Paragraph FontSize="14"
                FontFamily="Segoe">
       <Run>The ExtendedTabControl is a TabControl that offers a different navigation style. Instead of displaying the tabs on multiple lines when there are too many to fit in the view, the ExtendedTabContol offers the ability for the user to navigate left/right, and/or use a drop down list.</Run>
+      <!--##INCLUDE_OPEN_SOURCE
          <LineBreak />
          <LineBreak />
          <Run>This feature is only available in the "Plus" version.</Run>
@@ -33,29 +34,244 @@
          <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
             Click here for more details about Xceed Toolkit Plus for WPF.
          </Hyperlink>
+       ##END-->
     </Paragraph>
   </local:DemoView.Description>
 
+  <!--##EXCLUDE_OPEN_SOURCE-->
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
 
+    <GroupBox Header="Features"
+              Grid.Row="0"
+              Margin="5">
+      <Grid Margin="5">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
+        <!-- Show Prev/Next Buttons -->
+        <TextBlock Grid.Row="0"
+                   VerticalAlignment="Center"
+                   Text="Show Prev/Next Buttons: " />
 
+        <CheckBox Grid.Row="0"
+                  Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  IsChecked="{Binding ShowPrevNextButtons, ElementName=_extendedTabControl}" />
 
+        <!-- Show DropList Button -->
+        <TextBlock Grid.Row="1"
+                   VerticalAlignment="Center"
+                   Text="Show DropList Button: " />
 
+        <CheckBox Grid.Row="1"
+                  Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  IsChecked="{Binding ShowDropListButton, ElementName=_extendedTabControl}" />
 
+        <!-- Show Tab Items Close Button -->
+        <TextBlock Grid.Row="2"
+                   VerticalAlignment="Center"
+                   Text="Show Remove Button: " />
 
+        <CheckBox x:Name="_closeButtonVisibility"
+                  Grid.Row="2"
+                  Grid.Column="1"
+                  IsChecked="true"
+                  Width="160"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center" />
+        
+        <!-- Show Add TabItem Button -->
+        <TextBlock Grid.Row="3"
+                   VerticalAlignment="Center"
+                   Text="Show Add Button: " />
 
+        <CheckBox x:Name="_addButtonVisibility"
+                  Grid.Row="3"
+                  Grid.Column="1"
+                  IsChecked="true"
+                  Width="160"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center" />
 
+        <!-- Cache TabItems -->
+        <TextBlock Grid.Row="0"
+                   Grid.Column="2"
+                   VerticalAlignment="Center"
+                   Text="Cache TabItems: "
+                   ToolTip="Gets or sets if the TabItems will be cached or reloaded while switching the selected TabItems." />
 
+        <CheckBox Grid.Row="0"
+                  Grid.Column="3"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  IsChecked="{Binding CacheTabItems, ElementName=_extendedTabControl}" />
 
+        <!-- TabStripPlacement -->
+        <TextBlock Grid.Row="1"
+                   Grid.Column="2"
+                   VerticalAlignment="Center"
+                   Text="TabStripPlacement: " />
 
+        <ComboBox Grid.Row="1"
+                  Grid.Column="3"
+                  Width="160"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding TabStripPlacement, ElementName=_extendedTabControl}"
+                  SelectedValuePath="Tag">
+          <ComboBoxItem Content="Top"
+                        Tag="Top" />
+          <ComboBoxItem Content="Bottom"
+                        Tag="Bottom" />
+          <ComboBoxItem Content="Left"
+                        Tag="Left" />
+          <ComboBoxItem Content="Right"
+                        Tag="Right" />
+        </ComboBox>
 
+        <!--##EXCLUDE_OPEN_SOURCE-->
+        <!-- Next/Previous Tab Buttons Position -->
+        <TextBlock Grid.Row="2"
+                   Grid.Column="2"
+                   VerticalAlignment="Center"
+                   Text="PreviousNextButtonsPosition:" />
 
+        <ComboBox Grid.Row="2"
+                  Grid.Column="3"
+                  Width="160"
+                  Margin="5"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding PreviousNextButtonsPosition, ElementName=_extendedTabControl}"
+                  SelectedValuePath="Tag">
+          <ComboBoxItem Content="AfterTabItems"
+                        Tag="{x:Static xctk:PreviousNextButtonsPosition.AfterTabItems}" />
+          <ComboBoxItem Content="BeforeAndAfterTabItems"
+                        Tag="{x:Static xctk:PreviousNextButtonsPosition.BeforeAndAfterTabItems}" />
+        </ComboBox>
+        <!--##END-->
 
+      </Grid>
+    </GroupBox>
 
+    <xctk:ExtendedTabControl x:Name="_extendedTabControl"
+                             Grid.Row="1"
+                             Height="350"
+                             Margin="20"
+                             Padding="10"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             ShowRemoveButton="{Binding Source={x:Reference _closeButtonVisibility}, Path=IsChecked}"
+                             ShowAddButton="{Binding Source={x:Reference _addButtonVisibility}, Path=IsChecked}">
 
+      <TabItem Header="Jan-16">
+        January 2016
+      </TabItem>
+      <TabItem Header="Feb-16">
+        February 2016
+      </TabItem>
+      <TabItem Header="Mar-16">
+        March 2016
+      </TabItem>
+      <TabItem Header="Apr-16">
+        April 2016
+      </TabItem>
+      <TabItem Header="May-16">
+        May 2016
+      </TabItem>
+      <TabItem Header="Jun-16">
+        June 2016
+      </TabItem>
+      <TabItem Header="Jul-16">
+        July 2016
+      </TabItem>
+      <TabItem Header="Aug-16">
+        August 2016
+      </TabItem>
+      <TabItem Header="Sep-16">
+        September 2016
+      </TabItem>
+      <TabItem Header="Oct-16">
+        October 2016
+      </TabItem>
+      <TabItem Header="Nov-16">
+        November 2016
+      </TabItem>
+      <TabItem Header="Dec-16">
+        December 2016
+      </TabItem>
+      <TabItem Header="Reports 2016">
+        Reports 2016
+      </TabItem>
+      <TabItem Header="Jan-17">
+        January 2017
+      </TabItem>
+      <TabItem Header="Feb-17">
+        February 2017
+      </TabItem>
+      <TabItem Header="Mar-17">
+        March 2017
+      </TabItem>
+      <TabItem Header="Apr-17">
+        April 2017
+      </TabItem>
+      <TabItem Header="May-17">
+        May 2017
+      </TabItem>
+      <TabItem Header="Jun-17">
+        June 2017
+      </TabItem>
+      <TabItem Header="Jul-17">
+        July 2017
+      </TabItem>
+      <TabItem Header="Aug-17">
+        August 2017
+      </TabItem>
+      <TabItem Header="Sep-17">
+        September 2017
+      </TabItem>
+      <TabItem Header="Oct-17">
+        October 2017
+      </TabItem>
+      <TabItem Header="Nov-17">
+        November 2017
+      </TabItem>
+      <TabItem Header="Dec-17">
+        December 2017
+      </TabItem>
+      <TabItem Header="Reports 2017">
+        Reports 2017
+      </TabItem>
 
+    </xctk:ExtendedTabControl>
 
+  </Grid>
+  <!--##END-->
 
-
+  <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\ExtTabControl.png" Width="600" Height="400"/>
+   ##END-->
 </local:DemoView>

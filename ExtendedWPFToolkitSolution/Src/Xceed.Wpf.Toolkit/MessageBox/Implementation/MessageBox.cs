@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -52,24 +52,12 @@ namespace Xceed.Wpf.Toolkit
 
     #region Private Members
 
-    /// <summary>
-    /// Tracks the MessageBoxButon value passed into the InitializeContainer method
-    /// </summary>
     private MessageBoxButton _button = MessageBoxButton.OK;
 
-    /// <summary>
-    /// Tracks the MessageBoxResult to set as the default and focused button
-    /// </summary>
     private MessageBoxResult _defaultResult = MessageBoxResult.None;
 
-    /// <summary>
-    /// Will contain the result when the messagebox is shown inside a WindowContainer
-    /// </summary>
     private MessageBoxResult _dialogResult = MessageBoxResult.None;
 
-    /// <summary>
-    /// Tracks the owner of the MessageBox
-    /// </summary>
     private Window _owner;
     private IntPtr _ownerHandle;
 
@@ -213,9 +201,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region MessageBoxResult
 
-    /// <summary>
-    /// Gets the MessageBox result, which is set when the "Closed" event is raised.
-    /// </summary>
     public MessageBoxResult MessageBoxResult
     {
       get
@@ -325,9 +310,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Overrides the OnApplyTemplate method.
-    /// </summary>
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
@@ -405,35 +387,16 @@ namespace Xceed.Wpf.Toolkit
     #region Show with Window as Owner
 
 
-    /// <summary>
-    /// Displays a message box that has a message and that returns a result.
-    /// </summary>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText )
     {
       return Show( messageText, string.Empty, MessageBoxButton.OK, ( Style )null );
     }
 
-    /// <summary>
-    /// Displays a message box that has a message and that returns a result.
-    /// </summary>
-    /// <param name="owner">A System.Windows.Window that represents the owner of the MessageBox</param>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( Window owner, string messageText )
     {
       return Show( owner, messageText, string.Empty, MessageBoxButton.OK, ( Style )null );
     }
 
-    /// <summary>
-    /// Displays a message box that has a message and title bar caption; and that returns a result.
-    /// </summary>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption )
     {
       return Show( messageText, caption, MessageBoxButton.OK, ( Style )null );
@@ -454,14 +417,6 @@ namespace Xceed.Wpf.Toolkit
       return Show( messageText, caption, button, ( Style )null );
     }
 
-    /// <summary>
-    /// Displays a message box that has a message and that returns a result.
-    /// </summary>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
-    /// <param name="button">A System.Windows.MessageBoxButton value that specifies which button or buttons to display.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, Style messageBoxStyle )
     {
       return ShowCore( null, IntPtr.Zero, messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None, messageBoxStyle );
@@ -484,15 +439,6 @@ namespace Xceed.Wpf.Toolkit
       return Show( messageText, caption, button, icon, ( Style )null );
     }
 
-    /// <summary>
-    /// Displays a message box that has a message and that returns a result.
-    /// </summary>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
-    /// <param name="button">A System.Windows.MessageBoxButton value that specifies which button or buttons to display.</param>
-    /// <param name="image"> A System.Windows.MessageBoxImage value that specifies the icon to display.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, Style messageBoxStyle )
     {
       return ShowCore( null, IntPtr.Zero, messageText, caption, button, icon, MessageBoxResult.None, messageBoxStyle );
@@ -513,16 +459,6 @@ namespace Xceed.Wpf.Toolkit
     {
       return Show( messageText, caption, button, icon, defaultResult, ( Style )null );
     }
-    /// <summary>
-    /// Displays a message box that has a message and that returns a result.
-    /// </summary>
-    /// <param name="messageText">A System.String that specifies the text to display.</param>
-    /// <param name="caption">A System.String that specifies the title bar caption to display.</param>
-    /// <param name="button">A System.Windows.MessageBoxButton value that specifies which button or buttons to display.</param>
-    /// <param name="image"> A System.Windows.MessageBoxImage value that specifies the icon to display.</param>
-    /// <param name="defaultResult">A System.Windows.MessageBoxResult value that specifies the default result of the MessageBox.</param>
-    /// <param name="messageBoxStyle">A Style that will be applied to the MessageBox instance.</param>
-    /// <returns>A System.Windows.MessageBoxResult value that specifies which message box button is clicked by the user.</returns>
     public static MessageBoxResult Show( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
       return ShowCore( null, IntPtr.Zero, messageText, caption, button, icon, defaultResult, messageBoxStyle );
@@ -593,10 +529,6 @@ namespace Xceed.Wpf.Toolkit
     #endregion //Public Static
 
     #region Public Methods
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox()
     {
       if( this.Container != null || this.Parent == null )
@@ -611,54 +543,31 @@ namespace Xceed.Wpf.Toolkit
       this.Visibility = Visibility.Visible;
     }
 
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox( string messageText )
     {
       this.ShowMessageBoxCore( messageText, string.Empty, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxResult.None );
     }
 
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox( string messageText, string caption )
     {
       this.ShowMessageBoxCore( messageText, caption, MessageBoxButton.OK, MessageBoxImage.None, MessageBoxResult.None );
     }
 
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox( string messageText, string caption, MessageBoxButton button )
     {
       this.ShowMessageBoxCore( messageText, caption, button, MessageBoxImage.None, MessageBoxResult.None );
     }
 
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon )
     {
       this.ShowMessageBoxCore( messageText, caption, button, icon, MessageBoxResult.None );
     }
 
-    /// <summary>
-    /// Displays this message box when embedded in a WindowContainer parent.
-    /// Note that this call is not blocking and that you must register to the Closed event in order to handle the dialog result, if any.
-    /// </summary>
     public void ShowMessageBox( string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult )
     {
       this.ShowMessageBoxCore( messageText, caption, button, icon, defaultResult );
     }
 
-    /// <summary>
-    /// Display the MessageBox window and returns only when this MessageBox closes.
-    /// </summary>
     public bool? ShowDialog()
     {
       if( this.Parent != null )
@@ -675,16 +584,6 @@ namespace Xceed.Wpf.Toolkit
     #endregion
 
     #region Protected
-    /// <summary>
-    /// Initializes the MessageBox.
-    /// </summary>
-    /// <param name="owner">The Window owner.</param>
-    /// <param name="ownerHandle">The Window Handle owner.</param>
-    /// <param name="text">The text.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="button">The button.</param>
-    /// <param name="image">The image.</param>
-    /// <param name="defaultResult">The MessageBox result as default.</param>
     protected void InitializeMessageBox( Window owner, IntPtr ownerHandle, string text, string caption, MessageBoxButton button, MessageBoxImage image, MessageBoxResult defaultResult )
     {
       Text = text;
@@ -696,11 +595,6 @@ namespace Xceed.Wpf.Toolkit
       SetImageSource( image );
     }
 
-    /// <summary>
-    /// Changes the control's visual state(s).
-    /// </summary>
-    /// <param name="name">name of the state</param>
-    /// <param name="useTransitions">True if state transitions should be used.</param>
     protected void ChangeVisualState( string name, bool useTransitions )
     {
       VisualStateManager.GoToState( this, name, useTransitions );
@@ -719,9 +613,6 @@ namespace Xceed.Wpf.Toolkit
       return object.Equals( _windowControl, windowtoTest );
     }
 
-    /// <summary>
-    /// Closes the MessageBox.
-    /// </summary>
     private void Close()
     {
       if( this.Container != null )
@@ -735,9 +626,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Sets the button that represents the _defaultResult to the default button and gives it focus.
-    /// </summary>
     private void SetDefaultResult()
     {
       var defaultButton = GetDefaultButtonFromDefaultResult();
@@ -748,10 +636,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Gets the default button from the _defaultResult.
-    /// </summary>
-    /// <returns>The default button that represents the defaultResult</returns>
     private Button GetDefaultButtonFromDefaultResult()
     {
       Button defaultButton = null;
@@ -776,11 +660,6 @@ namespace Xceed.Wpf.Toolkit
       return defaultButton;
     }
 
-    /// <summary>
-    /// Gets the default button.
-    /// </summary>
-    /// <remarks>Used when the _defaultResult is set to None</remarks>
-    /// <returns>The button to use as the default</returns>
     private Button GetDefaultButton()
     {
       Button defaultButton = null;
@@ -798,11 +677,6 @@ namespace Xceed.Wpf.Toolkit
       return defaultButton;
     }
 
-    /// <summary>
-    /// Gets a message box button.
-    /// </summary>
-    /// <param name="name">The name of the button to get.</param>
-    /// <returns>The button</returns>
     private Button GetMessageBoxButton( string name )
     {
       Button button = GetTemplateChild( name ) as Button;
@@ -822,15 +696,6 @@ namespace Xceed.Wpf.Toolkit
       CommandBindings.Add( new CommandBinding( ApplicationCommands.Copy, new ExecutedRoutedEventHandler( ExecuteCopy ) ) );
     }
 
-    /// <summary>
-    /// Shows the MessageBox.
-    /// </summary>
-    /// <param name="messageText">The message text.</param>
-    /// <param name="caption">The caption.</param>
-    /// <param name="button">The button.</param>
-    /// <param name="icon">The icon.</param>
-    /// <param name="defaultResult">The default result.</param>
-    /// <returns></returns>
     private static MessageBoxResult ShowCore( Window owner, IntPtr ownerHandle, string messageText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultResult, Style messageBoxStyle )
     {
       if( System.Windows.Interop.BrowserInteropHelper.IsBrowserHosted )
@@ -858,10 +723,6 @@ namespace Xceed.Wpf.Toolkit
 
     private delegate Window ComputeOwnerWindowCoreDelegate();
 
-    /// <summary>
-    /// Resolves the owner Window of the MessageBox.
-    /// </summary>
-    /// <returns>the owner Window</returns>
     private static Window ComputeOwnerWindow()
     {
       Window result = null;
@@ -904,10 +765,6 @@ namespace Xceed.Wpf.Toolkit
       return owner;
     }
 
-    /// <summary>
-    /// Sets the message image source.
-    /// </summary>
-    /// <param name="image">The image to show.</param>
     private void SetImageSource( MessageBoxImage image )
     {
       String iconName = String.Empty;
@@ -941,14 +798,18 @@ namespace Xceed.Wpf.Toolkit
           }
       }
 
+      string platformSuffix = String.Empty;
+
+#if NETCORE
+      platformSuffix = ".NETCore";
+#elif NET5
+      platformSuffix = ".NET5";
+#endif // NETCORE
+
       // Use this syntax for other themes to get the icons
-      this.ImageSource = new BitmapImage( new Uri( String.Format( "/Xceed.Wpf.Toolkit;component/MessageBox/Icons/{0}", iconName ), UriKind.RelativeOrAbsolute ) );
+      this.ImageSource = new BitmapImage( new Uri( String.Format( "/Xceed.Wpf.Toolkit{0};component/MessageBox/Icons/{1}", platformSuffix, iconName ), UriKind.RelativeOrAbsolute ) );
     }
 
-    /// <summary>
-    /// Creates the container which will host the MessageBox control.
-    /// </summary>
-    /// <returns></returns>
     private Window CreateContainer()
     {
       var newWindow = new Window();
@@ -984,10 +845,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
-    /// <summary>
-    /// Processes the move of a drag operation on the header.
-    /// </summary>
-    /// <param name="e">The <see cref="System.Windows.Controls.Primitives.DragDeltaEventArgs"/> instance containing the event data.</param>
     protected virtual void OnHeaderDragDelta( DragDeltaEventArgs e )
     {
       if( !this.IsCurrentWindow( e.OriginalSource ) )
@@ -1029,10 +886,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Processes the double-click on the header.
-    /// </summary>
-    /// <param name="e">The <see cref="System.Windows.Input.Primitives.MouseButtonEventArgs"/> instance containing the event data.</param>
     protected virtual void OnHeaderIconDoubleClicked( MouseButtonEventArgs e )
     {
       if( !this.IsCurrentWindow( e.OriginalSource ) )
@@ -1051,10 +904,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Processes the close button click.
-    /// </summary>
-    /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
     protected virtual void OnCloseButtonClicked( RoutedEventArgs e )
     {
       if( !this.IsCurrentWindow( e.OriginalSource ) )
@@ -1075,11 +924,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Sets the MessageBoxResult according to the button pressed and then closes the MessageBox.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
     private void Button_Click( object sender, RoutedEventArgs e )
     {
       Button button = e.OriginalSource as Button;
@@ -1110,11 +954,6 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
     }
 
-    /// <summary>
-    /// Callack to the Container.Closed event
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     private void OnContainerClosed( object sender, EventArgs e )
     {
       this.Container.Closed -= this.OnContainerClosed;
@@ -1151,9 +990,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
-    /// <summary>
-    /// Occurs when the MessageBox is closed.
-    /// </summary>
     public event EventHandler Closed;
     protected virtual void OnClosed( EventArgs e )
     {

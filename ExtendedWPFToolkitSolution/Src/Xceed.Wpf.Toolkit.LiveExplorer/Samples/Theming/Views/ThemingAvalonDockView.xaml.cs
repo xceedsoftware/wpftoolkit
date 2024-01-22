@@ -1,4 +1,21 @@
-﻿/**************************************************************************************
+﻿/*************************************************************************************
+   
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************/
+
+/**************************************************************************************
 
    Toolkit for WPF
 
@@ -18,151 +35,274 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging; // For Open Source Version
-using System.IO; // For Open Source Version
+using System.Collections.Generic;
+using Xceed.Wpf.AvalonDock.Themes;
+using Xceed.Wpf.Toolkit.LiveExplorer.Core;
+using Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Helpers;
+using System.Text;
+using System.Windows.Media.Imaging;
+using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views
 {
-  /// <summary>
-  /// Interaction logic for ThemingAvalonDockView.xaml
-  /// </summary>
   public partial class ThemingAvalonDockView : DemoView
   {
 
-
-
-    #region constructors
+    #region Constructors
 
     public ThemingAvalonDockView()
     {
-      this.Initialized += new EventHandler( AvalonDockControlsThemes_Initialized );
+      this.InitializeAvailableThemes();
+      this.DataContext = this;
+      this.Initialized += new EventHandler( OnInitialized );
       InitializeComponent();
+    }
+
+    #endregion Constructors
+
+    #region Static Properties
+
+    private static string ToolkitAssembly
+    {
+      get
+      {
+        var toolkitAssembly = "/Xceed.Wpf.Toolkit";
+#if NET5
+      toolkitAssembly += ".NET5";
+#elif NETCORE
+      toolkitAssembly += ".NETCore";
+#endif
+        return toolkitAssembly;
+      }
+    }
+
+    #endregion Static Properties
+
+    #region AvailableThemes Property
+
+    internal List<ThemeChoiceViewModel> AvailableThemes
+    {
+      get { return ( List<ThemeChoiceViewModel> )GetValue( AvailableThemesProperty ); }
+      set { SetValue( AvailableThemesProperty, value ); }
+    }
+
+    internal static readonly DependencyProperty AvailableThemesProperty =
+        DependencyProperty.Register(
+          "AvailableThemes",
+          typeof( List<ThemeChoiceViewModel> ),
+          typeof( ThemingAvalonDockView ),
+          new PropertyMetadata( null ) );
+
+    #endregion
+
+    #region SelectedTheme Property
+
+    internal ThemeChoiceViewModel SelectedTheme
+    {
+      get { return ( ThemeChoiceViewModel )GetValue( SelectedThemeProperty ); }
+      set { SetValue( SelectedThemeProperty, value ); }
+    }
+
+    internal static readonly DependencyProperty SelectedThemeProperty =
+        DependencyProperty.Register(
+          "SelectedTheme",
+          typeof( ThemeChoiceViewModel ),
+          typeof( ThemingAvalonDockView ),
+          new PropertyMetadata( null, OnSelectedThemePropertyChanged ) );
+
+    private static void OnSelectedThemePropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      var self = ( ThemingAvalonDockView )d;
+
+      var oldTheme = e.OldValue as ThemeChoiceViewModel;
+      if( oldTheme != null )
+      {
+        oldTheme.IsSelected = false;
+      }
+
+      self._previewImage.Source = null;
+      self._dockingManager.Visibility = Visibility.Collapsed;
+
+      var newTheme = e.NewValue as ThemeChoiceViewModel;
+      if( newTheme != null )
+      {
+        newTheme.IsSelected = true;
+        ThemingSharedProperties.NotifyThemeChoiceSelected( newTheme );
+      }
+
     }
 
     #endregion
 
-    #region EventHandlers
+    #region SelectedDockingTheme Property
 
-    private void DefaultComboBoxItem_Selected( object sender, RoutedEventArgs e )
+    internal Theme SelectedDockingTheme
     {
-      AvalonDockComboBoxItem comboBoxItem = sender as AvalonDockComboBoxItem;
-
-      if( comboBoxItem != null )
-      {
-        this.SetOpenSourceImage( comboBoxItem );
-      }
+      get { return ( Theme )GetValue( SelectedDockingThemeProperty ); }
+      set { SetValue( SelectedDockingThemeProperty, value ); }
     }
 
-    private void AvalonDockControlsThemes_Initialized( object sender, EventArgs e )
+    internal static readonly DependencyProperty SelectedDockingThemeProperty =
+        DependencyProperty.Register(
+          "SelectedDockingTheme",
+          typeof( Theme ),
+          typeof( ThemingAvalonDockView ),
+          new PropertyMetadata( null ) );
+
+    #endregion
+
+    #region Methods (Private)
+
+    private void OnInitialized( object sender, EventArgs e )
+    {
+      this.SelectedTheme = ThemingSharedProperties.GetLastThemeChoiceOrDefault( this.AvailableThemes );
+    }
+
+    private void InitializeAvailableThemes()
+    {
+      var themes = new List<ThemeChoiceViewModel> {
+        new ThemeChoiceViewModel { DisplayName = "Generic",
+                          BaseName = ThemeBaseNames.Generic,
+                          ActionOnSelected = OnGenericThemeSelected },
+        new ThemeChoiceViewModel { DisplayName = "Aero",
+                          BaseName = ThemeBaseNames.Aero,
+                          ActionOnSelected = OnAeroThemeSelected},
+        new ThemeChoiceViewModel { DisplayName = "VS2010",
+                          BaseName = ThemeBaseNames.VS2010,
+                          ActionOnSelected = OnVS2010ThemeSelected},
+        new ThemeChoiceViewModel { DisplayName = "Metro",
+                          BaseName = ThemeBaseNames.MetroBasic,
+                          ActionOnSelected = OnMetroBasicThemeSelected},
+        new ThemeChoiceViewModel { DisplayName = "Material Design",
+                          BaseName = ThemeBaseNames.Material,
+                          ActionOnSelected = OnMaterialThemeSelected,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Office 2007 Blue",
+                          BaseName = ThemeBaseNames.Office2007,
+                          ActionOnSelected = OnOffice2007BlueThemeSelected,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Office 2007 Black",
+                          BaseName = ThemeBaseNames.Office2007,
+                          ActionOnSelected = OnOffice2007BlackThemeSelected,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Office 2007 Silver",
+                          BaseName = ThemeBaseNames.Office2007,
+                          ActionOnSelected = OnOffice2007SilverThemeSelected,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Windows 10",
+                          BaseName = ThemeBaseNames.Windows10,
+                          ActionOnSelected = OnWindows10ThemeSelected,
+                          IsPlus = true }
+        ,new ThemeChoiceViewModel { DisplayName = "Metro Dark",
+                          BaseName = ThemeBaseNames.MetroAccent,
+                          ActionOnSelected = OnMetroAccentThemeSelected,
+                          IsDark = true,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Metro Light",
+                          BaseName = ThemeBaseNames.MetroAccent,
+                          ActionOnSelected = OnMetroAccentThemeSelected,
+                          IsPlus = true },
+        new ThemeChoiceViewModel { DisplayName = "Fluent Design Dark",
+                          BaseName = ThemeBaseNames.Fluent,
+                          ActionOnSelected = OnFluentThemeSelected,
+                          IsDark = true,
+                          IsPlus = true},
+        new ThemeChoiceViewModel { DisplayName = "Fluent Design Light",
+                          BaseName = ThemeBaseNames.Fluent,
+                          ActionOnSelected = OnFluentThemeSelected,
+                          IsPlus = true }
+      };
+
+      this.AvailableThemes = themes;
+    }
+
+    private ImageSource GetPreviewImage( string name )
+    {
+      var sb = new StringBuilder();
+      sb.Append( "..\\OpenSourceImages\\" );
+      sb.Append( name );
+      sb.Append( ".png" );
+      return new BitmapImage( new Uri( sb.ToString(), UriKind.RelativeOrAbsolute ) );
+    }
+
+    private void OnGenericThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _dockingManager.Visibility = Visibility.Visible;
+      SampleBorder.Resources.MergedDictionaries.Clear();
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( ToolkitAssembly + ";component\\Themes/Aero2.NormalColor.xaml", UriKind.RelativeOrAbsolute ) } );
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( $"pack://application:,,,/PresentationFramework.Aero2;V4.0.0.0;component/Themes/Aero2.NormalColor.xaml" ) } );
+      SelectedDockingTheme = new GenericTheme();
+    }
+
+    private void OnMetroBasicThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _dockingManager.Visibility = Visibility.Visible;
+      SampleBorder.Resources.MergedDictionaries.Clear();
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( ToolkitAssembly + ";component\\Themes/Aero2.NormalColor.xaml", UriKind.RelativeOrAbsolute ) } );
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( $"pack://application:,,,/PresentationFramework.Aero2;V4.0.0.0;component/Themes/Aero2.NormalColor.xaml" ) } );
+      SelectedDockingTheme = new MetroTheme();
+    }
+
+    private void OnVS2010ThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _dockingManager.Visibility = Visibility.Visible;
+      SampleBorder.Resources.MergedDictionaries.Clear();
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( ToolkitAssembly + ";component\\Themes/Aero2.NormalColor.xaml", UriKind.RelativeOrAbsolute ) } );
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( $"pack://application:,,,/PresentationFramework.Aero2;V4.0.0.0;component/Themes/Aero2.NormalColor.xaml" ) } );
+      SelectedDockingTheme = new VS2010Theme();
+    }
+
+    private void OnAeroThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _dockingManager.Visibility = Visibility.Visible;
+      SampleBorder.Resources.MergedDictionaries.Clear();
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( ToolkitAssembly + ";component\\Themes/Aero2.NormalColor.xaml", UriKind.RelativeOrAbsolute ) } );
+      SampleBorder.Resources.MergedDictionaries.Add( new ResourceDictionary() { Source = new Uri( $"pack://application:,,,/PresentationFramework.Aero2;V4.0.0.0;component/Themes/Aero2.NormalColor.xaml" ) } );
+      SelectedDockingTheme = new AeroTheme();
+    }
+
+    private void OnWindows10ThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( "AvalonDock_Windows10" );
+    }
+
+    private void OnOffice2007SilverThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( "AvalonDock_Office2007Silver" );
+    }
+
+    private void OnOffice2007BlackThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( "AvalonDock_Office2007Black" );
+    }
+
+    private void OnOffice2007BlueThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( "AvalonDock_Office2007Blue" );
+    }
+
+    private void OnMetroAccentThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( choice.IsDark ? "AvalonDock_MetroDark" : "AvalonDock_MetroLight" );
+    }
+
+    private void OnFluentThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( choice.IsDark ? "AvalonDock_FluentDark" : "AvalonDock_FluentLight" );
+    }
+
+    private void OnMaterialThemeSelected( ThemeChoiceViewModel choice )
+    {
+      _previewImage.Source = GetPreviewImage( "AvalonDock_Material" );
+    }
+
+    private void WPFControlsThemes_Initialized( object sender, EventArgs e )
     {
       _themeCombo.SelectedIndex = 0;
     }
 
-    private void MetroComboBoxItem_Selected( object sender, RoutedEventArgs e )
-    {
-      AvalonDockComboBoxItem comboBoxItem = sender as AvalonDockComboBoxItem;
-      if( comboBoxItem != null )
-      {
-        this.SetOpenSourceImage( comboBoxItem );
-      }
-    }
+    #endregion Methods (Private)
 
-
-
-
-
-
-
-
-
-    #endregion
-
-    #region private Methods
-
-
-     private void SetOpenSourceImage( AvalonDockComboBoxItem comboBoxItem )
-    {
-      if( comboBoxItem != null )
-      {
-        bool isPlusPanel = ( comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Black 
-                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Blue
-                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Office2007Silver
-                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.Windows10
-                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroDark
-                          || comboBoxItem.ThemeEnum == AvalonDockThemesEnum.MetroLight );
-
-        if( _openSourceScreenShot != null )
-          _openSourceScreenShot.Visibility = isPlusPanel ? Visibility.Visible : Visibility.Collapsed;
-        if( _openSourceTextHyperlink != null )
-          _openSourceTextHyperlink.Visibility = isPlusPanel ? Visibility.Visible : Visibility.Collapsed;
-        if( _dockingManager != null )
-          _dockingManager.Visibility = isPlusPanel ? Visibility.Collapsed : Visibility.Visible;
-
-        if( isPlusPanel )
-        {
-          BitmapImage bitmapImage = new BitmapImage();
-
-          bitmapImage.BeginInit();
-          switch( comboBoxItem.ThemeEnum )
-          {
-            case AvalonDockThemesEnum.Office2007Black:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockOffice2007Black.png", UriKind.Relative );
-              break;
-            case AvalonDockThemesEnum.Office2007Blue:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockOffice2007Blue.png", UriKind.Relative );
-              break;
-            case AvalonDockThemesEnum.Office2007Silver:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockOffice2007Silver.png", UriKind.Relative );
-              break;
-            case AvalonDockThemesEnum.Windows10:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockWindows10.png", UriKind.Relative );
-              break;
-            case AvalonDockThemesEnum.MetroDark:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockMetroDark.png", UriKind.Relative );
-              break;
-            case AvalonDockThemesEnum.MetroLight:
-              bitmapImage.UriSource = new Uri( "..\\OpenSourceImages\\AvalonDockMetroLight.png", UriKind.Relative );
-              break;
-            default:
-              throw new InvalidDataException( "LayoutcomboBox.SelectedIndex is not valid." );
-          }
-          bitmapImage.EndInit();
-
-          if( _openSourceScreenShot != null )
-            _openSourceScreenShot.Source = bitmapImage;
-        }
-      }
-    }
-
-
-
-
-
-
-    #endregion
-  }
-
-
-  public enum AvalonDockThemesEnum
-  {
-    Generic,
-    Aero,
-    VS2010,
-    Metro,
-    Office2007Black,
-    Office2007Blue,
-    Office2007Silver,
-    Windows10,
-    MetroDark,
-    MetroLight
-  }
-
-  public class AvalonDockComboBoxItem : ComboBoxItem
-  {
-    public AvalonDockThemesEnum ThemeEnum
-    {
-      get;
-      set;
-    }
   }
 }

@@ -23,7 +23,7 @@
    <local:DemoView.Description>
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         The WatermarkTextBox is simply a TextBox that allows you to sepcify an object, usually a String, to represent null or missing text.
+         The WatermarkTextBox is simply a TextBox that allows you to specify an object, usually a String, to represent null or missing text.
       </Paragraph>
    </local:DemoView.Description>
 

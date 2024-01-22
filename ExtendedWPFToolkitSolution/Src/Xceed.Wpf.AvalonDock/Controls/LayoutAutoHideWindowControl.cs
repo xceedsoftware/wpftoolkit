@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -69,16 +69,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region AnchorableStyle
 
-    /// <summary>
-    /// AnchorableStyle Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register( "AnchorableStyle", typeof( Style ), typeof( LayoutAutoHideWindowControl ),
             new FrameworkPropertyMetadata( ( Style )null ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableStyle property. This dependency property 
-    /// indicates the style to apply to the LayoutAnchorableControl hosted in this auto hide window.
-    /// </summary>
     public Style AnchorableStyle
     {
       get
@@ -95,16 +88,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Background
 
-    /// <summary>
-    /// Background Dependency Property
-    /// </summary>
     public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register( "Background", typeof( Brush ), typeof( LayoutAutoHideWindowControl ),
             new FrameworkPropertyMetadata( ( Brush )null ) );
 
-    /// <summary>
-    /// Gets or sets the Background property.  This dependency property 
-    /// indicates background of the autohide childwindow.
-    /// </summary>
     public Brush Background
     {
       get

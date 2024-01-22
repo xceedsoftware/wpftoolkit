@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -82,16 +82,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsContentImmutable
 
-    /// <summary>
-    /// IsContentImmutable Dependency Property
-    /// </summary>
     public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register( "IsContentImmutable", typeof( bool ), typeof( LayoutFloatingWindowControl ),
               new FrameworkPropertyMetadata( ( bool )false ) );
 
-    /// <summary>
-    /// Gets/sets the IsContentImmutable property.  This dependency property 
-    /// indicates if the content can be modified.
-    /// </summary>
     public bool IsContentImmutable
     {
       get
@@ -108,18 +101,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsDragging
 
-    /// <summary>
-    /// IsDragging Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey IsDraggingPropertyKey = DependencyProperty.RegisterReadOnly( "IsDragging", typeof( bool ), typeof( LayoutFloatingWindowControl ),
             new FrameworkPropertyMetadata( ( bool )false, new PropertyChangedCallback( OnIsDraggingChanged ) ) );
 
     public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the IsDragging property.  This dependency property 
-    /// indicates that this floating window is being dragged.
-    /// </summary>
     public bool IsDragging
     {
       get
@@ -128,27 +114,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsDragging property.  
-    /// This dependency property indicates that this floating window is being dragged.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetIsDragging( bool value )
     {
       SetValue( IsDraggingPropertyKey, value );
     }
 
-    /// <summary>
-    /// Handles changes to the IsDragging property.
-    /// </summary>
     private static void OnIsDraggingChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( LayoutFloatingWindowControl )d ).OnIsDraggingChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the IsDragging property.
-    /// </summary>
     protected virtual void OnIsDraggingChanged( DependencyPropertyChangedEventArgs e )
     {
       if( ( bool )e.NewValue )
@@ -187,16 +162,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsMaximized
 
-    /// <summary>
-    /// IsMaximized Dependency Property
-    /// </summary>
     public static readonly DependencyProperty IsMaximizedProperty = DependencyProperty.Register( "IsMaximized", typeof( bool ), typeof( LayoutFloatingWindowControl ),
               new FrameworkPropertyMetadata( ( bool )false ) );
 
-    /// <summary>
-    /// Gets/sets the IsMaximized property.  This dependency property 
-    /// indicates if the window is maximized.
-    /// </summary>
     public bool IsMaximized
     {
       get
@@ -210,11 +178,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsMaximized property.  
-    /// This dependency property indicates if the window is maximized.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
 
     protected override void OnStateChanged( EventArgs e )
     {
@@ -245,19 +208,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region ResizeBorderThickness
 
-    /// <summary>
-    /// ResizeBorderThickness Dependency Property
-    /// </summary>
     public static readonly DependencyProperty ResizeBorderThicknessProperty = DependencyProperty.Register(
         "ResizeBorderThickness",
         typeof( Thickness ),
         typeof( LayoutFloatingWindowControl ),
         new FrameworkPropertyMetadata( new Thickness( 10 ) ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutDocumentFloatingWindowControl/LayoutAnchorableFloatingWindowControl resize icon Border Thickness property.  
-    /// This dependency property makes it possible to increase the resize icon border of floating windows.
-    /// </summary>
     public Thickness ResizeBorderThickness
     {
       get

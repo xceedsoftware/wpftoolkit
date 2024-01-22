@@ -13,7 +13,7 @@
   <local:DemoView.Description>
     <Paragraph FontSize="14"
                FontFamily="Segoe">
-      By default the propertyGrid provides a context menu for all the properties for a given object. You can override this behavior by setting the ShowAdvancedOptions property to True, and then use the AdvancedOptionsMenu property to provide a custom context menu for the properties.
+      By default the PropertyGrid provides a context menu for all the properties for a given object. You can override this behavior by setting the ShowAdvancedOptions property to True, and then use the AdvancedOptionsMenu property to provide a custom context menu for the properties.
     </Paragraph>
   </local:DemoView.Description>
   <local:DemoView.Resources>

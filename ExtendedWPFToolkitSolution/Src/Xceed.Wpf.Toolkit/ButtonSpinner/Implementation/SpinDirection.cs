@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -17,20 +17,10 @@
 
 namespace Xceed.Wpf.Toolkit
 {
-  /// <summary>
-  /// Represents spin directions that could be initiated by the end-user.
-  /// </summary>
-  /// <QualityBand>Preview</QualityBand>
   public enum SpinDirection
   {
-    /// <summary>
-    /// Represents a spin initiated by the end-user in order to Increase a value.
-    /// </summary>
     Increase = 0,
 
-    /// <summary>
-    /// Represents a spin initiated by the end-user in order to Decrease a value.
-    /// </summary>
     Decrease = 1
   }
 }

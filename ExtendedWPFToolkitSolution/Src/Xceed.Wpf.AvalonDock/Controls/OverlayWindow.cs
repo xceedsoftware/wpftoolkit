@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -203,14 +203,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Private Methods
 
-    /// <summary>
-    /// This method controls the DropTargetInto button of the overlay window.
-    /// It checks that only 1 of the defined ContentLayouts can be present on the LayoutDocumentPane or LayoutAnchorablePane.
-    /// The combination between the ContentLayout Title and the ContentId is the search key, and has to be unique.
-    /// If a floating window is dropped on a LayoutDocumentPane or LayoutAnchorablePane, it checks if one of the containing LayoutContents
-    /// is already present on the LayoutDocumentPane or LayoutAnchorablePane. If so, then it will disable the DropTargetInto button.
-    /// </summary>
-    /// <param name="positionableElement">The given LayoutDocumentPane or LayoutAnchorablePane</param>
     private void SetDropTargetIntoVisibility( ILayoutPositionableElement positionableElement )
     {
       if( positionableElement is LayoutAnchorablePane )
@@ -255,11 +247,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Find any LayoutDocument or LayoutAnchorable from a given source (e.g. LayoutDocumentPane, LayoutAnchorableFloatingWindow, etc.)
-    /// </summary>
-    /// <param name="source">The given source to search in</param>
-    /// <returns>A list of all LayoutContent's</returns>
     private List<LayoutContent> GetAllLayoutContents( object source )
     {
       var result = new List<LayoutContent>();

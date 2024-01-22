@@ -1,4 +1,21 @@
-﻿<!--*************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--*************************************************************************************
 
    Toolkit for WPF
 
@@ -25,7 +42,7 @@
                 Title="Chart Legend">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>The chart control contains a collection of areas which each contain a collection of series. A single legend will combine all the series from all the areas in one place. Here, 2 areas are used to display 2 series.</Run>
+            <Run>The chart control contains a collection of areas that each contain a collection of series. A single legend will combine all the series from all the areas in one place. Here, 2 areas are used to display 2 series.</Run>
             <LineBreak />
             <LineBreak />
             <Run>A legend can be moved around, resized, and docked. Please note that a legend can be resized only when its Dock property is set to Float and if the AllowResize property is set to true.</Run>

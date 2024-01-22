@@ -32,7 +32,7 @@
   </local:DemoView.Description>
   <local:DemoView.Resources>
     <xctk:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter" />
-
+    
     <ObjectDataProvider x:Key="DropDownPlacementMode"
                         MethodName="GetValues"
                         ObjectType="{x:Type sys:Enum}">
@@ -85,7 +85,7 @@
                     Width="110"
                     VerticalAlignment="Center"
                     Margin="5" />
-
+          
           <!-- 2nd Column-->
           <TextBlock Text="DropDownContentBackground:"
                      VerticalAlignment="Center" 

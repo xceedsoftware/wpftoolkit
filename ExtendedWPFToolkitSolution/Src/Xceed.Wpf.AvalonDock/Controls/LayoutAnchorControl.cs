@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -67,18 +67,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Side
 
-    /// <summary>
-    /// Side Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey SidePropertyKey = DependencyProperty.RegisterReadOnly( "Side", typeof( AnchorSide ), typeof( LayoutAnchorControl ),
             new FrameworkPropertyMetadata( ( AnchorSide )AnchorSide.Left ) );
 
     public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the Side property.  This dependency property 
-    /// indicates the anchor side of the control.
-    /// </summary>
     public AnchorSide Side
     {
       get
@@ -87,11 +80,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the Side property.  
-    /// This dependency property indicates the anchor side of the control.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetSide( AnchorSide value )
     {
       SetValue( SidePropertyKey, value );

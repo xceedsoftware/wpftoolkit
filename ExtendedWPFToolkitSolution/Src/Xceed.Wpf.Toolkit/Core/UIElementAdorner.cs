@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -22,12 +22,6 @@ using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.Core
 {
-  /// <summary>
-  /// An adorner that can display one and only one UIElement.  
-  /// That element can be a panel, which contains multiple other elements.
-  /// The element is added to the adorner's visual and logical trees, enabling it to 
-  /// particpate in dependency property value inheritance, amongst other things.
-  /// </summary>
   internal class UIElementAdorner<TElement> : Adorner where TElement : UIElement
   {
     #region Fields
@@ -40,10 +34,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region Constructor
 
-    /// <summary>
-    /// Constructor. 
-    /// </summary>
-    /// <param name="adornedElement">The element to which the adorner will be bound.</param>
     public UIElementAdorner( UIElement adornedElement )
       : base( adornedElement )
     {
@@ -55,9 +45,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region Child
 
-    /// <summary>
-    /// Gets/sets the child element hosted in the adorner.
-    /// </summary>
     public TElement Child
     {
       get
@@ -89,11 +76,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region GetDesiredTransform
 
-    /// <summary>
-    /// Override.
-    /// </summary>
-    /// <param name="transform"></param>
-    /// <returns></returns>
     public override GeneralTransform GetDesiredTransform( GeneralTransform transform )
     {
       GeneralTransformGroup result = new GeneralTransformGroup();
@@ -106,9 +88,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region OffsetLeft
 
-    /// <summary>
-    /// Gets/sets the horizontal offset of the adorner.
-    /// </summary>
     public double OffsetLeft
     {
       get
@@ -126,9 +105,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region SetOffsets
 
-    /// <summary>
-    /// Updates the location of the adorner in one atomic operation.
-    /// </summary>
     public void SetOffsets( double left, double top )
     {
       _offsetLeft = left;
@@ -140,9 +116,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region OffsetTop
 
-    /// <summary>
-    /// Gets/sets the vertical offset of the adorner.
-    /// </summary>
     public double OffsetTop
     {
       get
@@ -162,11 +135,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
     #region Protected Overrides
 
-    /// <summary>
-    /// Override.
-    /// </summary>
-    /// <param name="constraint"></param>
-    /// <returns></returns>
     protected override Size MeasureOverride( Size constraint )
     {
       if( _child == null )
@@ -176,11 +144,6 @@ namespace Xceed.Wpf.Toolkit.Core
       return _child.DesiredSize;
     }
 
-    /// <summary>
-    /// Override.
-    /// </summary>
-    /// <param name="finalSize"></param>
-    /// <returns></returns>
     protected override Size ArrangeOverride( Size finalSize )
     {
       if( _child == null )
@@ -190,9 +153,6 @@ namespace Xceed.Wpf.Toolkit.Core
       return finalSize;
     }
 
-    /// <summary>
-    /// Override.
-    /// </summary>
     protected override IEnumerator LogicalChildren
     {
       get
@@ -204,19 +164,11 @@ namespace Xceed.Wpf.Toolkit.Core
       }
     }
 
-    /// <summary>
-    /// Override.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     protected override Visual GetVisualChild( int index )
     {
       return _child;
     }
 
-    /// <summary>
-    /// Override.
-    /// </summary>
     protected override int VisualChildrenCount
     {
       get

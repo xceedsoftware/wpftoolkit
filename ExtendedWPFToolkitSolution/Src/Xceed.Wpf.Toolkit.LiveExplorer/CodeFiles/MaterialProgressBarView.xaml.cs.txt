@@ -30,19 +30,46 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.MaterialControls.Views
     public MaterialProgressBarView()
     {
       InitializeComponent();
+#if !OPEN_SOURCE
+      this.Loaded += this.MaterialProgressBarView_Loaded;
+#endif
     }
 
     #endregion
 
+#if !OPEN_SOURCE
 
+    #region Private Methods
 
+    private void AnimateDeterminateProgressBar()
+    {
+      var storyboard = new Storyboard();
 
+      // Animate Determinate ProgressBar
+      DoubleAnimation valueAnim = new DoubleAnimation( materialDeterminateProgressBar.Minimum, materialDeterminateProgressBar.Maximum, System.TimeSpan.FromMilliseconds( 4000 ) );
+      Storyboard.SetTarget( valueAnim, materialDeterminateProgressBar );
+      Storyboard.SetTargetProperty( valueAnim, new PropertyPath( MaterialProgressBarCircular.ValueProperty ) );
+      storyboard.Children.Add( valueAnim );
 
+      storyboard.Begin( this );
+    }
 
+    #endregion
 
+    #region Event Handlers
 
+    private void MaterialProgressBarView_Loaded( object sender, RoutedEventArgs e )
+    {
+      this.AnimateDeterminateProgressBar();
+    }
 
+    private void ResetButton_Click( object sender, RoutedEventArgs e )
+    {
+      this.AnimateDeterminateProgressBar();
+    }
 
+    #endregion
 
+#endif
   }
 }

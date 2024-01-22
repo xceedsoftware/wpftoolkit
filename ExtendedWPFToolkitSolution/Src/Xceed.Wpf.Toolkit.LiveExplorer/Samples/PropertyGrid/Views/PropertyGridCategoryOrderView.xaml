@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -24,12 +41,12 @@
                  Title="PropertyGrid Category Ordering">
      <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>When the PropertyGrid is Categorized, the CategoryOrder attribute allows you to specify the order in which the categoriess should be displayed.</Run>
+            <Run>When the PropertyGrid is Categorized, the CategoryOrder attribute allows you to specify the order in which the categories should be displayed.</Run>
             <LineBreak />
             <LineBreak />
             <Run>The PropertyGrid on the left displays non-ordered categories, where the important information is at the bottom of the PropertyGrid.</Run>
             <LineBreak />
-            <Run>The PropertyGrid on the right uses the CategoryOrder attribute to order the categories in the desired order.</Run>
+            <Run>The PropertyGrid on the right uses the CategoryOrder attribute to apply a desired order.</Run>
         </Paragraph>
     </local:DemoView.Description>
 

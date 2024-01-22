@@ -24,15 +24,15 @@
                  Title="PropertyGrid Category Ordering">
      <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>When the PropertyGrid is Categorized, the CategoryOrder attribute allows you to specify the order in which the categoriess should be displayed.</Run>
+            <Run>When the PropertyGrid is Categorized, the CategoryOrder attribute allows you to specify the order in which the categories should be displayed.</Run>
             <LineBreak />
             <LineBreak />
             <Run>The PropertyGrid on the left displays non-ordered categories, where the important information is at the bottom of the PropertyGrid.</Run>
             <LineBreak />
-            <Run>The PropertyGrid on the right uses the CategoryOrder attribute to order the categories in the desired order.</Run>
+            <Run>The PropertyGrid on the right uses the CategoryOrder attribute to apply a desired order.</Run>
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>
       <Grid.ColumnDefinitions>
          <ColumnDefinition Width="*" />
@@ -44,7 +44,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
          </Grid.RowDefinitions>
-
+         
          <TextBlock Text="Non-Ordered Categories:" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" Margin="10"/>
          <xctk:PropertyGrid x:Name="_propertyGrid1" Grid.Row="1" Width="290" MaxHeight="350" VerticalAlignment="Top" Margin="10"/>
       </Grid>
@@ -54,7 +54,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
          </Grid.RowDefinitions>
-
+         
          <TextBlock Grid.Column="1" Text="Ordered Categories:" FontSize="16" FontWeight="Bold" Margin="10"/>
          <xctk:PropertyGrid x:Name="_propertyGrid2" Grid.Row="1" Grid.Column="1" Width="290" MaxHeight="350" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10"/>
       </Grid>

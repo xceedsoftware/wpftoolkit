@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -205,9 +205,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region IsAutoHidden
 
-    /// <summary>
-    /// Get a value indicating if the anchorable is anchored to a border in an autohide status
-    /// </summary>
     public bool IsAutoHidden
     {
       get
@@ -405,10 +402,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Public Methods
 
-    /// <summary>
-    /// Hide this contents
-    /// </summary>
-    /// <remarks>Add this content to <see cref="ILayoutRoot.Hidden"/> collection of parent root.</remarks>
     public void Hide( bool cancelable = true )
     {
       if( !IsVisible )
@@ -451,10 +444,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
     }
 
 
-    /// <summary>
-    /// Show the content
-    /// </summary>
-    /// <remarks>Try to show the content where it was previously hidden.</remarks>
     public void Show()
     {
       if( IsVisible )
@@ -507,11 +496,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
     }
 
 
-    /// <summary>
-    /// Add the anchorable to a DockingManager layout
-    /// </summary>
-    /// <param name="manager"></param>
-    /// <param name="strategy"></param>
     public void AddToLayout( DockingManager manager, AnchorableShowStrategy strategy )
     {
       if( IsVisible ||

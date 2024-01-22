@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -68,16 +68,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region ModalBackgroundBrush
 
-    /// <summary>
-    /// Identifies the ModalBackgroundBrush dependency property.
-    /// </summary>
     // Initialized in the static constructor.
     public static readonly DependencyProperty ModalBackgroundBrushProperty;
 
-    /// <summary>
-    /// When using a modal window in the WindowContainer, a ModalBackgroundBrush can be set
-    /// for the WindowContainer.
-    /// </summary>
     public Brush ModalBackgroundBrush
     {
       get
@@ -108,9 +101,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #region Base Class Override
 
-    /// <summary>
-    /// Measure the size of the WindowContainer based on its children.
-    /// </summary>
     protected override Size MeasureOverride( Size constraint )
     {
       Size size = base.MeasureOverride( constraint );
@@ -129,9 +119,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       return size;
     }
 
-    /// <summary>
-    /// Register and unregister to children events.
-    /// </summary>
     protected override void OnVisualChildrenChanged( DependencyObject visualAdded, DependencyObject visualRemoved )
     {
       base.OnVisualChildrenChanged( visualAdded, visualRemoved );

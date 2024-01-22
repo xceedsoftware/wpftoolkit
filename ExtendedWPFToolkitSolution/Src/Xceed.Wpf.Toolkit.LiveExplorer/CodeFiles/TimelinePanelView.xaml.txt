@@ -24,10 +24,10 @@
                  Title="TimelinePanel">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-           TimelinePanel is a WPF panel at arranges it's children along a timeline.  Items are placed along the timeline based on the Date attached property, which is set on each item.
+           TimelinePanel is a WPF panel that arranges it's children along a timeline.  Items are placed along the timeline based on the Date attached property, which is set on each item.
         </Paragraph>
     </local:DemoView.Description>
-
+    
    <local:DemoView.Resources>
       <ObjectDataProvider x:Key="Orientations" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">

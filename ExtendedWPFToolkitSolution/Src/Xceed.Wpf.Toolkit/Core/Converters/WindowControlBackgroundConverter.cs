@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -24,15 +24,6 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
 {
   public class WindowControlBackgroundConverter : IMultiValueConverter
   {
-    /// <summary>
-    /// Used in the WindowContainer Template to calculate the resulting background brush
-    /// from the WindowBackground (values[0]) and WindowOpacity (values[1]) propreties.
-    /// </summary>
-    /// <param name="values"></param>
-    /// <param name="targetType"></param>
-    /// <param name="parameter"></param>
-    /// <param name="culture"></param>
-    /// <returns></returns>
     public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
     {
       Brush backgroundColor = ( Brush )values[ 0 ];

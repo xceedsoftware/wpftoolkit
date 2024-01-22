@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -25,10 +42,10 @@
                 Title="Property Element Syntax">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-         This sample demonstrate the usage of Property Element syntax that offers the option to provide property data directly in XAML.
+         This sample demonstrates the usage of Property Element syntax that offers the option to provide property data directly in XAML.
          <LineBreak/>
          <LineBreak/>
-           The sample also demonstrate the usage of CategoryGroupDescription to control the categorization of the elements.
+           The sample also demonstrates the usage of CategoryGroupDescription to control the categorization of the elements.
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>

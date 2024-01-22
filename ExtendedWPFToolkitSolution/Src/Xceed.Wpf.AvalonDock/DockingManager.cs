@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -104,16 +104,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AllowMovingFloatingWindowWithKeyboard
 
-    /// <summary>
-    /// AllowMovingFloatingWindowWithKeyboard Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AllowMovingFloatingWindowWithKeyboardProperty = DependencyProperty.Register( "AllowMovingFloatingWindowWithKeyboard", typeof( bool ), typeof( DockingManager ),
               new FrameworkPropertyMetadata( ( bool )false ) );
 
-    /// <summary>
-    /// Gets/sets the AllowMovingFloatingWindowWithKeyboard property.  This dependency property 
-    /// indicates if the window can be moved with arrows keys.
-    /// </summary>
     public bool AllowMovingFloatingWindowWithKeyboard
     {
       get
@@ -130,16 +123,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region Layout
 
-    /// <summary>
-    /// Layout Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register( "Layout", typeof( LayoutRoot ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnLayoutChanged ), new CoerceValueCallback( CoerceLayoutValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the Layout property.  This dependency property 
-    /// indicates layout tree.
-    /// </summary>
     public LayoutRoot Layout
     {
       get
@@ -152,9 +138,6 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Coerces the <see cref="DockingManager.Layout"/> value.
-    /// </summary>
     private static object CoerceLayoutValue( DependencyObject d, object value )
     {
       if( value == null )
@@ -165,17 +148,11 @@ namespace Xceed.Wpf.AvalonDock
       return value;
     }
 
-    /// <summary>
-    /// Handles changes to the Layout property.
-    /// </summary>
     private static void OnLayoutChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutChanged( e.OldValue as LayoutRoot, e.NewValue as LayoutRoot );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the <see cref="DockingManager.Layout"/> property.
-    /// </summary>
     protected virtual void OnLayoutChanged( LayoutRoot oldLayout, LayoutRoot newLayout )
     {
       if( oldLayout != null )
@@ -249,18 +226,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutUpdateStrategy
 
-    /// <summary>
-    /// LayoutUpdateStrategy Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutUpdateStrategyProperty = DependencyProperty.Register( "LayoutUpdateStrategy", typeof( ILayoutUpdateStrategy ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ILayoutUpdateStrategy )null ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutUpdateStrategy property.  This dependency property 
-    /// indicates the strategy class to call when AvalonDock needs to positionate a LayoutAnchorable inside an existing layout.
-    /// </summary>
-    /// <remarks>Sometimes it's impossible to automatically insert an anchorable in the layout without specifing the target parent pane.
-    /// Set this property to an object that will be asked to insert the anchorable to the desidered position.</remarks>
     public ILayoutUpdateStrategy LayoutUpdateStrategy
     {
       get
@@ -277,16 +245,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorSideTemplate
 
-    /// <summary>
-    /// AnchorSideTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorSideTemplateProperty = DependencyProperty.Register( "AnchorSideTemplate", typeof( ControlTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ControlTemplate )null ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorSideTemplate property.  This dependency property 
-    /// indicates ....
-    /// </summary>
     public ControlTemplate AnchorSideTemplate
     {
       get
@@ -303,16 +264,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorGroupTemplate
 
-    /// <summary>
-    /// AnchorGroupTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorGroupTemplateProperty = DependencyProperty.Register( "AnchorGroupTemplate", typeof( ControlTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ControlTemplate )null ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorGroupTemplate property.  This dependency property 
-    /// indicates the template used to render the AnchorGroup control.
-    /// </summary>
     public ControlTemplate AnchorGroupTemplate
     {
       get
@@ -329,16 +283,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorTemplate
 
-    /// <summary>
-    /// AnchorTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorTemplateProperty = DependencyProperty.Register( "AnchorTemplate", typeof( ControlTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ControlTemplate )null ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorTemplate property.  This dependency property 
-    /// indicates ....
-    /// </summary>
     public ControlTemplate AnchorTemplate
     {
       get
@@ -355,16 +302,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentPaneControlStyle
 
-    /// <summary>
-    /// DocumentPaneControlStyle Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentPaneControlStyleProperty = DependencyProperty.Register( "DocumentPaneControlStyle", typeof( Style ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnDocumentPaneControlStyleChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentPaneControlStyle property.  This dependency property 
-    /// indicates ....
-    /// </summary>
     public Style DocumentPaneControlStyle
     {
       get
@@ -377,17 +317,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentPaneControlStyle property.
-    /// </summary>
     private static void OnDocumentPaneControlStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentPaneControlStyleChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentPaneControlStyle property.
-    /// </summary>
     protected virtual void OnDocumentPaneControlStyleChanged( DependencyPropertyChangedEventArgs e )
     {
     }
@@ -396,16 +330,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorablePaneControlStyle
 
-    /// <summary>
-    /// AnchorablePaneControlStyle Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorablePaneControlStyleProperty = DependencyProperty.Register( "AnchorablePaneControlStyle", typeof( Style ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnAnchorablePaneControlStyleChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorablePaneControlStyle property.  This dependency property 
-    /// indicates the style to apply to AnchorablePaneControl.
-    /// </summary>
     public Style AnchorablePaneControlStyle
     {
       get
@@ -418,17 +345,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorablePaneControlStyle property.
-    /// </summary>
     private static void OnAnchorablePaneControlStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorablePaneControlStyleChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorablePaneControlStyle property.
-    /// </summary>
     protected virtual void OnAnchorablePaneControlStyleChanged( DependencyPropertyChangedEventArgs e )
     {
     }
@@ -437,16 +358,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentHeaderTemplate
 
-    /// <summary>
-    /// DocumentHeaderTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentHeaderTemplateProperty = DependencyProperty.Register( "DocumentHeaderTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnDocumentHeaderTemplateChanged ), new CoerceValueCallback( CoerceDocumentHeaderTemplateValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentHeaderTemplate property.  This dependency property 
-    /// indicates data template to use for document header.
-    /// </summary>
     public DataTemplate DocumentHeaderTemplate
     {
       get
@@ -459,24 +373,15 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentHeaderTemplate property.
-    /// </summary>
     private static void OnDocumentHeaderTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentHeaderTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentHeaderTemplate property.
-    /// </summary>
     protected virtual void OnDocumentHeaderTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
 
-    /// <summary>
-    /// Coerces the DocumentHeaderTemplate value.
-    /// </summary>
     private static object CoerceDocumentHeaderTemplateValue( DependencyObject d, object value )
     {
       if( value != null &&
@@ -489,16 +394,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentHeaderTemplateSelector
 
-    /// <summary>
-    /// DocumentHeaderTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentHeaderTemplateSelectorProperty = DependencyProperty.Register( "DocumentHeaderTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnDocumentHeaderTemplateSelectorChanged ), new CoerceValueCallback( CoerceDocumentHeaderTemplateSelectorValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentHeaderTemplateSelector property.  This dependency property 
-    /// indicates the template selector that is used when selcting the data template for the header.
-    /// </summary>
     public DataTemplateSelector DocumentHeaderTemplateSelector
     {
       get
@@ -511,17 +409,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentHeaderTemplateSelector property.
-    /// </summary>
     private static void OnDocumentHeaderTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentHeaderTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentHeaderTemplateSelector property.
-    /// </summary>
     protected virtual void OnDocumentHeaderTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.NewValue != null &&
@@ -533,9 +425,6 @@ namespace Xceed.Wpf.AvalonDock
 
     }
 
-    /// <summary>
-    /// Coerces the DocumentHeaderTemplateSelector value.
-    /// </summary>
     private static object CoerceDocumentHeaderTemplateSelectorValue( DependencyObject d, object value )
     {
       return value;
@@ -545,16 +434,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentTitleTemplate
 
-    /// <summary>
-    /// DocumentTitleTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentTitleTemplateProperty = DependencyProperty.Register( "DocumentTitleTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnDocumentTitleTemplateChanged ), new CoerceValueCallback( CoerceDocumentTitleTemplateValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentTitleTemplate property.  This dependency property 
-    /// indicates the datatemplate to use when creating the title for a document.
-    /// </summary>
     public DataTemplate DocumentTitleTemplate
     {
       get
@@ -567,24 +449,15 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentTitleTemplate property.
-    /// </summary>
     private static void OnDocumentTitleTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentTitleTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentTitleTemplate property.
-    /// </summary>
     protected virtual void OnDocumentTitleTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
 
-    /// <summary>
-    /// Coerces the DocumentTitleTemplate value.
-    /// </summary>
     private static object CoerceDocumentTitleTemplateValue( DependencyObject d, object value )
     {
       if( value != null &&
@@ -598,16 +471,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentTitleTemplateSelector
 
-    /// <summary>
-    /// DocumentTitleTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentTitleTemplateSelectorProperty = DependencyProperty.Register( "DocumentTitleTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnDocumentTitleTemplateSelectorChanged ), new CoerceValueCallback( CoerceDocumentTitleTemplateSelectorValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentTitleTemplateSelector property.  This dependency property 
-    /// indicates the data template selector to use when creating the data template for the title.
-    /// </summary>
     public DataTemplateSelector DocumentTitleTemplateSelector
     {
       get
@@ -620,26 +486,17 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentTitleTemplateSelector property.
-    /// </summary>
     private static void OnDocumentTitleTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentTitleTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentTitleTemplateSelector property.
-    /// </summary>
     protected virtual void OnDocumentTitleTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.NewValue != null )
         DocumentTitleTemplate = null;
     }
 
-    /// <summary>
-    /// Coerces the DocumentTitleTemplateSelector value.
-    /// </summary>
     private static object CoerceDocumentTitleTemplateSelectorValue( DependencyObject d, object value )
     {
       return value;
@@ -649,16 +506,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorableTitleTemplate
 
-    /// <summary>
-    /// AnchorableTitleTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register( "AnchorableTitleTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnAnchorableTitleTemplateChanged ), new CoerceValueCallback( CoerceAnchorableTitleTemplateValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableTitleTemplate property.  This dependency property 
-    /// indicates the data template to use for anchorables title.
-    /// </summary>
     public DataTemplate AnchorableTitleTemplate
     {
       get
@@ -671,24 +521,15 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorableTitleTemplate property.
-    /// </summary>
     private static void OnAnchorableTitleTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorableTitleTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorableTitleTemplate property.
-    /// </summary>
     protected virtual void OnAnchorableTitleTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
 
-    /// <summary>
-    /// Coerces the AnchorableTitleTemplate value.
-    /// </summary>
     private static object CoerceAnchorableTitleTemplateValue( DependencyObject d, object value )
     {
       if( value != null &&
@@ -701,16 +542,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorableTitleTemplateSelector
 
-    /// <summary>
-    /// AnchorableTitleTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableTitleTemplateSelectorProperty = DependencyProperty.Register( "AnchorableTitleTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnAnchorableTitleTemplateSelectorChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableTitleTemplateSelector property.  This dependency property 
-    /// indicates selctor to use when selecting data template for the title of anchorables.
-    /// </summary>
     public DataTemplateSelector AnchorableTitleTemplateSelector
     {
       get
@@ -723,17 +557,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorableTitleTemplateSelector property.
-    /// </summary>
     private static void OnAnchorableTitleTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorableTitleTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorableTitleTemplateSelector property.
-    /// </summary>
     protected virtual void OnAnchorableTitleTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.NewValue != null &&
@@ -745,16 +573,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorableHeaderTemplate
 
-    /// <summary>
-    /// AnchorableHeaderTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableHeaderTemplateProperty = DependencyProperty.Register( "AnchorableHeaderTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnAnchorableHeaderTemplateChanged ), new CoerceValueCallback( CoerceAnchorableHeaderTemplateValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableHeaderTemplate property.  This dependency property 
-    /// indicates the data template to use for anchorable templates.
-    /// </summary>
     public DataTemplate AnchorableHeaderTemplate
     {
       get
@@ -767,24 +588,15 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorableHeaderTemplate property.
-    /// </summary>
     private static void OnAnchorableHeaderTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorableHeaderTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorableHeaderTemplate property.
-    /// </summary>
     protected virtual void OnAnchorableHeaderTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
 
-    /// <summary>
-    /// Coerces the AnchorableHeaderTemplate value.
-    /// </summary>
     private static object CoerceAnchorableHeaderTemplateValue( DependencyObject d, object value )
     {
       if( value != null &&
@@ -798,16 +610,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorableHeaderTemplateSelector
 
-    /// <summary>
-    /// AnchorableHeaderTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableHeaderTemplateSelectorProperty = DependencyProperty.Register( "AnchorableHeaderTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnAnchorableHeaderTemplateSelectorChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableHeaderTemplateSelector property.  This dependency property 
-    /// indicates the selector to use when selecting the data template for anchorable headers.
-    /// </summary>
     public DataTemplateSelector AnchorableHeaderTemplateSelector
     {
       get
@@ -820,17 +625,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorableHeaderTemplateSelector property.
-    /// </summary>
     private static void OnAnchorableHeaderTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorableHeaderTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorableHeaderTemplateSelector property.
-    /// </summary>
     protected virtual void OnAnchorableHeaderTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.NewValue != null )
@@ -841,16 +640,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutRootPanel
 
-    /// <summary>
-    /// LayoutRootPanel Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutRootPanelProperty = DependencyProperty.Register( "LayoutRootPanel", typeof( LayoutPanelControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutPanelControl )null, new PropertyChangedCallback( OnLayoutRootPanelChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutRootPanel property.  This dependency property 
-    /// indicates the layout panel control which is attached to the Layout.Root property.
-    /// </summary>
     public LayoutPanelControl LayoutRootPanel
     {
       get
@@ -863,17 +655,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the LayoutRootPanel property.
-    /// </summary>
     private static void OnLayoutRootPanelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutRootPanelChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the LayoutRootPanel property.
-    /// </summary>
     protected virtual void OnLayoutRootPanelChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -886,16 +672,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region RightSidePanel
 
-    /// <summary>
-    /// RightSidePanel Dependency Property
-    /// </summary>
     public static readonly DependencyProperty RightSidePanelProperty = DependencyProperty.Register( "RightSidePanel", typeof( LayoutAnchorSideControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutAnchorSideControl )null, new PropertyChangedCallback( OnRightSidePanelChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the RightSidePanel property.  This dependency property 
-    /// indicates right side anchor panel.
-    /// </summary>
     public LayoutAnchorSideControl RightSidePanel
     {
       get
@@ -908,17 +687,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the RightSidePanel property.
-    /// </summary>
     private static void OnRightSidePanelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnRightSidePanelChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the RightSidePanel property.
-    /// </summary>
     protected virtual void OnRightSidePanelChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -931,16 +704,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LeftSidePanel
 
-    /// <summary>
-    /// LeftSidePanel Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LeftSidePanelProperty = DependencyProperty.Register( "LeftSidePanel", typeof( LayoutAnchorSideControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutAnchorSideControl )null, new PropertyChangedCallback( OnLeftSidePanelChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the LeftSidePanel property.  This dependency property 
-    /// indicates the left side panel control.
-    /// </summary>
     public LayoutAnchorSideControl LeftSidePanel
     {
       get
@@ -953,17 +719,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the LeftSidePanel property.
-    /// </summary>
     private static void OnLeftSidePanelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLeftSidePanelChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the LeftSidePanel property.
-    /// </summary>
     protected virtual void OnLeftSidePanelChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -976,16 +736,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region TopSidePanel
 
-    /// <summary>
-    /// TopSidePanel Dependency Property
-    /// </summary>
     public static readonly DependencyProperty TopSidePanelProperty = DependencyProperty.Register( "TopSidePanel", typeof( LayoutAnchorSideControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutAnchorSideControl )null, new PropertyChangedCallback( OnTopSidePanelChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the TopSidePanel property.  This dependency property 
-    /// indicates top side control panel.
-    /// </summary>
     public LayoutAnchorSideControl TopSidePanel
     {
       get
@@ -998,17 +751,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the TopSidePanel property.
-    /// </summary>
     private static void OnTopSidePanelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnTopSidePanelChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the TopSidePanel property.
-    /// </summary>
     protected virtual void OnTopSidePanelChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -1021,16 +768,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region BottomSidePanel
 
-    /// <summary>
-    /// BottomSidePanel Dependency Property
-    /// </summary>
     public static readonly DependencyProperty BottomSidePanelProperty = DependencyProperty.Register( "BottomSidePanel", typeof( LayoutAnchorSideControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutAnchorSideControl )null, new PropertyChangedCallback( OnBottomSidePanelChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the BottomSidePanel property.  This dependency property 
-    /// indicates bottom side panel control.
-    /// </summary>
     public LayoutAnchorSideControl BottomSidePanel
     {
       get
@@ -1043,17 +783,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the BottomSidePanel property.
-    /// </summary>
     private static void OnBottomSidePanelChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnBottomSidePanelChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the BottomSidePanel property.
-    /// </summary>
     protected virtual void OnBottomSidePanelChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -1121,18 +855,11 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AutoHideWindow
 
-    /// <summary>
-    /// AutoHideWindow Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey AutoHideWindowPropertyKey = DependencyProperty.RegisterReadOnly( "AutoHideWindow", typeof( LayoutAutoHideWindowControl ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( LayoutAutoHideWindowControl )null, new PropertyChangedCallback( OnAutoHideWindowChanged ) ) );
 
     public static readonly DependencyProperty AutoHideWindowProperty = AutoHideWindowPropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the AutoHideWindow property.  This dependency property 
-    /// indicates the currently shown autohide window.
-    /// </summary>
     public LayoutAutoHideWindowControl AutoHideWindow
     {
       get
@@ -1141,27 +868,16 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the AutoHideWindow property.  
-    /// This dependency property indicates the currently shown autohide window.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetAutoHideWindow( LayoutAutoHideWindowControl value )
     {
       SetValue( AutoHideWindowPropertyKey, value );
     }
 
-    /// <summary>
-    /// Handles changes to the AutoHideWindow property.
-    /// </summary>
     private static void OnAutoHideWindowChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAutoHideWindowChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AutoHideWindow property.
-    /// </summary>
     protected virtual void OnAutoHideWindowChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.OldValue != null )
@@ -1175,17 +891,10 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AutoHideWindowClosingTimer
 
-    /// <summary>
-    /// AutoHideWindowClosingTimer Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AutoHideWindowClosingTimerProperty = DependencyProperty.Register( "AutoHideWindowClosingTimer", typeof( int ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( int )1500, new PropertyChangedCallback( OnAutoHideWindowClosingTimerChanged ), new CoerceValueCallback( CoerceAutoHideWindowClosingTimer ) ) );
 
 
-    /// <summary>
-    /// Gets or sets the AutoHideWindowClosingTimer property.  This dependency property 
-    /// indicates how long it will take to close the AutoHideWindow when not moused over or active.
-    /// </summary>
     public int AutoHideWindowClosingTimer
     {
       get
@@ -1235,16 +944,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutItemTemplate
 
-    /// <summary>
-    /// LayoutItemTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutItemTemplateProperty = DependencyProperty.Register( "LayoutItemTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnLayoutItemTemplateChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableTemplate property.  This dependency property 
-    /// indicates the template to use to render anchorable and document contents.
-    /// </summary>
     public DataTemplate LayoutItemTemplate
     {
       get
@@ -1257,17 +959,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorableTemplate property.
-    /// </summary>
     private static void OnLayoutItemTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutItemTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorableTemplate property.
-    /// </summary>
     protected virtual void OnLayoutItemTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
@@ -1276,16 +972,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutItemTemplateSelector
 
-    /// <summary>
-    /// LayoutItemTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutItemTemplateSelectorProperty = DependencyProperty.Register( "LayoutItemTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnLayoutItemTemplateSelectorChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutItemTemplateSelector property.  This dependency property 
-    /// indicates selector object to use for anchorable templates.
-    /// </summary>
     public DataTemplateSelector LayoutItemTemplateSelector
     {
       get
@@ -1298,17 +987,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the LayoutItemTemplateSelector property.
-    /// </summary>
     private static void OnLayoutItemTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutItemTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the LayoutItemTemplateSelector property.
-    /// </summary>
     protected virtual void OnLayoutItemTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
     }
@@ -1317,16 +1000,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentsSource
 
-    /// <summary>
-    /// DocumentsSource Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentsSourceProperty = DependencyProperty.Register( "DocumentsSource", typeof( IEnumerable ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( IEnumerable )null, new PropertyChangedCallback( OnDocumentsSourceChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentsSource property.  This dependency property 
-    /// indicates the source collection of documents.
-    /// </summary>
     public IEnumerable DocumentsSource
     {
       get
@@ -1339,17 +1015,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentsSource property.
-    /// </summary>
     private static void OnDocumentsSourceChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentsSourceChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentsSource property.
-    /// </summary>
     protected virtual void OnDocumentsSourceChanged( DependencyPropertyChangedEventArgs e )
     {
       DetachDocumentsSource( Layout, e.OldValue as IEnumerable );
@@ -1360,16 +1030,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentContextMenu
 
-    /// <summary>
-    /// DocumentContextMenu Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentContextMenuProperty = DependencyProperty.Register( "DocumentContextMenu", typeof( ContextMenu ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ContextMenu )null ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentContextMenu property.  This dependency property 
-    /// indicates context menu to show for documents.
-    /// </summary>
     public ContextMenu DocumentContextMenu
     {
       get
@@ -1386,16 +1049,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorablesSource
 
-    /// <summary>
-    /// AnchorablesSource Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorablesSourceProperty = DependencyProperty.Register( "AnchorablesSource", typeof( IEnumerable ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( IEnumerable )null, new PropertyChangedCallback( OnAnchorablesSourceChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorablesSource property.  This dependency property 
-    /// indicates source collection of anchorables.
-    /// </summary>
     public IEnumerable AnchorablesSource
     {
       get
@@ -1408,17 +1064,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the AnchorablesSource property.
-    /// </summary>
     private static void OnAnchorablesSourceChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnAnchorablesSourceChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the AnchorablesSource property.
-    /// </summary>
     protected virtual void OnAnchorablesSourceChanged( DependencyPropertyChangedEventArgs e )
     {
       DetachAnchorablesSource( Layout, e.OldValue as IEnumerable );
@@ -1431,16 +1081,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region ActiveContent
 
-    /// <summary>
-    /// ActiveContent Dependency Property
-    /// </summary>
     public static readonly DependencyProperty ActiveContentProperty = DependencyProperty.Register( "ActiveContent", typeof( object ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( object )null, new PropertyChangedCallback( OnActiveContentChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the ActiveContent property.  This dependency property 
-    /// indicates the content currently active.
-    /// </summary>
     public object ActiveContent
     {
       get
@@ -1453,18 +1096,12 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the ActiveContent property.
-    /// </summary>
     private static void OnActiveContentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).InternalSetActiveContent( e.NewValue );
       ( ( DockingManager )d ).OnActiveContentChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the ActiveContent property.
-    /// </summary>
     protected virtual void OnActiveContentChanged( DependencyPropertyChangedEventArgs e )
     {
       if( ActiveContentChanged != null )
@@ -1475,16 +1112,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AnchorableContextMenu
 
-    /// <summary>
-    /// AnchorableContextMenu Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AnchorableContextMenuProperty = DependencyProperty.Register( "AnchorableContextMenu", typeof( ContextMenu ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( ContextMenu )null ) );
 
-    /// <summary>
-    /// Gets or sets the AnchorableContextMenu property.  This dependency property 
-    /// indicates the context menu to show up for anchorables.
-    /// </summary>
     public ContextMenu AnchorableContextMenu
     {
       get
@@ -1501,16 +1131,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region Theme
 
-    /// <summary>
-    /// Theme Dependency Property
-    /// </summary>
     public static readonly DependencyProperty ThemeProperty = DependencyProperty.Register( "Theme", typeof( Theme ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( null, new PropertyChangedCallback( OnThemeChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the Theme property.  This dependency property 
-    /// indicates the theme to use for AvalonDock controls.
-    /// </summary>
     public Theme Theme
     {
       get
@@ -1523,17 +1146,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the Theme property.
-    /// </summary>
     private static void OnThemeChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnThemeChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the Theme property.
-    /// </summary>
     protected virtual void OnThemeChanged( DependencyPropertyChangedEventArgs e )
     {
       var oldTheme = e.OldValue as Theme;
@@ -1576,26 +1193,19 @@ namespace Xceed.Wpf.AvalonDock
         fwc.UpdateThemeResources( oldTheme );
 
       if( _navigatorWindow != null )
-        _navigatorWindow.UpdateThemeResources();
+        _navigatorWindow.UpdateThemeResources( oldTheme );
 
       if( _overlayWindow != null )
-        _overlayWindow.UpdateThemeResources();
+        _overlayWindow.UpdateThemeResources( oldTheme );
     }
 
     #endregion
 
     #region GridSplitterWidth
 
-    /// <summary>
-    /// GridSplitterWidth Dependency Property
-    /// </summary>
     public static readonly DependencyProperty GridSplitterWidthProperty = DependencyProperty.Register( "GridSplitterWidth", typeof( double ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( double )6.0 ) );
 
-    /// <summary>
-    /// Gets or sets the GridSplitterWidth property.  This dependency property 
-    /// indicates width of grid splitters.
-    /// </summary>
     public double GridSplitterWidth
     {
       get
@@ -1612,16 +1222,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region GridSplitterHeight
 
-    /// <summary>
-    /// GridSplitterHeight Dependency Property
-    /// </summary>
     public static readonly DependencyProperty GridSplitterHeightProperty = DependencyProperty.Register( "GridSplitterHeight", typeof( double ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( double )6.0 ) );
 
-    /// <summary>
-    /// Gets or sets the GridSplitterHeight property.  This dependency property 
-    /// indicates height of grid splitters.
-    /// </summary>
     public double GridSplitterHeight
     {
       get
@@ -1638,16 +1241,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentPaneMenuItemHeaderTemplate
 
-    /// <summary>
-    /// DocumentPaneMenuItemHeaderTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentPaneMenuItemHeaderTemplateProperty = DependencyProperty.Register( "DocumentPaneMenuItemHeaderTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null, new PropertyChangedCallback( OnDocumentPaneMenuItemHeaderTemplateChanged ), new CoerceValueCallback( CoerceDocumentPaneMenuItemHeaderTemplateValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentPaneMenuItemHeaderTemplate property.  This dependency property 
-    /// indicates the header template to use while creating menu items for the document panes.
-    /// </summary>
     public DataTemplate DocumentPaneMenuItemHeaderTemplate
     {
       get
@@ -1660,24 +1256,15 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentPaneMenuItemHeaderTemplate property.
-    /// </summary>
     private static void OnDocumentPaneMenuItemHeaderTemplateChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentPaneMenuItemHeaderTemplateChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentPaneMenuItemHeaderTemplate property.
-    /// </summary>
     protected virtual void OnDocumentPaneMenuItemHeaderTemplateChanged( DependencyPropertyChangedEventArgs e )
     {
     }
 
-    /// <summary>
-    /// Coerces the DocumentPaneMenuItemHeaderTemplate value.
-    /// </summary>
     private static object CoerceDocumentPaneMenuItemHeaderTemplateValue( DependencyObject d, object value )
     {
       if( value != null &&
@@ -1693,16 +1280,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region DocumentPaneMenuItemHeaderTemplateSelector
 
-    /// <summary>
-    /// DocumentPaneMenuItemHeaderTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DocumentPaneMenuItemHeaderTemplateSelectorProperty = DependencyProperty.Register( "DocumentPaneMenuItemHeaderTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null, new PropertyChangedCallback( OnDocumentPaneMenuItemHeaderTemplateSelectorChanged ), new CoerceValueCallback( CoerceDocumentPaneMenuItemHeaderTemplateSelectorValue ) ) );
 
-    /// <summary>
-    /// Gets or sets the DocumentPaneMenuItemHeaderTemplateSelector property.  This dependency property 
-    /// indicates the data template selector to use for the menu items show when user select the DocumentPane document switch context menu.
-    /// </summary>
     public DataTemplateSelector DocumentPaneMenuItemHeaderTemplateSelector
     {
       get
@@ -1715,17 +1295,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DocumentPaneMenuItemHeaderTemplateSelector property.
-    /// </summary>
     private static void OnDocumentPaneMenuItemHeaderTemplateSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnDocumentPaneMenuItemHeaderTemplateSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DocumentPaneMenuItemHeaderTemplateSelector property.
-    /// </summary>
     protected virtual void OnDocumentPaneMenuItemHeaderTemplateSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       if( e.NewValue != null &&
@@ -1734,9 +1308,6 @@ namespace Xceed.Wpf.AvalonDock
 
     }
 
-    /// <summary>
-    /// Coerces the DocumentPaneMenuItemHeaderTemplateSelector value.
-    /// </summary>
     private static object CoerceDocumentPaneMenuItemHeaderTemplateSelectorValue( DependencyObject d, object value )
     {
       return value;
@@ -1746,16 +1317,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region IconContentTemplate
 
-    /// <summary>
-    /// IconContentTemplate Dependency Property
-    /// </summary>
     public static readonly DependencyProperty IconContentTemplateProperty = DependencyProperty.Register( "IconContentTemplate", typeof( DataTemplate ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplate )null ) );
 
-    /// <summary>
-    /// Gets or sets the IconContentTemplate property.  This dependency property 
-    /// indicates the data template to use while extracting the icon from model.
-    /// </summary>
     public DataTemplate IconContentTemplate
     {
       get
@@ -1772,16 +1336,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region IconContentTemplateSelector
 
-    /// <summary>
-    /// IconContentTemplateSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty IconContentTemplateSelectorProperty = DependencyProperty.Register( "IconContentTemplateSelector", typeof( DataTemplateSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( DataTemplateSelector )null ) );
 
-    /// <summary>
-    /// Gets or sets the IconContentTemplateSelector property.  This dependency property 
-    /// indicates data template selector to use while selecting the datatamplate for content icons.
-    /// </summary>
     public DataTemplateSelector IconContentTemplateSelector
     {
       get
@@ -1798,16 +1355,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutItemContainerStyle
 
-    /// <summary>
-    /// LayoutItemContainerStyle Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutItemContainerStyleProperty = DependencyProperty.Register( "LayoutItemContainerStyle", typeof( Style ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnLayoutItemContainerStyleChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutItemContainerStyle property.  This dependency property 
-    /// indicates the style to apply to LayoutDocumentItem objects. A LayoutDocumentItem object is created when a new LayoutDocument is created inside the current Layout.
-    /// </summary>
     public Style LayoutItemContainerStyle
     {
       get
@@ -1820,17 +1370,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the LayoutItemContainerStyle property.
-    /// </summary>
     private static void OnLayoutItemContainerStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutItemContainerStyleChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the LayoutItemContainerStyle property.
-    /// </summary>
     protected virtual void OnLayoutItemContainerStyleChanged( DependencyPropertyChangedEventArgs e )
     {
       AttachLayoutItems();
@@ -1840,16 +1384,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region LayoutItemContainerStyleSelector
 
-    /// <summary>
-    /// LayoutItemContainerStyleSelector Dependency Property
-    /// </summary>
     public static readonly DependencyProperty LayoutItemContainerStyleSelectorProperty = DependencyProperty.Register( "LayoutItemContainerStyleSelector", typeof( StyleSelector ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( StyleSelector )null, new PropertyChangedCallback( OnLayoutItemContainerStyleSelectorChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the LayoutItemContainerStyleSelector property.  This dependency property 
-    /// indicates style selector of the LayoutDocumentItemStyle.
-    /// </summary>
     public StyleSelector LayoutItemContainerStyleSelector
     {
       get
@@ -1862,17 +1399,11 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
-    /// <summary>
-    /// Handles changes to the LayoutItemContainerStyleSelector property.
-    /// </summary>
     private static void OnLayoutItemContainerStyleSelectorChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DockingManager )d ).OnLayoutItemContainerStyleSelectorChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the LayoutItemContainerStyleSelector property.
-    /// </summary>
     protected virtual void OnLayoutItemContainerStyleSelectorChanged( DependencyPropertyChangedEventArgs e )
     {
       AttachLayoutItems();
@@ -1882,16 +1413,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region ShowSystemMenu
 
-    /// <summary>
-    /// ShowSystemMenu Dependency Property
-    /// </summary>
     public static readonly DependencyProperty ShowSystemMenuProperty = DependencyProperty.Register( "ShowSystemMenu", typeof( bool ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( bool )true ) );
 
-    /// <summary>
-    /// Gets or sets the ShowSystemMenu property.  This dependency property 
-    /// indicates if floating windows should show the system menu when a custom context menu is not defined.
-    /// </summary>
     public bool ShowSystemMenu
     {
       get
@@ -1908,16 +1432,9 @@ namespace Xceed.Wpf.AvalonDock
 
     #region AllowMixedOrientation
 
-    /// <summary>
-    /// AllowMixedOrientation Dependency Property
-    /// </summary>
     public static readonly DependencyProperty AllowMixedOrientationProperty = DependencyProperty.Register( "AllowMixedOrientation", typeof( bool ), typeof( DockingManager ),
             new FrameworkPropertyMetadata( ( bool )false ) );
 
-    /// <summary>
-    /// Gets or sets the AllowMixedOrientation property.  This dependency property 
-    /// indicates if the manager should allow mixed orientation for document panes.
-    /// </summary>
     public bool AllowMixedOrientation
     {
       get
@@ -2036,11 +1553,6 @@ namespace Xceed.Wpf.AvalonDock
       return new NavigatorWindow( this );
     }
 
-    /// <summary>
-    /// Return the LayoutItem wrapper for the content passed as argument
-    /// </summary>
-    /// <param name="content">LayoutContent to search</param>
-    /// <returns>Either a LayoutAnchorableItem or LayoutDocumentItem which contains the LayoutContent passed as argument</returns>
     public LayoutItem GetLayoutItemFromModel( LayoutContent content )
     {
       if( _layoutItems == null )
@@ -3395,6 +2907,13 @@ namespace Xceed.Wpf.AvalonDock
         var grandParent = parentPane.Parent as ILayoutPane;
         if( grandParent != null )
         {
+          var greatGrandParent = grandParent.Parent;
+          // Case 2934 - Do not remove the Last Parent in the LayoutRoot in order to keep the view of the LayoutRoot by default
+          if( greatGrandParent != null && greatGrandParent == this.Layout.RootPanel && greatGrandParent.ChildrenCount == 1 )
+          {
+            break;
+          }
+
           grandParent.RemoveChild( parentPane );
         }
 
@@ -3627,25 +3146,12 @@ namespace Xceed.Wpf.AvalonDock
 
     #region Events
 
-    /// <summary>
-    /// Event fired when <see cref="DockingManager.Layout"/> property changes
-    /// </summary>
     public event EventHandler LayoutChanged;
 
-    /// <summary>
-    /// Event fired when <see cref="DockingManager.Layout"/> property is about to be changed
-    /// </summary>
     public event EventHandler LayoutChanging;
 
-    /// <summary>
-    /// Event fired when a document is about to be closed
-    /// </summary>
-    /// <remarks>Subscribers have the opportuniy to cancel the operation.</remarks>
     public event EventHandler<DocumentClosingEventArgs> DocumentClosing;
 
-    /// <summary>
-    /// Event fired after a document is closed
-    /// </summary>
     public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
 
     public event EventHandler ActiveContentChanged;

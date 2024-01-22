@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -32,17 +32,10 @@ namespace Xceed.Wpf.AvalonDock.Themes.Controls
 
     #region Thickness
 
-    /// <summary>
-    /// Thickness Dependency Property
-    /// </summary>
     public static readonly DependencyProperty ThicknessProperty =
         DependencyProperty.Register( "Thickness", typeof( double ), typeof( SplineBorder ),
             new FrameworkPropertyMetadata( ( double )1.0, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-    /// <summary>
-    /// Gets or sets the Thickness property.  This dependency property 
-    /// indicates the border thickness.
-    /// </summary>
     public double Thickness
     {
       get
@@ -59,17 +52,10 @@ namespace Xceed.Wpf.AvalonDock.Themes.Controls
 
     #region Fill
 
-    /// <summary>
-    /// Fill Dependency Property
-    /// </summary>
     public static readonly DependencyProperty FillProperty =
         DependencyProperty.Register( "Fill", typeof( Brush ), typeof( SplineBorder ),
             new FrameworkPropertyMetadata( ( Brush )null, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-    /// <summary>
-    /// Gets or sets the Fill property.  This dependency property 
-    /// indicates the fill color.
-    /// </summary>
     public Brush Fill
     {
       get
@@ -86,17 +72,10 @@ namespace Xceed.Wpf.AvalonDock.Themes.Controls
 
     #region Stroke
 
-    /// <summary>
-    /// Stroke Dependency Property
-    /// </summary>
     public static readonly DependencyProperty StrokeProperty =
         DependencyProperty.Register( "Stroke", typeof( Brush ), typeof( SplineBorder ),
             new FrameworkPropertyMetadata( Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-    /// <summary>
-    /// Gets or sets the Stroke property.  This dependency property 
-    /// indicates the stroke brush.
-    /// </summary>
     public Brush Stroke
     {
       get
@@ -113,17 +92,10 @@ namespace Xceed.Wpf.AvalonDock.Themes.Controls
 
     #region BottomBorderMargin
 
-    /// <summary>
-    /// BottomBorderMargin Dependency Property
-    /// </summary>
     public static readonly DependencyProperty BottomBorderMarginProperty =
         DependencyProperty.Register( "BottomBorderMargin", typeof( double ), typeof( SplineBorder ),
             new FrameworkPropertyMetadata( ( double )0.0, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-    /// <summary>
-    /// Gets or sets the BottomBorderMargin property.  This dependency property 
-    /// indicates the adjustment for the bottom margin.
-    /// </summary>
     public double BottomBorderMargin
     {
       get

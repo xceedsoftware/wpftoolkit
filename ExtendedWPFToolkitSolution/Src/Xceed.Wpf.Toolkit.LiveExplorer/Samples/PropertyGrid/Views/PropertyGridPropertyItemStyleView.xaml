@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -37,7 +54,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     <StackPanel Grid.Row="0" Margin="10" >
-      <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties are set to Red."
+      <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties is set to Red."
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
       <TextBlock Text="Using the PreparePropertyItem event, the display name of the property 'Friend' is changed to 'Friend (renamed)'."

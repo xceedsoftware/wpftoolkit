@@ -341,6 +341,33 @@
       <TextBlock Text="DateTimePicker Usage: "
                  Margin="0,10,0,0"
                  Style="{StaticResource Header}" />
+      <!--##EXCLUDE_OPEN_SOURCE-->
+      <xctk:DateTimePicker x:Name="_datetimePicker"
+                           Width="300"
+                           VerticalAlignment="Top"
+                           IsReadOnly="False"
+                           Format="{Binding Source={x:Reference _format}, Path=SelectedItem}"
+                           FormatString="{Binding Text, ElementName=_formatString}"
+                           Watermark="{Binding  Source={x:Reference _watermark}, Path=Text}"
+                           TimeFormat="{Binding Source={x:Reference _timeFormat}, Path=SelectedItem}"
+                           TimeFormatString="{Binding Text, ElementName=_timeFormatString}"
+                           TimeWatermark="{Binding  Source={x:Reference _timeWatermark}, Path=Text}"
+                           AutoCloseCalendar="{Binding IsChecked, ElementName=_autoCloseCalendar}"
+                           AutoCloseCalendarOnTimeSelection="{Binding IsChecked, ElementName=_autoCloseCalendarOnTimeSelection}"
+                           ClipValueToMinMax="{Binding IsChecked, ElementName=_clipValueToMinMax}"
+                           TimePickerVisibility="{Binding Source={x:Reference _timePickerVisibility}, Path=SelectedItem}"
+                           TimePickerShowButtonSpinner="{Binding IsChecked, ElementName=_timePickerShowButtonSpinner}"
+                           TodayButtonVisibility="{Binding Source={x:Reference _todayButtonVisibility}, Path=SelectedItem}"
+                           Minimum="{Binding Value, ElementName=_minimum}"
+                           Maximum="{Binding Value, ElementName=_maximum}"
+                           Kind="{Binding SelectedItem, ElementName=_kind}"
+                           CalendarDisplayMode="{Binding SelectedItem, ElementName=_calendarDisplayMode}"
+                           CalendarWidth="{Binding Value, ElementName=_calendarWidth}"
+                           ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
+                           CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"
+                           AutoClipTimeParts="{Binding IsChecked, ElementName=_autoClipTimeParts}" />
+      <!--##END-->
+      <!--##INCLUDE_OPEN_SOURCE
       <xctk:DateTimePicker x:Name="_datetimePicker"
                            Width="300"
                            VerticalAlignment="Top"
@@ -363,6 +390,7 @@
                            ShowDropDownButton="{Binding IsChecked, ElementName=_showDropDownButton}"
                            CurrentDateTimePart="{Binding SelectedItem, ElementName=_currentDateTimePart, Mode=TwoWay}"
                            AutoClipTimeParts="{Binding IsChecked, ElementName=_autoClipTimeParts}" />
+      ##END-->
     </StackPanel>
 
     <StackPanel Grid.Row="1"

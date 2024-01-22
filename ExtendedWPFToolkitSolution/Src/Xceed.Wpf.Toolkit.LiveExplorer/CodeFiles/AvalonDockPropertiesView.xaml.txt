@@ -35,7 +35,7 @@
       <ResourceDictionary.MergedDictionaries>
         <localView:GenericResourceDictionary />
       </ResourceDictionary.MergedDictionaries>
-
+      
       <xcad:LayoutRoot x:Key="DefaultLayout" x:Name="layoutRoot1">
         <xcad:LayoutPanel Orientation="Horizontal">
           <xcad:LayoutAnchorablePane DockWidth="160">
@@ -208,6 +208,7 @@
           <Setter.Value>
             <ControlTemplate TargetType="{x:Type xcad:LayoutDocumentPaneControl}">
               <Grid>
+                <!--##INCLUDE_OPEN_SOURCE
                  <TabControl x:Name="leftMaterialTabs"
                              TabStripPlacement="Left">
                   <TabItem Header="First"
@@ -226,6 +227,34 @@
                            VerticalContentAlignment="Center"
                            Content="MaterialTabItem #5" />
                 </TabControl>
+                ##END-->
+                <!--##EXCLUDE_OPEN_SOURCE-->
+                <xctk:MaterialTabControl x:Name="leftMaterialTabs"
+                                        TabStripPlacement="Left"
+                                        IsInkEffectActive="True"
+                                        InkEffectBrush="AliceBlue"
+                                        InkEffectOpacity="20"
+                                        InkBarBrush="Beige"
+                                        SelectedForeground="DarkBlue"
+                                        IsInkBarActive="True"
+                                        IsSlidingAnimationActive="True">
+                  <xctk:MaterialTabItem Header="First"
+                                        VerticalContentAlignment="Center"
+                                        Content="MaterialTabItem #1" />
+                  <xctk:MaterialTabItem Header="Second"
+                                        VerticalContentAlignment="Center"
+                                        Content="MaterialTabItem #2" />
+                  <xctk:MaterialTabItem Header="Third"
+                                        VerticalContentAlignment="Center"
+                                        Content="MaterialTabItem #3" />
+                  <xctk:MaterialTabItem Header="Fourth"
+                                        VerticalContentAlignment="Center"
+                                        Content="MaterialTabItem #4" />
+                  <xctk:MaterialTabItem Header="Fifth"
+                                        VerticalContentAlignment="Center"
+                                        Content="MaterialTabItem #5" />
+                </xctk:MaterialTabControl>
+                <!--##END-->
               </Grid>
             </ControlTemplate>
           </Setter.Value>
@@ -624,6 +653,19 @@
                   Margin="5"
                   ToolTip="Sets whether the docking manager should allow mixed orientation for document panes." />
 
+        <!--##EXCLUDE_OPEN_SOURCE-->
+        <TextBlock Grid.Column="2"
+                   Grid.Row="4"
+                   Margin="40,0,0,0"
+                   Text="CanFloatBehindMainWindow:"
+                   VerticalAlignment="Center" />
+        <CheckBox Grid.Column="3"
+                  Grid.Row="4"
+                  IsChecked="{Binding CanFloatBehindMainWindow, ElementName=_dockingManager}"
+                  VerticalAlignment="Center"
+                  Margin="5"
+                  ToolTip="Float layout (Anchorable/Document) behind the Main Window." />
+        <!--##END-->
       </Grid>
     </GroupBox>
 
@@ -655,6 +697,11 @@
                              BorderBrush="Black"
                              BorderThickness="1"
                              AllowMixedOrientation="True">
+          <!--##EXCLUDE_OPEN_SOURCE-->
+          <xcad:DockingManager.CanFloatBehindMainWindow>
+            True
+          </xcad:DockingManager.CanFloatBehindMainWindow>
+          <!--##END-->
         </xcad:DockingManager>
 
       </StackPanel>

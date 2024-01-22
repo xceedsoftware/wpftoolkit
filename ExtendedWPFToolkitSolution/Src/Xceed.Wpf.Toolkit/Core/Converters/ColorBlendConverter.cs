@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -21,16 +21,10 @@ using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.Core.Converters
 {
-  /// <summary>
-  /// This converter allow to blend two colors into one based on a specified ratio
-  /// </summary>
   public class ColorBlendConverter : IValueConverter
   {
     private double _blendedColorRatio = 0;
 
-    /// <summary>
-    /// The ratio of the blended color. Must be between 0 and 1.
-    /// </summary>
     public double BlendedColorRatio
     {
       get
@@ -47,9 +41,6 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
       }
     }
 
-    /// <summary>
-    /// The color to blend with the source color
-    /// </summary>
     public Color BlendedColor
     {
       get; set;

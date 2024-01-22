@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -44,9 +44,7 @@ namespace Microsoft.Windows.Shell
 
     private readonly List<HANDLE_MESSAGE> _messageTable;
 
-    /// <summary>The Window that's chrome is being modified.</summary>
     private Window _window;
-    /// <summary>Underlying HWND for the _window.</summary>
     private IntPtr _hwnd;
     private HwndSource _hwndSource = null;
     private bool _isHooked = false;
@@ -60,7 +58,6 @@ namespace Microsoft.Windows.Shell
     // Field to track attempts to force off Device Bitmaps on Win7.
     private int _blackGlassFixupAttemptCount;
 
-    /// <summary>Object that describes the current modifications being made to the chrome.</summary>
     private WindowChrome _chromeInfo;
 
     // Keep track of this so we can detect when we need to apply changes.  Tracking these separately
@@ -713,10 +710,6 @@ namespace Microsoft.Windows.Shell
 
     #endregion
 
-    /// <summary>Add and remove a native WindowStyle from the HWND.</summary>
-    /// <param name="removeStyle">The styles to be removed.  These can be bitwise combined.</param>
-    /// <param name="addStyle">The styles to be added.  These can be bitwise combined.</param>
-    /// <returns>Whether the styles of the HWND were modified as a result of this call.</returns>
     private bool _ModifyStyle( WS removeStyle, WS addStyle )
     {
       Assert.IsNotDefault( _hwnd );
@@ -731,9 +724,6 @@ namespace Microsoft.Windows.Shell
       return true;
     }
 
-    /// <summary>
-    /// Get the WindowState as the native HWND knows it to be.  This isn't necessarily the same as what Window thinks.
-    /// </summary>
     private WindowState _GetHwndState()
     {
       var wpl = NativeMethods.GetWindowPlacement( _hwnd );
@@ -747,10 +737,6 @@ namespace Microsoft.Windows.Shell
       return WindowState.Normal;
     }
 
-    /// <summary>
-    /// Get the bounding rectangle for the window in physical coordinates.
-    /// </summary>
-    /// <returns>The bounding rectangle for the window.</returns>
     private Rect _GetWindowRect()
     {
       // Get the window rectangle.
@@ -758,15 +744,6 @@ namespace Microsoft.Windows.Shell
       return new Rect( windowPosition.Left, windowPosition.Top, windowPosition.Width, windowPosition.Height );
     }
 
-    /// <summary>
-    /// Update the items in the system menu based on the current, or assumed, WindowState.
-    /// </summary>
-    /// <param name="assumeState">
-    /// The state to assume that the Window is in.  This can be null to query the Window's state.
-    /// </param>
-    /// <remarks>
-    /// We want to update the menu while we have some control over whether the caption will be repainted.
-    /// </remarks>
     private void _UpdateSystemMenu( WindowState? assumeState )
     {
       const MF mfEnabled = MF.ENABLED | MF.BYCOMMAND;
@@ -1089,9 +1066,6 @@ namespace Microsoft.Windows.Shell
       }
     }
 
-    /// <summary>
-    /// Matrix of the HT values to return when responding to NC window messages.
-    /// </summary>
     [SuppressMessage( "Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member" )]
     private static readonly HT[,] _HitTestBorders = new[ , ]
     {

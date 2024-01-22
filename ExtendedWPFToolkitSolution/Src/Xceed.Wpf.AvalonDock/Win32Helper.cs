@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -47,73 +47,26 @@ namespace Xceed.Wpf.AvalonDock
           WS_GROUP = 0x00020000;
 
 
-    /// <summary>
-    /// SetWindowPos Flags
-    /// </summary>
     [Flags()]
     internal enum SetWindowPosFlags : uint
     {
-      /// <summary>If the calling thread and the thread that owns the window are attached to different input queues,
-      /// the system posts the request to the thread that owns the window. This prevents the calling thread from
-      /// blocking its execution while other threads process the request.</summary>
-      /// <remarks>SWP_ASYNCWINDOWPOS</remarks>
       SynchronousWindowPosition = 0x4000,
-      /// <summary>Prevents generation of the WM_SYNCPAINT message.</summary>
-      /// <remarks>SWP_DEFERERASE</remarks>
       DeferErase = 0x2000,
-      /// <summary>Draws a frame (defined in the window's class description) around the window.</summary>
-      /// <remarks>SWP_DRAWFRAME</remarks>
       DrawFrame = 0x0020,
-      /// <summary>Applies new frame styles set using the SetWindowLong function. Sends a WM_NCCALCSIZE message to
-      /// the window, even if the window's size is not being changed. If this flag is not specified, WM_NCCALCSIZE
-      /// is sent only when the window's size is being changed.</summary>
-      /// <remarks>SWP_FRAMECHANGED</remarks>
       FrameChanged = 0x0020,
-      /// <summary>Hides the window.</summary>
-      /// <remarks>SWP_HIDEWINDOW</remarks>
       HideWindow = 0x0080,
-      /// <summary>Does not activate the window. If this flag is not set, the window is activated and moved to the
-      /// top of either the topmost or non-topmost group (depending on the setting of the hWndInsertAfter
-      /// parameter).</summary>
-      /// <remarks>SWP_NOACTIVATE</remarks>
       DoNotActivate = 0x0010,
-      /// <summary>Discards the entire contents of the client area. If this flag is not specified, the valid
-      /// contents of the client area are saved and copied back into the client area after the window is sized or
-      /// repositioned.</summary>
-      /// <remarks>SWP_NOCOPYBITS</remarks>
       DoNotCopyBits = 0x0100,
-      /// <summary>Retains the current position (ignores X and Y parameters).</summary>
-      /// <remarks>SWP_NOMOVE</remarks>
       IgnoreMove = 0x0002,
-      /// <summary>Does not change the owner window's position in the Z order.</summary>
-      /// <remarks>SWP_NOOWNERZORDER</remarks>
       DoNotChangeOwnerZOrder = 0x0200,
-      /// <summary>Does not redraw changes. If this flag is set, no repainting of any kind occurs. This applies to
-      /// the client area, the nonclient area (including the title bar and scroll bars), and any part of the parent
-      /// window uncovered as a result of the window being moved. When this flag is set, the application must
-      /// explicitly invalidate or redraw any parts of the window and parent window that need redrawing.</summary>
-      /// <remarks>SWP_NOREDRAW</remarks>
       DoNotRedraw = 0x0008,
-      /// <summary>Same as the SWP_NOOWNERZORDER flag.</summary>
-      /// <remarks>SWP_NOREPOSITION</remarks>
       DoNotReposition = 0x0200,
-      /// <summary>Prevents the window from receiving the WM_WINDOWPOSCHANGING message.</summary>
-      /// <remarks>SWP_NOSENDCHANGING</remarks>
       DoNotSendChangingEvent = 0x0400,
-      /// <summary>Retains the current size (ignores the cx and cy parameters).</summary>
-      /// <remarks>SWP_NOSIZE</remarks>
       IgnoreResize = 0x0001,
-      /// <summary>Retains the current Z order (ignores the hWndInsertAfter parameter).</summary>
-      /// <remarks>SWP_NOZORDER</remarks>
       IgnoreZOrder = 0x0004,
-      /// <summary>Displays the window.</summary>
-      /// <remarks>SWP_SHOWWINDOW</remarks>
       ShowWindow = 0x0040,
     }
 
-    /// <summary>
-    ///     Special window handles
-    /// </summary>
     internal static readonly IntPtr HWND_TOPMOST = new IntPtr( -1 );
     internal static readonly IntPtr HWND_NOTOPMOST = new IntPtr( -2 );
     internal static readonly IntPtr HWND_TOP = new IntPtr( 0 );
@@ -395,14 +348,6 @@ namespace Xceed.Wpf.AvalonDock
     [DllImport( "user32.dll", ExactSpelling = true, CharSet = CharSet.Auto )]
     internal static extern IntPtr GetParent( IntPtr hWnd );
 
-    /// <summary>
-    /// Changes an attribute of the specified window. The function also sets the 32-bit (long) value at the specified offset into the extra window memory.
-    /// </summary>
-    /// <param name="hWnd">A handle to the window and, indirectly, the class to which the window belongs..</param>
-    /// <param name="nIndex">The zero-based offset to the value to be set. Valid values are in the range zero through the number of bytes of extra window memory, minus the size of an integer. To set any other value, specify one of the following values: GWL_EXSTYLE, GWL_HINSTANCE, GWL_ID, GWL_STYLE, GWL_USERDATA, GWL_WNDPROC </param>
-    /// <param name="dwNewLong">The replacement value.</param>
-    /// <returns>If the function succeeds, the return value is the previous value of the specified 32-bit integer.
-    /// If the function fails, the return value is zero. To get extended error information, call GetLastError. </returns>
     [DllImport( "user32.dll" )]
     static extern int SetWindowLong( IntPtr hWnd, int nIndex, int dwNewLong );
 
@@ -425,71 +370,22 @@ namespace Xceed.Wpf.AvalonDock
 
     //Monitor Patch #13440
 
-    /// <summary>
-    /// The MonitorFromRect function retrieves a handle to the display monitor that 
-    /// has the largest area of intersection with a specified rectangle.
-    /// </summary>
-    /// <param name="lprc">Pointer to a RECT structure that specifies the rectangle of interest in 
-    /// virtual-screen coordinates</param>
-    /// <param name="dwFlags">Determines the function's return value if the rectangle does not intersect 
-    /// any display monitor</param>
-    /// <returns>
-    /// If the rectangle intersects one or more display monitor rectangles, the return value 
-    /// is an HMONITOR handle to the display monitor that has the largest area of intersection with the rectangle.
-    /// If the rectangle does not intersect a display monitor, the return value depends on the value of dwFlags.
-    /// </returns>
     [DllImport( "user32.dll" )]
     public static extern IntPtr MonitorFromRect( [In] ref RECT lprc, uint dwFlags );
 
-    /// <summary>
-    /// The MonitorFromWindow function retrieves a handle to the display monitor that has the largest area of intersection with the bounding rectangle of a specified window. 
-    /// </summary>
-    /// <param name="hwnd">A handle to the window of interest.</param>
-    /// <param name="dwFlags">Determines the function's return value if the window does not intersect any display monitor.</param>
-    /// <returns>If the window intersects one or more display monitor rectangles, the return value is an HMONITOR handle to the display monitor that has the largest area of intersection with the window. 
-    /// If the window does not intersect a display monitor, the return value depends on the value of dwFlags.
-    /// </returns>
     [DllImport( "user32.dll" )]
     public static extern IntPtr MonitorFromWindow( IntPtr hwnd, uint dwFlags );
 
 
-    /// <summary>
-    /// The MONITORINFO structure contains information about a display monitor.
-    /// </summary>
     [StructLayout( LayoutKind.Sequential )]
     public class MonitorInfo
     {
-      /// <summary>
-      /// The size of the structure, in bytes. 
-      /// </summary>
       public int Size = Marshal.SizeOf( typeof( MonitorInfo ) );
-      /// <summary>
-      /// A RECT structure that specifies the display monitor rectangle, expressed 
-      /// in virtual-screen coordinates. 
-      /// Note that if the monitor is not the primary display monitor, 
-      /// some of the rectangle's coordinates may be negative values. 
-      /// </summary>
       public RECT Monitor;
-      /// <summary>
-      /// A RECT structure that specifies the work area rectangle of the display monitor, 
-      /// expressed in virtual-screen coordinates. Note that if the monitor is not the primary 
-      /// display monitor, some of the rectangle's coordinates may be negative values.
-      /// </summary>
       public RECT Work;
-      /// <summary>
-      /// A set of flags that represent attributes of the display monitor. 
-      /// </summary>
       public uint Flags;
     }
 
-    /// <summary>
-    /// The GetMonitorInfo function retrieves information about a display monitor. 
-    /// </summary>
-    /// <param name="hMonitor">Handle to the display monitor of interest.</param>
-    /// <param name="lpmi">Pointer to a MONITORINFO or MONITORINFOEX structure that receives 
-    /// information about the specified display monitor</param>
-    /// <returns>If the function succeeds, the return value is nonzero.
-    /// If the function fails, the return value is zero.</returns>
     [DllImport( "user32.dll" )]
     [return: MarshalAs( UnmanagedType.Bool )]
     public static extern bool GetMonitorInfo( IntPtr hMonitor, [In, Out] MonitorInfo lpmi );

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -75,18 +75,12 @@ namespace Standard
       return true;
     }
 
-    /// <summary>The native RGB macro.</summary>
-    /// <param name="c"></param>
-    /// <returns></returns>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static int RGB( Color c )
     {
       return c.R | ( c.G << 8 ) | ( c.B << 16 );
     }
 
-    /// <summary>Convert a native integer that represent a color with an alpha channel into a Color struct.</summary>
-    /// <param name="color">The integer that represents the color.  Its bits are of the format 0xAARRGGBB.</param>
-    /// <returns>A Color representation of the parameter.</returns>
     public static Color ColorFromArgbDword( uint color )
     {
       return Color.FromArgb(
@@ -279,13 +273,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Is this using WPF4?
-    /// </summary>
-    /// <remarks>
-    /// There are a few specific bugs in Window in 3.5SP1 and below that require workarounds
-    /// when handling WM_NCCALCSIZE on the HWND.
-    /// </remarks>
     public static bool IsPresentationFrameworkVersionLessThan4
     {
       get
@@ -412,9 +399,6 @@ namespace Standard
       return diff;
     }
 
-    /// From a list of BitmapFrames find the one that best matches the requested dimensions.
-    /// The methods used here are copied from Win32 sources.  We want to be consistent with
-    /// system behaviors.
     private static BitmapFrame _GetBestMatch( IList<BitmapFrame> frames, int bitDepth, int width, int height )
     {
       int bestScore = int.MaxValue;
@@ -467,14 +451,6 @@ namespace Standard
       return s_bitDepth;
     }
 
-    /// <summary>
-    /// Simple guard against the exceptions that File.Delete throws on null and empty strings.
-    /// </summary>
-    /// <param name="path">The path to delete.  Unlike File.Delete, this can be null or empty.</param>
-    /// <remarks>
-    /// Note that File.Delete, and by extension SafeDeleteFile, does not throw an exception
-    /// if the file does not exist.
-    /// </remarks>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static void SafeDeleteFile( string path )
     {
@@ -485,7 +461,6 @@ namespace Standard
       }
     }
 
-    /// <summary>GDI's DeleteObject</summary>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static void SafeDeleteObject( ref IntPtr gdiObject )
     {
@@ -532,8 +507,6 @@ namespace Standard
       }
     }
 
-    /// <summary>GDI+'s DisposeImage</summary>
-    /// <param name="gdipImage"></param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static void SafeDisposeImage( ref IntPtr gdipImage )
     {
@@ -584,12 +557,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Utility to help classes catenate their properties for implementing ToString().
-    /// </summary>
-    /// <param name="source">The StringBuilder to catenate the results into.</param>
-    /// <param name="propertyName">The name of the property to be catenated.</param>
-    /// <param name="value">The value of the property to be catenated.</param>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static void GeneratePropertyString( StringBuilder source, string propertyName, string value )
     {
@@ -615,15 +582,6 @@ namespace Standard
       }
     }
 
-    /// <summary>
-    /// Generates ToString functionality for a struct.  This is an expensive way to do it,
-    /// it exists for the sake of debugging while classes are in flux.
-    /// Eventually this should just be removed and the classes should
-    /// do this without reflection.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="object"></param>
-    /// <returns></returns>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     [Obsolete]
     public static string GenerateToString<T>( T @object ) where T : struct
@@ -845,18 +803,6 @@ namespace Standard
       return decoder.GetString();
     }
 
-    /// <summary>
-    /// Encodes a URL string.  Duplicated functionality from System.Web.HttpUtility.UrlEncode.
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    /// <remarks>
-    /// Duplicated from System.Web.HttpUtility because System.Web isn't part of the client profile.
-    /// URL Encoding replaces ' ' with '+' and unsafe ASCII characters with '%XX'.
-    /// Safe characters are defined in RFC2396 (http://www.ietf.org/rfc/rfc2396.txt).
-    /// They are the 7-bit ASCII alphanumerics and the mark characters "-_.!~*'()".
-    /// This implementation does not treat '~' as a safe character to be consistent with the System.Web version.
-    /// </remarks>
     [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode" )]
     public static string UrlEncode( string url )
     {

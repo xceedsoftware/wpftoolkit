@@ -34,7 +34,7 @@
          <RowDefinition />
       </Grid.RowDefinitions>
       <StackPanel Grid.Row="0" Margin="20">
-         <TextBlock Text="Focus the element to inspect with the propertyGrid." 
+         <TextBlock Text="Focus the element to inspect with the PropertyGrid." 
                     TextWrapping="Wrap"/>
       </StackPanel>
 

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -20,15 +20,8 @@ using System.Windows.Controls;
 
 namespace Xceed.Wpf.Toolkit
 {
-  /// <summary>
-  /// Provides data for the ExtendedTabControl.TabItemAdded and ExtendedTabControl.TabItemRemoved events.
-  /// </summary>
-  /// <QualityBand>Preview</QualityBand>
   public class TabItemEventArgs : RoutedEventArgs
   {
-    /// <summary>
-    /// Gets the TabItem that is passed in TabItemAdded/TabItemRemoved events. 
-    /// </summary>
     public TabItem TabItem
     {
       get;
@@ -36,10 +29,6 @@ namespace Xceed.Wpf.Toolkit
     }
 
 
-    /// <summary>
-    /// Initializes a new instance of the TabItemEventArgs class.
-    /// </summary>
-    /// <param name="tabItem">TabItem to add or to remove.</param>
     public TabItemEventArgs( TabItem tabItem )
       : base()
     {

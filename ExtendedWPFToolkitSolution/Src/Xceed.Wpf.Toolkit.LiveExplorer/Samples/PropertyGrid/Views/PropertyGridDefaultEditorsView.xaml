@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -26,7 +43,7 @@
            This example demonstrates the default editors provided by the PropertyGrid. A different editor exists for each
            of the following types (C# name): string, bool, decimal, int, short, long, float, byte, sbyte, uint, ulong, ushort, 
            DateTime, TimeSpan, Color, Enums, FontFamily, FontWeight, FontStyle, FontStretch, 
-           IList&lt;T&gt; (primtive type), IList&lt;T&gt; (custom type),
+           IList&lt;T&gt; (primitive type), IList&lt;T&gt; (custom type),
       </Paragraph>
     </local:DemoView.Description>
 

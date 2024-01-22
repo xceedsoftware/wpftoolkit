@@ -1,4 +1,21 @@
-﻿#region Copyright (C) 2001-2003 Jean-Claude Manoli [jc@manoli.net]
+﻿/*************************************************************************************
+   
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************/
+
+#region Copyright (C) 2001-2003 Jean-Claude Manoli [jc@manoli.net]
 /*
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the author(s) be held liable for any damages arising from
@@ -32,9 +49,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 {
   public class CSharpFormat : CLikeFormat
   {
-    /// <summary>
-    /// The list of C# keywords.
-    /// </summary>
     protected override string Keywords
     {
       get
@@ -50,9 +64,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary>
-    /// The list of C# preprocessors.
-    /// </summary>
     protected override string Preprocessors
     {
       get
@@ -63,15 +74,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
     }
   }
 
-  /// <summary>
-  /// Provides a base class for formatting languages similar to C.
-  /// </summary>
   public abstract class CLikeFormat : CodeFormat
   {
-    /// <summary>
-    /// Regular expression string to match single line and multi-line 
-    /// comments (// and /* */). 
-    /// </summary>
     protected override string CommentRegEx
     {
       get
@@ -80,9 +84,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary>
-    /// Regular expression string to match string and character literals. 
-    /// </summary>
     protected override string StringRegEx
     {
       get
@@ -92,30 +93,13 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
     }
   }
 
-  /// <summary>
-  /// Provides a base class for formatting most programming languages.
-  /// </summary>
   public abstract class CodeFormat : SourceFormat
   {
-    /// <summary>
-    /// Must be overridden to provide a list of keywords defined in 
-    /// each language.
-    /// </summary>
-    /// <remarks>
-    /// Keywords must be separated with spaces.
-    /// </remarks>
     protected abstract string Keywords
     {
       get;
     }
 
-    /// <summary>
-    /// Can be overridden to provide a list of preprocessors defined in 
-    /// each language.
-    /// </summary>
-    /// <remarks>
-    /// Preprocessors must be separated with spaces.
-    /// </remarks>
     protected virtual string Preprocessors
     {
       get
@@ -124,33 +108,16 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary>
-    /// Must be overridden to provide a regular expression string
-    /// to match strings literals. 
-    /// </summary>
     protected abstract string StringRegEx
     {
       get;
     }
 
-    /// <summary>
-    /// Must be overridden to provide a regular expression string
-    /// to match comments. 
-    /// </summary>
     protected abstract string CommentRegEx
     {
       get;
     }
 
-    /// <summary>
-    /// Determines if the language is case sensitive.
-    /// </summary>
-    /// <value><b>true</b> if the language is case sensitive, <b>false</b> 
-    /// otherwise. The default is true.</value>
-    /// <remarks>
-    /// A case-insensitive language formatter must override this 
-    /// property to return false.
-    /// </remarks>
     public virtual bool CaseSensitive
     {
       get
@@ -159,7 +126,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary/>
     protected CodeFormat()
     {
       //generate the keyword and preprocessor regexes from the keyword lists
@@ -197,13 +163,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       CodeParagraphGlobal = new List<Run>();
     }
 
-    /// <summary>
-    /// Called to evaluate the HTML fragment corresponding to each 
-    /// matching token in the code.
-    /// </summary>
-    /// <param name="match">The <see cref="Match"/> resulting from a 
-    /// single regular expression match.</param>
-    /// <returns>A string containing the HTML code fragment.</returns>
     protected override string MatchEval( Match match ) //protected override
     {
       if( match.Groups[ 1 ].Success ) //comment
@@ -260,26 +219,8 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
     }
   }
 
-  /// <summary>
-  ///	Provides a base implementation for all code formatters.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// To display the formatted code on your web site, the web page must 
-  /// refer to a stylesheet that defines the formatting for the different 
-  /// CSS classes generated by CSharpFormat:
-  /// .csharpcode, pre, .rem, .kwrd, .str, .op, .preproc, .alt, .lnum.
-  /// </para>
-  /// <para>
-  /// Note that if you have multi-line comments in your source code
-  /// (like /* ... */), the "line numbers" or "alternate line background" 
-  /// options will generate code that is not strictly HTML 4.01 compliant. 
-  /// The code will still look good with IE5+ or Mozilla 0.8+. 
-  /// </para>
-  /// </remarks>
   public abstract class SourceFormat
   {
-    /// <summary/>
     protected SourceFormat()
     {
       _tabSpaces = 4;
@@ -290,12 +231,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 
     private byte _tabSpaces;
 
-    /// <summary>
-    /// Gets or sets the tabs width.
-    /// </summary>
-    /// <value>The number of space characters to substitute for tab 
-    /// characters. The default is <b>4</b>, unless overridden is a 
-    /// derived class.</value>
     public byte TabSpaces
     {
       get
@@ -310,11 +245,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 
     private bool _lineNumbers;
 
-    /// <summary>
-    /// Enables or disables line numbers in output.
-    /// </summary>
-    /// <value>When <b>true</b>, line numbers are generated. 
-    /// The default is <b>false</b>.</value>
     public bool LineNumbers
     {
       get
@@ -329,11 +259,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 
     private bool _alternate;
 
-    /// <summary>
-    /// Enables or disables alternating line background.
-    /// </summary>
-    /// <value>When <b>true</b>, lines background is alternated. 
-    /// The default is <b>false</b>.</value>
     public bool Alternate
     {
       get
@@ -348,11 +273,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 
     private bool _embedStyleSheet;
 
-    /// <summary>
-    /// Enables or disables the embedded CSS style sheet.
-    /// </summary>
-    /// <value>When <b>true</b>, the CSS &lt;style&gt; element is included 
-    /// in the HTML output. The default is <b>false</b>.</value>
     public bool EmbedStyleSheet
     {
       get
@@ -365,10 +285,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary>
-    /// Transforms a source code string to HTML 4.01.
-    /// </summary>
-    /// <returns>A string containing the HTML formatted code.</returns>
     public Paragraph FormatCode( string source )
     {
       return FormatCode( source, _lineNumbers, _alternate, _embedStyleSheet, false );
@@ -376,9 +292,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
 
     private Regex codeRegex;
 
-    /// <summary>
-    /// The regular expression used to capture language tokens.
-    /// </summary>
     protected Regex CodeRegex
     {
       get
@@ -392,9 +305,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
     }
 
     private List<Run> codeParagraphGlobal;
-    /// <summary>
-    /// This is a List of Run's that can be added later to the string of code
-    /// </summary>
     protected List<Run> CodeParagraphGlobal
     {
       get
@@ -407,13 +317,6 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Core.CodeFormatting
       }
     }
 
-    /// <summary>
-    /// Called to evaluate the HTML fragment corresponding to each 
-    /// matching token in the code.
-    /// </summary>
-    /// <param name="match">The <see cref="Match"/> resulting from a 
-    /// single regular expression match.</param>
-    /// <returns>A string containing the HTML code fragment.</returns>
     protected abstract string MatchEval( Match match ); //protected abstract
 
     //does the formatting job

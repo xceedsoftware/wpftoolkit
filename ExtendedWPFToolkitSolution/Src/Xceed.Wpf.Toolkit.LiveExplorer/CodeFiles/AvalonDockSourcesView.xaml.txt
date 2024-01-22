@@ -14,7 +14,7 @@
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
   ***********************************************************************************-->
-
+  
 <local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.AvalonDock.Views.AvalonDockSourcesView"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -47,7 +47,7 @@
     <DataTemplate DataType="{x:Type views:Note}">
       <views:NoteView />
     </DataTemplate>
-
+    
   </local:DemoView.Resources>
 
   <Grid>
@@ -73,7 +73,7 @@
         <xcad:DockingManager.LayoutUpdateStrategy>
           <localView:LayoutManager />
         </xcad:DockingManager.LayoutUpdateStrategy>
-
+        
         <xcad:DockingManager.LayoutItemContainerStyleSelector>
           <localView:ContainerStyleSelector>
 
@@ -91,10 +91,10 @@
                 <Setter Property="ContentId" Value="{Binding Model.Content}" />
               </Style>
             </localView:ContainerStyleSelector.LayoutAnchorableItemStyle>
-
+            
           </localView:ContainerStyleSelector>
         </xcad:DockingManager.LayoutItemContainerStyleSelector>
-
+        
       </xcad:DockingManager>
 
     </StackPanel>

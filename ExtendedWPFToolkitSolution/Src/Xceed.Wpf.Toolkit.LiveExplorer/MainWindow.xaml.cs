@@ -1,4 +1,21 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  ***********************************************************************************/
+
+/*************************************************************************************
 
    Toolkit for WPF
 
@@ -24,9 +41,6 @@ using Xceed.Wpf.Toolkit.LiveExplorer.Core;
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer
 {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
   public partial class MainWindow : Window
   {
     private const string toolkitAssembly =
@@ -122,7 +136,12 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer
 
     private void Hyperlink_RequestNavigate( object sender, System.Windows.Navigation.RequestNavigateEventArgs e )
     {
-      Process.Start( new ProcessStartInfo( e.Uri.AbsoluteUri ) );
+      using( var p = new Process() )
+      {
+        p.StartInfo.FileName = e.Uri.AbsoluteUri;
+        p.StartInfo.UseShellExecute = true;
+        p.Start();
+      }
       e.Handled = true;
     }
 

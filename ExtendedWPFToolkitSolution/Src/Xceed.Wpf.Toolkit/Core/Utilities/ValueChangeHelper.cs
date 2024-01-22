@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -22,18 +22,10 @@ using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
-  /// <summary>
-  /// This helper class will raise events when a specific
-  /// path value on one or many items changes.
-  /// </summary>
   internal class ValueChangeHelper : DependencyObject
   {
 
     #region Value Property
-    /// <summary>
-    /// This private property serves as the target of a binding that monitors the value of the binding
-    /// of each item in the source.
-    /// </summary>
     private static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( object ), typeof( ValueChangeHelper ), new UIPropertyMetadata( null, OnValueChanged ) );
     private object Value
     {

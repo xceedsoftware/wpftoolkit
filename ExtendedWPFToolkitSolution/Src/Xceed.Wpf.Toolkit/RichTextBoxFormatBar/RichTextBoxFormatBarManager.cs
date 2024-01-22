@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -148,11 +148,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    /// <summary>
-    /// Attaches a FormatBar to a RichtextBox
-    /// </summary>
-    /// <param name="richTextBox">The RichtextBox to attach to.</param>
-    /// <param name="formatBar">The Formatbar to attach.</param>
     private void AttachFormatBarToRichtextBox( global::System.Windows.Controls.RichTextBox richTextBox, IRichTextBoxFormatBar formatBar )
     {
       _richTextBox = richTextBox;
@@ -168,9 +163,6 @@ namespace Xceed.Wpf.Toolkit
       _toolbar = formatBar;
     }
 
-    /// <summary>
-    /// Shows the FormatBar
-    /// </summary>
     void ShowAdorner()
     {
       if( _adorner.Visibility == Visibility.Visible )
@@ -199,10 +191,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Positions the FormatBar so that is does not go outside the bounds of the RichTextBox or covers the selected text
-    /// </summary>
-    /// <param name="adorningEditor"></param>
     private void PositionFormatBar( Control adorningEditor )
     {
       Point mousePosition = Mouse.GetPosition( _richTextBox );
@@ -237,10 +225,6 @@ namespace Xceed.Wpf.Toolkit
       _adorner.SetOffsets( left, top );
     }
 
-    /// <summary>
-    /// Ensures that the IRichTextFormatBar is in the adorner layer.
-    /// </summary>
-    /// <returns>True if the IRichTextFormatBar is in the adorner layer, else false.</returns>
     bool VerifyAdornerLayer()
     {
       if( _adorner.Parent != null )
@@ -254,9 +238,6 @@ namespace Xceed.Wpf.Toolkit
       return true;
     }
 
-    /// <summary>
-    /// Hides the IRichTextFormatBar that is in the adornor layer.
-    /// </summary>
     void HideAdorner()
     {
       if( IsAdornerVisible )

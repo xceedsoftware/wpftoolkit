@@ -37,7 +37,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
     <StackPanel Grid.Row="0" Margin="10" >
-      <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties are set to Red."
+      <TextBlock Text="Using the PropertyContainerStyle property, the Foreground of all properties is set to Red."
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
       <TextBlock Text="Using the PreparePropertyItem event, the display name of the property 'Friend' is changed to 'Friend (renamed)'."

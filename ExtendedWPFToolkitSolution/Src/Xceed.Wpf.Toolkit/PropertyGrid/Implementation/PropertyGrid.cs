@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -457,15 +457,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region PropertyContainerStyle
 
-    /// <summary>
-    /// Identifies the PropertyContainerStyle dependency property
-    /// </summary>
     public static readonly DependencyProperty PropertyContainerStyleProperty =
         DependencyProperty.Register( "PropertyContainerStyle", typeof( Style ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnPropertyContainerStyleChanged ) );
 
-    /// <summary>
-    /// Gets or sets the style that will be applied to all PropertyItemBase instances displayed in the property grid.
-    /// </summary>
     public Style PropertyContainerStyle
     {
       get
@@ -750,15 +744,9 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region SelectedProperty
 
-    /// <summary>
-    /// Identifies the SelectedProperty dependency property
-    /// </summary>
     public static readonly DependencyProperty SelectedPropertyProperty =
         DependencyProperty.Register( "SelectedProperty", typeof( object ), typeof( PropertyGrid ), new UIPropertyMetadata( null, OnSelectedPropertyChanged ) );
 
-    /// <summary>
-    /// Gets or sets the selected property or returns null if the selection is empty.
-    /// </summary>
     public object SelectedProperty
     {
       get
@@ -1284,20 +1272,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    /// <summary>
-    /// Override this call to control the filter applied based on the
-    /// text input.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <returns></returns>
     protected virtual Predicate<object> CreateFilter( string filter )
     {
       return null;
     }
 
-    /// <summary>
-    /// Updates all property values in the PropertyGrid with the data from the SelectedObject
-    /// </summary>
     public void Update()
     {
       if( _containerHelper != null )
@@ -1404,17 +1383,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region PreparePropertyItemEvent Attached Routed Event
 
-    /// <summary>
-    /// Identifies the PreparePropertyItem event.
-    /// This attached routed event may be raised by the PropertyGrid itself or by a
-    /// PropertyItemBase containing sub-items.
-    /// </summary>
     public static readonly RoutedEvent PreparePropertyItemEvent = EventManager.RegisterRoutedEvent( "PreparePropertyItem", RoutingStrategy.Bubble, typeof( PropertyItemEventHandler ), typeof( PropertyGrid ) );
 
-    /// <summary>
-    /// This event is raised when a property item is about to be displayed in the PropertyGrid.
-    /// This allow the user to customize the property item just before it is displayed.
-    /// </summary>
     public event PropertyItemEventHandler PreparePropertyItem
     {
       add
@@ -1427,21 +1397,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    /// <summary>
-    /// Adds a handler for the PreparePropertyItem attached event
-    /// </summary>
-    /// <param name="element">the element to attach the handler</param>
-    /// <param name="handler">the handler for the event</param>
     public static void AddPreparePropertyItemHandler( UIElement element, PropertyItemEventHandler handler )
     {
       element.AddHandler( PropertyGrid.PreparePropertyItemEvent, handler );
     }
 
-    /// <summary>
-    /// Removes a handler for the PreparePropertyItem attached event
-    /// </summary>
-    /// <param name="element">the element to attach the handler</param>
-    /// <param name="handler">the handler for the event</param>
     public static void RemovePreparePropertyItemHandler( UIElement element, PropertyItemEventHandler handler )
     {
       element.RemoveHandler( PropertyGrid.PreparePropertyItemEvent, handler );
@@ -1456,16 +1416,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #region ClearPropertyItemEvent Attached Routed Event
 
-    /// <summary>
-    /// Identifies the ClearPropertyItem event.
-    /// This attached routed event may be raised by the PropertyGrid itself or by a
-    /// PropertyItemBase containing sub items.
-    /// </summary>
     public static readonly RoutedEvent ClearPropertyItemEvent = EventManager.RegisterRoutedEvent( "ClearPropertyItem", RoutingStrategy.Bubble, typeof( PropertyItemEventHandler ), typeof( PropertyGrid ) );
-    /// <summary>
-    /// This event is raised when an property item is about to be remove from the display in the PropertyGrid
-    /// This allow the user to remove any attached handler in the PreparePropertyItem event.
-    /// </summary>
     public event PropertyItemEventHandler ClearPropertyItem
     {
       add
@@ -1495,21 +1446,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     #endregion //PropertiesGenerated Event
 
-    /// <summary>
-    /// Adds a handler for the ClearPropertyItem attached event
-    /// </summary>
-    /// <param name="element">the element to attach the handler</param>
-    /// <param name="handler">the handler for the event</param>
     public static void AddClearPropertyItemHandler( UIElement element, PropertyItemEventHandler handler )
     {
       element.AddHandler( PropertyGrid.ClearPropertyItemEvent, handler );
     }
 
-    /// <summary>
-    /// Removes a handler for the ClearPropertyItem attached event
-    /// </summary>
-    /// <param name="element">the element to attach the handler</param>
-    /// <param name="handler">the handler for the event</param>
     public static void RemoveClearPropertyItemHandler( UIElement element, PropertyItemEventHandler handler )
     {
       element.RemoveHandler( PropertyGrid.ClearPropertyItemEvent, handler );

@@ -33,6 +33,7 @@
     <Compile Include="CodeBox.cs" />
     <Compile Include="Core\Converters\ZeroToBoolConverter.cs" />
     <Compile Include="Core\CSharpFormatter.cs" />
+    <Compile Include="Core\ThemeBaseNames.cs" />
     <Compile Include="Core\XamlFormatter.cs" />
     <Compile Include="HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
@@ -302,6 +303,8 @@
       <DependentUpon>WatermarkTextboxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\Theming\Converters\FlagPathConverter.cs" />
+    <Compile Include="Samples\Theming\Helpers\ThemeChoiceViewModel.cs" />
+    <Compile Include="Samples\Theming\Helpers\ThemingSharedProperties.cs" />
     <Compile Include="Samples\Theming\Views\ThemingAvalonDockView.xaml.cs">
       <DependentUpon>ThemingAvalonDockView.xaml</DependentUpon>
     </Compile>
@@ -835,6 +838,60 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Aero.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_FluentDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_FluentLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Generic.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Material.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Metro.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_MetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_MetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Office2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Office2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Office2007Silver.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_VS2010.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDock_Windows10.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_FluentDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_FluentLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_Material.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_MetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_MetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_Office2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_Office2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_Office2007Silver.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_System.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Core_Windows10.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_FluentDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_FluentLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_Material.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_MetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_MetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_Office2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_Office2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_Office2007Silver.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\DataGrid_Windows10.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_FluentDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_FluentLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_LiveExplorer.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_Material.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_MediaPlayer.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_MetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_MetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_Office2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_Office2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_Office2007Silver.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_System.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\ListBox_Windows10.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_FluentDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_FluentLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_Material.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_MetroDark.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_MetroLight.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_Office2007Black.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_Office2007Blue.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_Office2007Silver.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_System.png" />
+    <Resource Include="Samples\Theming\OpenSourceImages\Toolkit_Windows10.png" />
     <Resource Include="CodeFiles\PropertyGridAdvancedContextMenuView.xaml.cs.txt" />
     <Resource Include="CodeFiles\PropertyGridAdvancedContextMenuView.xaml.txt" />
     <Resource Include="CodeFiles\PropertyGridEditorComboBoxDefinitionSourceView.xaml.cs.txt" />
@@ -895,13 +952,6 @@
     <Resource Include="Samples\Panels\OpenSourceImages\StackPanel.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Samples\Theming\OpenSourceImages\ExtendedWPFToolkitControls.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Samples\Theming\OpenSourceImages\CoreWPFControls.png" />
-    <Resource Include="Samples\Theming\OpenSourceImages\DataGridControls.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Samples\PropertyGrid\OpenSourceImages\Localization.png" />
   </ItemGroup>
   <ItemGroup>
@@ -932,9 +982,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\PropertyGrid\Resources\woman.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Samples\Theming\OpenSourceImages\ListBoxControls.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Samples\ListBox\OpenSourceImages\ListBox.png" />
@@ -1131,13 +1178,6 @@
   <ItemGroup>
     <Resource Include="CodeFiles\ThemingAvalonDockView.xaml.cs.txt" />
     <Resource Include="CodeFiles\ThemingAvalonDockView.xaml.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockMetroDark.png" />
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockMetroLight.png" />
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Black.png" />
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Blue.png" />
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockOffice2007Silver.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="CodeFiles\RadialGaugeView.xaml.cs.txt" />
@@ -1342,9 +1382,6 @@
     <Resource Include="Samples\PropertyGrid\OpenSourceImages\ExpandingNonPrimitives.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Samples\Theming\OpenSourceImages\AvalonDockWindows10.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="CodeFiles\MaterialHamburgerView.xaml.cs.txt" />
     <Resource Include="CodeFiles\MaterialHamburgerView.xaml.txt" />
   </ItemGroup>
@@ -1402,14 +1439,5 @@
          include the ReferencePath property. No good reason why. We reactivate its use here
     -->
     <AssemblySearchPaths>$(ReferencePath);$(AssemblySearchPaths)</AssemblySearchPaths>
-    <PreBuildEvent>echo Deleting old CodeFiles directory...
-@if exist "$(ProjectDir)CodeFiles" rmdir /s /q "$(ProjectDir)CodeFiles"
-echo Copying sample code files...
-for /d /r "$(ProjectDir)Samples" %25%25a in (Views) do @if exist "%25%25a" xcopy "%25%25a" "$(ProjectDir)CodeFiles" /s /Y /I /q &gt; NUL
-echo Renaming sample code files...
-for /f "tokens=*" %25%25f in ('dir "$(ProjectDir)CodeFiles\*.*" /b') do ( 
-move /y "$(ProjectDir)CodeFiles\%25%25f" "$(ProjectDir)CodeFiles\%25%25f.txt" &gt; NUL
-)
-</PreBuildEvent>
   </PropertyGroup>
 </Project>

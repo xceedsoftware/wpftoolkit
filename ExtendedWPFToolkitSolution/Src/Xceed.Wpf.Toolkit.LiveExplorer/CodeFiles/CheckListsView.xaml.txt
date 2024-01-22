@@ -51,7 +51,7 @@
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
-
+      
       <GroupBox Grid.Column="0"
                 Header="Common Features" >
         <Grid>
@@ -220,7 +220,7 @@
         </Grid>
       </GroupBox>
     </Grid>
-
+    
 
     <GroupBox Header="Item Models"
               Grid.Row="1"

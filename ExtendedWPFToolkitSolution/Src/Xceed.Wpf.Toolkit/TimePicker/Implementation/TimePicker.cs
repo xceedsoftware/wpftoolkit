@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -100,16 +100,9 @@ namespace Xceed.Wpf.Toolkit
 
     #region TimeListItemsStyle
 
-    /// <summary>
-    /// TimeListItemsStyle Dependency Property
-    /// </summary>
     public static readonly DependencyProperty TimeListItemsStyleProperty = DependencyProperty.Register( "TimeListItemsStyle", typeof( Style ), typeof( TimePicker ),
             new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnTimeListItemsStyleChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the TimeListItemsStyle property.  
-    /// This dependency property indicates the style to apply to TimeListItems objects.
-    /// </summary>
     public Style TimeListItemsStyle
     {
       get
@@ -122,17 +115,11 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Handles changes to the TimeListItemsStyle property.
-    /// </summary>
     private static void OnTimeListItemsStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( TimePicker )d ).OnTimeListItemsStyleChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the TimeListItemsStyle property.
-    /// </summary>
     protected virtual void OnTimeListItemsStyleChanged( DependencyPropertyChangedEventArgs e )
     {
       // TODO: Add your property changed side-effects. Descendants can override as well.

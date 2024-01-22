@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -25,7 +42,7 @@
                  Title="PropertyGrid Binding to Structs">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            When the SelectedObject contains properties of type Struct youmay find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value.  Meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.
+            When the SelectedObject contains properties of type Struct you may find that edits performed in the PropertyGrid do not function properly.  This is because Structs are passed by value, meaning that the PropertyGrid receives a copy of the Struct and not a reference.  When this happens, the data binding expressions end up binding to and modifying that copy rather than the original values.
         </Paragraph>
     </local:DemoView.Description>
 

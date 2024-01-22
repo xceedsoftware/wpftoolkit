@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -25,14 +25,6 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
 {
   internal static class ReflectionHelper
   {
-    /// <summary>
-    /// Check the existence of the specified public instance (i.e. non static) property against
-    /// the type of the specified source object. If the property is not defined by the type,
-    /// a debug assertion will fail. Typically used to validate the parameter of a 
-    /// RaisePropertyChanged method.
-    /// </summary>
-    /// <param name="sourceObject">The object for which the type will be checked.</param>
-    /// <param name="propertyName">The name of the property.</param>
     [System.Diagnostics.Conditional( "DEBUG" )]
     internal static void ValidatePublicPropertyName( object sourceObject, string propertyName )
     {
@@ -46,14 +38,6 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
         string.Format( "Public property {0} not found on object of type {1}.", propertyName, sourceObject.GetType().FullName ) );
     }
 
-    /// <summary>
-    /// Check the existence of the specified instance (i.e. non static) property against
-    /// the type of the specified source object. If the property is not defined by the type,
-    /// a debug assertion will fail. Typically used to validate the parameter of a 
-    /// RaisePropertyChanged method.
-    /// </summary>
-    /// <param name="sourceObject">The object for which the type will be checked.</param>
-    /// <param name="propertyName">The name of the property.</param>
     [System.Diagnostics.Conditional( "DEBUG" )]
     internal static void ValidatePropertyName( object sourceObject, string propertyName )
     {

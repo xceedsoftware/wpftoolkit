@@ -15,6 +15,9 @@
 
   *************************************************************************************/
 
+#if !OPEN_SOURCE
+using Xceed.Wpf.Toolkit.Chart;
+#endif
 using System.Windows;
 using System;
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
@@ -29,7 +32,16 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
       InitializeComponent();
     }
 
+#if !OPEN_SOURCE
+    #region Event Handler
 
+    private void LegendButtonClick( object sender, RoutedEventArgs e )
+    {
+      Random r = new Random();
+      _series.DataPoints.Add( new DataPoint( _series.DataPoints.Count, r.NextDouble() ) );
+    }
 
+    #endregion
+#endif
   }
 }

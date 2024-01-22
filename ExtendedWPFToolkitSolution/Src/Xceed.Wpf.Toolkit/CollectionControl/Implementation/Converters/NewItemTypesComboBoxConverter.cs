@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -24,15 +24,6 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit.Converters
 {
-  /// <summary>
-  /// This multi-value converter is used in the CollectionControl template
-  /// to determine the list of possible new item types that will be shown in the combo box.
-  /// 
-  /// If the second value (i.e., CollectionControl.NewItemTypes) is not null, this list will be used.
-  /// Otherwise, if the first value (i.e., CollectionControl.ItemsSourceType) is a "IList&lt;T&gt;"
-  /// type, the new item type list will contain "T".
-  /// 
-  /// </summary>
   public class NewItemTypesComboBoxConverter : IMultiValueConverter
   {
     public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -86,18 +86,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsLeftSide
 
-    /// <summary>
-    /// IsLeftSide Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey IsLeftSidePropertyKey = DependencyProperty.RegisterReadOnly( "IsLeftSide", typeof( bool ), typeof( LayoutAnchorSideControl ),
             new FrameworkPropertyMetadata( ( bool )false ) );
 
     public static readonly DependencyProperty IsLeftSideProperty = IsLeftSidePropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the IsLeftSide property.  This dependency property 
-    /// indicates this control is anchored to left side.
-    /// </summary>
     public bool IsLeftSide
     {
       get
@@ -106,11 +99,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsLeftSide property.  
-    /// This dependency property indicates this control is anchored to left side.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetIsLeftSide( bool value )
     {
       SetValue( IsLeftSidePropertyKey, value );
@@ -120,18 +108,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsTopSide
 
-    /// <summary>
-    /// IsTopSide Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey IsTopSidePropertyKey = DependencyProperty.RegisterReadOnly( "IsTopSide", typeof( bool ), typeof( LayoutAnchorSideControl ),
             new FrameworkPropertyMetadata( ( bool )false ) );
 
     public static readonly DependencyProperty IsTopSideProperty = IsTopSidePropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the IsTopSide property.  This dependency property 
-    /// indicates this control is anchored to top side.
-    /// </summary>
     public bool IsTopSide
     {
       get
@@ -140,11 +121,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsTopSide property.  
-    /// This dependency property indicates this control is anchored to top side.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetIsTopSide( bool value )
     {
       SetValue( IsTopSidePropertyKey, value );
@@ -154,18 +130,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsRightSide
 
-    /// <summary>
-    /// IsRightSide Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey IsRightSidePropertyKey = DependencyProperty.RegisterReadOnly( "IsRightSide", typeof( bool ), typeof( LayoutAnchorSideControl ),
             new FrameworkPropertyMetadata( ( bool )false ) );
 
     public static readonly DependencyProperty IsRightSideProperty = IsRightSidePropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the IsRightSide property.  This dependency property 
-    /// indicates this control is anchored to right side.
-    /// </summary>
     public bool IsRightSide
     {
       get
@@ -174,11 +143,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsRightSide property.  
-    /// This dependency property indicates this control is anchored to right side.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetIsRightSide( bool value )
     {
       SetValue( IsRightSidePropertyKey, value );
@@ -188,18 +152,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region IsBottomSide
 
-    /// <summary>
-    /// IsBottomSide Read-Only Dependency Property
-    /// </summary>
     private static readonly DependencyPropertyKey IsBottomSidePropertyKey = DependencyProperty.RegisterReadOnly( "IsBottomSide", typeof( bool ), typeof( LayoutAnchorSideControl ),
             new FrameworkPropertyMetadata( ( bool )false ) );
 
     public static readonly DependencyProperty IsBottomSideProperty = IsBottomSidePropertyKey.DependencyProperty;
 
-    /// <summary>
-    /// Gets the IsBottomSide property.  This dependency property 
-    /// indicates if this panel is anchored to bottom side.
-    /// </summary>
     public bool IsBottomSide
     {
       get
@@ -208,11 +165,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Provides a secure method for setting the IsBottomSide property.  
-    /// This dependency property indicates if this panel is anchored to bottom side.
-    /// </summary>
-    /// <param name="value">The new value for the property.</param>
     protected void SetIsBottomSide( bool value )
     {
       SetValue( IsBottomSidePropertyKey, value );

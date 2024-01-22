@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -20,13 +20,6 @@ using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
-  /// <summary>
-  /// Used when properties are provided using a list source of items (eg. Properties or PropertiesSource). 
-  /// 
-  /// An instance of this class can be used as an item to easily customize the 
-  /// display of the property directly by modifying the values of this class 
-  /// (e.g., DisplayName, value, Category, etc.).
-  /// </summary>
   public class CustomPropertyItem : PropertyItemBase
   {
     #region Constructors

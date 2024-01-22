@@ -27,8 +27,8 @@
                 Title="Using Attributes">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-          This sample expose how you can use Attributes to customize the display of the properties in the PropertyGrid.
-           With attributes you can, for each properties, customize their own category, display property, display name, display order, description, editor, editor combox items,
+          This sample shows how you can use Attributes to customize the display of the properties in the PropertyGrid.
+           With attributes you can, for each property, customize their own category, display property, display name, display order, description, editor, editor combox items,
            and expandability (drill down). Here is the list of all supported attributes:
          <LineBreak />
          <LineBreak />
@@ -72,7 +72,7 @@
          LocalizedDescriptionAttribute
       </Paragraph>
     </local:DemoView.Description>
-
+    
    <Grid>
       <Grid.RowDefinitions>
          <RowDefinition Height="Auto" />
@@ -90,11 +90,11 @@
                     FontStyle="Italic"
                     Margin="0,10,0,0"/>
       </StackPanel>
-
+      
       <xctk:PropertyGrid Grid.Row="1" x:Name="_propertyGrid" Width="450" MaxHeight="650" Margin="10" 
                          SelectedObject="{Binding}"
                          ShowDescriptionByTooltip="True">
       </xctk:PropertyGrid>      
-
+      
    </Grid>
 </local:DemoView>

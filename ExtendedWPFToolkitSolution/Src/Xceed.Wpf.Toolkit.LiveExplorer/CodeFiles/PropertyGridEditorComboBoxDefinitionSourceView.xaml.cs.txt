@@ -29,12 +29,55 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.PropertyGrid.Views
     {
       InitializeComponent();
 
+#if !OPEN_SOURCE
+      this.DataContext = this;
 
+      var employees = new ObservableCollection<Employee>()
+        {
+          new Employee() { Name = "Joe Doe", Department = "Production" },
+          new Employee() { Name = "Mary Jane", Department = "Sales" },
+          new Employee() { Name = "Mark Moe", Department = "Accounting" }
+        };
 
+      this.Company = new Compnany()
+      {
+        City = "Maryland",
+        Employees = employees,
+        Employee = employees[ 0 ]
+      };
+#endif
     }
 
+#if !OPEN_SOURCE
+    public Compnany Company
+    {
+      get;
+      set;
+    }
+#endif
   }
 
+#if !OPEN_SOURCE
+  public class Compnany
+  {
+    public string City
+    {
+      get;
+      set;
+    }
 
+    public Employee Employee
+    {
+      get;
+      set;
+    }
 
+    [Browsable( false )]
+    public ObservableCollection<Employee> Employees
+    {
+      get;
+      set;
+    }
+  }
+#endif
 }

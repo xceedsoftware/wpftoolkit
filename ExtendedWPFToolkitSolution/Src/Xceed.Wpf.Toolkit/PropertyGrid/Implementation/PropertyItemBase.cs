@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -247,11 +247,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #endregion //IsSelected
 
     #region ParentElement
-    /// <summary>
-    /// Gets the parent property grid element of this property.
-    /// A PropertyItemBase instance if this is a sub-element, 
-    /// or the PropertyGrid itself if this is a first-level property.
-    /// </summary>
     public FrameworkElement ParentElement
     {
       get
@@ -315,10 +310,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     #endregion //Properties
 
     #region PropertyContainerStyle
-    /// <summary>
-    /// Get the PropertyContainerStyle for sub items of this property.
-    /// It return the value defined on PropertyGrid.PropertyContainerStyle.
-    /// </summary>
     public Style PropertyContainerStyle
     {
       get

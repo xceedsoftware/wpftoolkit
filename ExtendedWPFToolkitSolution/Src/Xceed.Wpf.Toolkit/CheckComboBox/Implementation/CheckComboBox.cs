@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -204,6 +204,11 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateDisplayMemberPathValuesBindings();
     }
 
+    protected override void OnIsAllItemsSelectedContentActiveChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateText();
+    }
+
     public override void OnApplyTemplate()
     {
       base.OnApplyTemplate();
@@ -310,23 +315,23 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void UpdateText()
     {
-      if( Items.Count == SelectedItems.Count )
+      if( this.IsAllItemsSelectedContentActive && (this.Items.Count == this.SelectedItems.Count) )
       {
-        SetCurrentValue( CheckComboBox.TextProperty, AllItemsSelectedContent );
+        this.SetCurrentValue( CheckComboBox.TextProperty, this.AllItemsSelectedContent );
         return;
       }
 
 #if VS2008
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
+      string newValue = String.Join( this.Delimiter, this.SelectedItems.Cast<object>().Select( x => this.GetItemDisplayValue( x ).ToString() ).ToArray() ); 
 #else
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ) ) );
+      string newValue = String.Join( this.Delimiter, this.SelectedItems.Cast<object>().Select( x => this.GetItemDisplayValue( x ) ) );
 #endif
 
-      if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
+      if( String.IsNullOrEmpty( this.Text ) || !this.Text.Equals( newValue ) )
       {
         _ignoreTextValueChanged = true;
 #if VS2008
-        Text = newValue;
+        this.Text = newValue;
 #else
         this.SetCurrentValue( CheckComboBox.TextProperty, newValue );
 #endif
@@ -344,10 +349,6 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateText();
     }
 
-    /// <summary>
-    /// Updates the SelectedItems collection based on the content of
-    /// the Text property.
-    /// </summary>
     private void UpdateFromText()
     {
       List<string> selectedValues = null;

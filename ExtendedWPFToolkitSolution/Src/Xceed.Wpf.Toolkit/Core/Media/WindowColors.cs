@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -20,21 +20,11 @@ using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.Core.Media
 {
-  /// <summary>
-  /// Contains system colors and configurations that can be used by the control themes.
-  /// 
-  /// Mainly extracted from the registry because theses values are not exposed by the standard .NET API.
-  /// </summary>
   public static class WindowColors
   {
     private static Color? _colorizationMode;
     private static bool? _colorizationOpaqueBlend;
 
-    /// <summary>
-    /// Relative to the \HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM\ColorizationColor Registry key.
-    /// 
-    /// Gets the window chrome color.
-    /// </summary>
     public static Color ColorizationColor
     {
       get
@@ -57,13 +47,6 @@ namespace Xceed.Wpf.Toolkit.Core.Media
       }
     }
 
-    /// <summary>
-    /// Relative to the \HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM\ColorizationOpaqueBlend Registry key:
-    /// 
-    /// Gets whether transparency is disabled.
-    /// 
-    /// Returns true if transparency is disabled; false otherwise.
-    /// </summary>
     public static bool ColorizationOpaqueBlend
     {
       get

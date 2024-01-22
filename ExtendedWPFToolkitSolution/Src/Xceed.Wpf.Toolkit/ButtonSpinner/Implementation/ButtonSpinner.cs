@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -29,9 +29,6 @@ namespace Xceed.Wpf.Toolkit
     Right
   }
 
-  /// <summary>
-  /// Represents a spinner control that includes two Buttons.
-  /// </summary>
   [TemplatePart( Name = PART_IncreaseButton, Type = typeof( ButtonBase ) )]
   [TemplatePart( Name = PART_DecreaseButton, Type = typeof( ButtonBase ) )]
   [ContentProperty( "Content" )]
@@ -208,9 +205,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Content
 
-    /// <summary>
-    /// Identifies the Content dependency property.
-    /// </summary>
     public static readonly DependencyProperty ContentProperty = DependencyProperty.Register( "Content", typeof( object ), typeof( ButtonSpinner ), new PropertyMetadata( null, OnContentPropertyChanged ) );
     public object Content
     {
@@ -224,11 +218,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// ContentProperty property changed handler.
-    /// </summary>
-    /// <param name="d">ButtonSpinner that changed its Content.</param>
-    /// <param name="e">Event arguments.</param>
     private static void OnContentPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ButtonSpinner source = d as ButtonSpinner;
@@ -282,9 +271,6 @@ namespace Xceed.Wpf.Toolkit
     #region DecreaseButton
 
     private ButtonBase _decreaseButton;
-    /// <summary>
-    /// Gets or sets the DecreaseButton template part.
-    /// </summary>
     private ButtonBase DecreaseButton
     {
       get
@@ -312,9 +298,6 @@ namespace Xceed.Wpf.Toolkit
     #region IncreaseButton
 
     private ButtonBase _increaseButton;
-    /// <summary>
-    /// Gets or sets the IncreaseButton template part.
-    /// </summary>
     private ButtonBase IncreaseButton
     {
       get
@@ -368,11 +351,6 @@ namespace Xceed.Wpf.Toolkit
       SetButtonUsage();
     }
 
-    /// <summary>
-    /// Cancel LeftMouseButtonUp events originating from a button that has
-    /// been changed to disabled.
-    /// </summary>
-    /// <param name="e">The data for the event.</param>
     protected override void OnMouseLeftButtonUp( MouseButtonEventArgs e )
     {
       base.OnMouseLeftButtonUp( e );
@@ -451,11 +429,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Called when valid spin direction changed.
-    /// </summary>
-    /// <param name="oldValue">The old value.</param>
-    /// <param name="newValue">The new value.</param>
     protected override void OnValidSpinDirectionChanged( ValidSpinDirections oldValue, ValidSpinDirections newValue )
     {
       SetButtonUsage();
@@ -466,12 +439,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
-    /// <summary>
-    /// Handle click event of IncreaseButton and DecreaseButton template parts,
-    /// translating Click to appropriate Spin event.
-    /// </summary>
-    /// <param name="sender">Event sender, should be either IncreaseButton or DecreaseButton template part.</param>
-    /// <param name="e">Event args.</param>
     private void OnButtonClick( object sender, RoutedEventArgs e )
     {
       if( AllowSpin )
@@ -485,11 +452,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    /// <summary>
-    /// Occurs when the Content property value changed.
-    /// </summary>
-    /// <param name="oldValue">The old value of the Content property.</param>
-    /// <param name="newValue">The new value of the Content property.</param>
     protected virtual void OnContentChanged( object oldValue, object newValue )
     {
     }
@@ -499,9 +461,6 @@ namespace Xceed.Wpf.Toolkit
       SetButtonUsage();
     }
 
-    /// <summary>
-    /// Disables or enables the buttons based on the valid spin direction.
-    /// </summary>
     private void SetButtonUsage()
     {
       // buttonspinner adds buttons that spin, so disable accordingly.

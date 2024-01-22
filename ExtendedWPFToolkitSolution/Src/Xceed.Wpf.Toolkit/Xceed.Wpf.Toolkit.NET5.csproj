@@ -633,6 +633,7 @@
     <Compile Include="TimePicker\Implementation\TimePicker.cs" />
     <Compile Include="TimeSpanUpDown\Implementation\TimeSpanUpDown.cs" />
     <Compile Include="Utils\Exceptions\ThrowException.cs" />
+    <Compile Include="Utils\Licensing\LicenseOrigin.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="MessageBox\Implementation\VisualStates.MessageBox.cs" />
     <Compile Include="WatermarkComboBox\Implementation\WatermarkComboBox.cs" />

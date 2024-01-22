@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -65,13 +65,6 @@ namespace Xceed.Wpf.Toolkit
     #region DialogResult
 
     private bool? _dialogResult;
-    /// <summary>
-    /// Gets or sets a value indicating whether the ChildWindow was accepted or canceled.
-    /// </summary>
-    /// <value>
-    /// True if the child window was accepted; false if the child window was
-    /// canceled. The default is null.
-    /// </value>
     [TypeConverter( typeof( NullableBoolConverter ) )]
     public bool? DialogResult
     {
@@ -850,9 +843,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
-    /// <summary>
-    /// Occurs when the ChildWindow is closed.
-    /// </summary>
     public event EventHandler Closed;
     protected virtual void OnClosed( EventArgs e )
     {
@@ -860,9 +850,6 @@ namespace Xceed.Wpf.Toolkit
         Closed( this, e );
     }
 
-    /// <summary>
-    /// Occurs when the ChildWindow is closing.
-    /// </summary>
     public event EventHandler<CancelEventArgs> Closing;
     protected virtual void OnClosing( CancelEventArgs e )
     {

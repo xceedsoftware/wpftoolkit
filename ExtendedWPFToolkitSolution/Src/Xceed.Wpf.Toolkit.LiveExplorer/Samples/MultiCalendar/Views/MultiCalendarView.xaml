@@ -1,4 +1,21 @@
-﻿<!--*************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--*************************************************************************************
 
    Toolkit for WPF
 
@@ -26,7 +43,7 @@
    <local:DemoView.Description>
       <Paragraph FontSize="14"
                  FontFamily="Segoe">
-         <Run>The MultiCalendar combines X Microsoft Calendars that can be positioned in a grid with rows and columns. The selected dates, blackout dates and highlighted dates can be chosen from any calendar. The MultiCalendar will have a fast response no matter how many CalendarDayButtons are selected.</Run>
+         <Run>The MultiCalendar combines a number of Microsoft Calendars that can be positioned in a grid with rows and columns. The selected dates, blackout dates and highlighted dates can be chosen from any calendar. The MultiCalendar will have a fast response no matter how many CalendarDayButtons are selected.</Run>
          <LineBreak />
          <LineBreak />
          <Run>The Background/Foreground of any CalendarDayButton can be easily customized based on its state(selected/highlighted/blackout/mouseOver/focused/today) and the background of any Calendar can be customized with an image or a brush.</Run>

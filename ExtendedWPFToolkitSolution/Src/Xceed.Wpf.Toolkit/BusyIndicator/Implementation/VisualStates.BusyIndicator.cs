@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -19,34 +19,16 @@ namespace Xceed.Wpf.Toolkit
 {
   internal static partial class VisualStates
   {
-    /// <summary>
-    /// Busyness group name.
-    /// </summary>
     public const string GroupBusyStatus = "BusyStatusStates";
 
-    /// <summary>
-    /// Busy state for BusyIndicator.
-    /// </summary>
     public const string StateBusy = "Busy";
 
-    /// <summary>
-    /// Idle state for BusyIndicator.
-    /// </summary>
     public const string StateIdle = "Idle";
 
-    /// <summary>
-    /// BusyDisplay group.
-    /// </summary>
     public const string GroupVisibility = "VisibilityStates";
 
-    /// <summary>
-    /// Visible state name for BusyIndicator.
-    /// </summary>
     public const string StateVisible = "Visible";
 
-    /// <summary>
-    /// Hidden state name for BusyIndicator.
-    /// </summary>
     public const string StateHidden = "Hidden";
   }
 }

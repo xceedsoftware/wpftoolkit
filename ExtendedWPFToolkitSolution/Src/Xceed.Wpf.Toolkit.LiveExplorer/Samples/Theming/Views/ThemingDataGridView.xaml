@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -15,69 +32,117 @@
 
   *************************************************************************************-->
 <local:DemoView x:Class="Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views.ThemingDataGridView"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
-                 xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Converters"
-                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-                 xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
-                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                 VerticalScrollBarVisibility="Disabled"
-                 Title="Theming WPF DataGrid"
-                 x:Name="_demo">
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:local="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer"
+                xmlns:conv="clr-namespace:Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Converters"
+                xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
+                xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                VerticalScrollBarVisibility="Disabled"
+                Title="Theming WPF DataGrid"
+                x:Name="_demo">
      <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-         <Run>Changes the themes of the datagrid control. Available themes are System, HighContrast, Office2007, Windows10, MaterialDesign and Metro with accent color.</Run>
-      <LineBreak />
-      <LineBreak />
-      <Run>The Xceed.Wpf.DataGrid.Themes.Office2007.dll, Xceed.Wpf.DataGrid.Themes.Windows10.dll, Xceed.Wpf.DataGrid.Themes.MaterialDesign.dll or Xceed.Wpf.DataGrid.Themes.Metro.dll assemblies are necessary to use these themes.</Run>
-      <LineBreak />
-            <LineBreak />
-            <Run>This feature is only available in the "Plus" version.</Run>
-            <LineBreak />
-            <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
-               Click here for more details about Xceed Toolkit Plus for WPF.
-            </Hyperlink>
+           <Run>Changes the themes of the datagrid control. Available themes are System, HighContrast, Office2007, Windows10, MaterialDesign, Metro with accent color and Fluent with accent color.</Run>
+           <LineBreak />
+           <LineBreak />
+           <Run>The Xceed.Wpf.DataGrid.Themes.Office2007.dll, Xceed.Wpf.DataGrid.Themes.Windows10.dll, Xceed.Wpf.DataGrid.Themes.MaterialDesign.dll, Xceed.Wpf.DataGrid.Themes.FluentDesign.dll or Xceed.Wpf.DataGrid.Themes.Metro.dll assemblies are necessary to use these themes.</Run>
+           <LineBreak />
+           <LineBreak />
+           <Run>This feature is only available in the "Plus" version.</Run>
+           <LineBreak />
+           <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
+              Click here for more details about Xceed Toolkit Plus for WPF.
+           </Hyperlink>
         </Paragraph>
     </local:DemoView.Description>
 
+   <local:DemoView.Resources>
+      <ResourceDictionary>
+         <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="../ItemTemplates/Common.xaml" />
+         </ResourceDictionary.MergedDictionaries>
+
+         <Style x:Key="plusSuffix" TargetType="TextBlock">
+            <Setter Property="Text" Value="Plus Only" />
+            <Setter Property="Margin" Value="5,0,0,0"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="BaselineOffset" Value="7"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="#06b025"/>
+            <Style.Triggers>
+               <DataTrigger Binding="{Binding IsHighlighted, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+               </DataTrigger>
+            </Style.Triggers>
+         </Style>
 
 
+      </ResourceDictionary>
+   </local:DemoView.Resources>
 
+   <Grid>
+      <Grid.RowDefinitions>
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="Auto" />
+         <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
 
+      <GroupBox Header="Features"
+                Margin="5">
+         <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+               <ColumnDefinition Width="Auto" />
+               <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
+            <StackPanel Margin="0,5,5,5" Orientation="Horizontal">
+               <TextBlock Text="Theme:" Margin="0,5,5,5" VerticalAlignment="Center"/>
+               <ComboBox x:Name="_themeCombo"
+                         Width="175"
+                         ItemsSource="{Binding AvailableThemes}"
+                         SelectedItem="{Binding SelectedTheme}"
+                         HorizontalContentAlignment="Stretch">
+                  <ComboBox.ItemTemplate>
+                     <DataTemplate>
+                        <DockPanel>
+                           <TextBlock Visibility="{Binding IsPlusVisibility}"
+                             DockPanel.Dock="Right"
+                             Style="{StaticResource plusSuffix}">
+                           </TextBlock>
+                           <TextBlock Text="{Binding DisplayName}" />
+                        </DockPanel>
+                     </DataTemplate>
+                  </ComboBox.ItemTemplate>
+               </ComboBox>
+            </StackPanel>
 
+         </Grid>
+      </GroupBox>
 
+      <Grid Grid.Row="1" Margin="0 10 10 4">
+         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+         </Grid.ColumnDefinitions>
 
+         <TextBlock HorizontalAlignment="Left" Text="Available in Toolkit Plus:" Style="{StaticResource Header}"/>
 
+         <TextBlock x:Name="_previewAdditionalText"
+                 Grid.Column="1"
+                 TextWrapping="Wrap"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Bottom"/>
+      </Grid>
 
+      <Grid Grid.Row="2" Margin="0 10 10 10">
+         <Viewbox Margin="20" Stretch="Uniform">
+            <Image x:Name="_previewImage" />
+         </Viewbox>
+      </Grid>
 
+   </Grid>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <Image Source="..\OpenSourceImages\DataGridControls.png" Width="700" Height="500"/>
 </local:DemoView>

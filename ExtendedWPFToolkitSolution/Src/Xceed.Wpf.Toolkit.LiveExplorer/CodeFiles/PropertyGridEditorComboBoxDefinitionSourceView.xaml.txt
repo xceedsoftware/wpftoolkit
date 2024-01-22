@@ -30,16 +30,46 @@
   <local:DemoView.Description>
     <Paragraph FontSize="14" FontFamily="Segoe">
       When using the PropertyGrid EditorComboBoxDefinition, you can bind its ItemsSource to a non-static collection source.
+      <!--##INCLUDE_OPEN_SOURCE
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />
             <Hyperlink NavigateUri="https://xceed.com/xceed-toolkit-plus-for-wpf" RequestNavigate="Hyperlink_RequestNavigate">
                Click here for more details about Xceed Toolkit Plus for WPF.
             </Hyperlink>
+        ##END-->
     </Paragraph>
   </local:DemoView.Description>
 
+  <!--##EXCLUDE_OPEN_SOURCE-->
+  <Grid>
+    <xctk:PropertyGrid x:Name="_propertyGrid"
+                       Width="450"
+                       MaxHeight="350"
+                       Margin="10"
+                       ShowAdvancedOptions="False"
+                       SelectedObject="{Binding Company}"
+                       MinHeight="100"
+                       MinWidth="300"
+                       AutoGenerateProperties="True">
 
+      <xctk:PropertyGrid.EditorDefinitions>
+        <xctk:EditorComboBoxDefinition TargetProperties="{x:Type view:Employee}"
+                                       SelectedItemBinding="{Binding Value}"
+                                       DisplayMemberPath="Name">
+          <xctk:EditorComboBoxDefinition.EditingElementStyle>
+            <Style>
+              <Setter Property="ComboBox.ItemsSource"
+                      Value="{Binding Path=Instance.Employees}" />
+            </Style>
+          </xctk:EditorComboBoxDefinition.EditingElementStyle>
+        </xctk:EditorComboBoxDefinition>
+      </xctk:PropertyGrid.EditorDefinitions>
+    </xctk:PropertyGrid>
+  </Grid>
+  <!--##END-->
 
+  <!--##INCLUDE_OPEN_SOURCE
     <Image Source="..\OpenSourceImages\EditorComboBoxDefinition.png" Width="660" Height="430"/>
+##END-->
 </local:DemoView>

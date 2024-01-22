@@ -26,10 +26,10 @@
            This example demonstrates the default editors provided by the PropertyGrid. A different editor exists for each
            of the following types (C# name): string, bool, decimal, int, short, long, float, byte, sbyte, uint, ulong, ushort, 
            DateTime, TimeSpan, Color, Enums, FontFamily, FontWeight, FontStyle, FontStretch, 
-           IList&lt;T&gt; (primtive type), IList&lt;T&gt; (custom type),
+           IList&lt;T&gt; (primitive type), IList&lt;T&gt; (custom type),
       </Paragraph>
     </local:DemoView.Description>
-
+   
    <DockPanel>
       <TextBlock DockPanel.Dock="Top" 
                  Text="Click on each property and see the description for details on the underlying editor."
@@ -37,5 +37,5 @@
       <xctk:PropertyGrid x:Name="_propertyGrid" SelectedObject="{Binding}"  Width="450" Margin="10,30,0,0" />
    </DockPanel>
 
-
+   
 </local:DemoView>

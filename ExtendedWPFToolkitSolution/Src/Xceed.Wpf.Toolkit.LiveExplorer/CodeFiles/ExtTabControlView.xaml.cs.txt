@@ -28,15 +28,61 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.ExtendedTabControl.Views
 
     public ExtTabControlView()
     {
+#if !OPEN_SOURCE
+      this.Loaded += ExtendedTabControlView_Loaded;
+#endif
       InitializeComponent();
     }
 
+#if !OPEN_SOURCE
+    private void ExtendedTabControlView_Loaded( object sender, System.Windows.RoutedEventArgs e )
+    {
+      // Redo the content with a bigger header and some fake text
+      this.LoadTabContent();
+    }
 
+    private void LoadTabContent()
+    {
+      foreach( var item in _extendedTabControl.Items )
+      {
+        // Get the TabItem
+        TabItem tabItem = _extendedTabControl.ItemContainerGenerator.ContainerFromItem( item ) as TabItem;
 
+        // Header
+        TextBlock tbHeader = new TextBlock();
+        tbHeader.FontSize = 16;
+        tbHeader.FontWeight = FontWeights.Bold;
+        tbHeader.Margin = new Thickness( 0, 5, 0, 0 );
 
+        if( tabItem.Content != null )
+        {
+          tbHeader.Text = tabItem.Content.ToString();
+        }
+        else if( tabItem.Header != null )
+        {
+          tbHeader.Text = tabItem.Header.ToString();
+        }
+        else
+        {
+          tbHeader.Text = "[empty]";
+        }
 
+        // Body
+        TextBlock tbBody = new TextBlock();
+        tbBody.Margin = new Thickness( 0, 15, 0, 0 );
+        tbBody.TextWrapping = TextWrapping.WrapWithOverflow;
+        tbBody.Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ornare turpis eu mauris dignissim luctus. Quisque nec felis egestas, imperdiet nibh vel, placerat nunc. Quisque pellentesque suscipit erat, et tempor magna finibus vel. Vivamus vitae quam neque. Phasellus lorem diam, laoreet id consectetur vitae, pellentesque sit amet sem. Morbi non mi eros. Donec orci sapien, consectetur et purus fringilla, tristique aliquam turpis. Nam at egestas neque, id varius magna. Aenean ultricies imperdiet metus. Curabitur sit amet augue consectetur, hendrerit orci sit amet, imperdiet augue. Pellentesque eu mauris nunc. Pellentesque facilisis enim eu odio dictum aliquam. Praesent ultrices tempor enim. Nunc euismod elit in massa consectetur, sed congue risus bibendum. Quisque volutpat sed libero ac feugiat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
 
+        // Build StackPanel
+        StackPanel stackPanel = new StackPanel();
+        stackPanel.Children.Add( tbHeader );
+        stackPanel.Children.Add( tbBody );
 
+        // Assign to TabItem's Content
+        tabItem.Content = stackPanel;
+      }
+    }
 
+#endif
   }
 }

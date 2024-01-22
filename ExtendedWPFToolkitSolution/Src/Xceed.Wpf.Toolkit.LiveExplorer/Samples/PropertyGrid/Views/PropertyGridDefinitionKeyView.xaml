@@ -1,4 +1,21 @@
-﻿<!--*************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--*************************************************************************************
 
    Toolkit for WPF
 
@@ -32,7 +49,7 @@
            business model code.
          <LineBreak/>
          <LineBreak/>
-           It can also be used to specify a specific default editor when a property type does not resolve to a valid editor (e.g., Object).
+           It can also be used to specify an editor to use as the default for property types that do not resolve to a valid editor (e.g., Object).
             <LineBreak />
            <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
@@ -52,7 +69,7 @@
          <TextBlock Text="Here the FirstName and LastName DefinitionKey attribute refer to the same 'nameType' EditorDefinition" 
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
-         <TextBlock Text="The ReferenceNo property, declare a DefinitionKey to 'int?' to displayed the content with a IntegerUpDown dispite it's type is 'object'" 
+         <TextBlock Text="The ReferenceNo property declares a DefinitionKey as 'int?' to display the content with an IntegerUpDown despite being of type 'object'" 
                     TextWrapping="Wrap"
                     Margin="0,0,0,10"/>
       </StackPanel>

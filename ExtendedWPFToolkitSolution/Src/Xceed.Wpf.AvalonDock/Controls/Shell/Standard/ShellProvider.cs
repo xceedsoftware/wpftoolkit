@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -30,7 +30,6 @@ namespace Standard
 
   #region Enums and Static Property Classes
 
-  /// <summary>ShellItem attribute flags.  SIATTRIBFLAGS_*</summary>
   internal enum SIATTRIBFLAGS
   {
     AND = 0x00000001,
@@ -44,10 +43,6 @@ namespace Standard
     ADLT_FREQUENT,     // The frequently used documents list
   }
 
-  /// <summary>
-  /// Flags for SetTabProperties.  STPF_*
-  /// </summary>
-  /// <remarks>The native enum was called STPFLAG.</remarks>
   [Flags]
   internal enum STPF
   {
@@ -58,12 +53,6 @@ namespace Standard
     USEAPPPEEKWHENACTIVE = 0x00000008,
   }
 
-  /// <summary>
-  /// Flags for Setting Taskbar Progress state.  TBPF_*
-  /// </summary>
-  /// <remarks>
-  /// The native enum was called TBPFLAG.
-  /// </remarks>
   internal enum TBPF
   {
     NOPROGRESS = 0x00000000,
@@ -73,9 +62,6 @@ namespace Standard
     PAUSED = 0x00000008,
   }
 
-  /// <summary>
-  /// THUMBBUTTON mask.  THB_*
-  /// </summary>
   [Flags]
   internal enum THB : uint
   {
@@ -85,9 +71,6 @@ namespace Standard
     FLAGS = 0x0008,
   }
 
-  /// <summary>
-  /// THUMBBUTTON flags.  THBF_*
-  /// </summary>
   [Flags]
   internal enum THBF : uint
   {
@@ -100,12 +83,6 @@ namespace Standard
     NONINTERACTIVE = 0x0010,
   }
 
-  /// <summary>
-  /// GetPropertyStoreFlags.  GPS_*.
-  /// </summary>
-  /// <remarks>
-  /// These are new for Vista, but are used in downlevel components
-  /// </remarks>
   internal enum GPS
   {
     // If no flags are specified (GPS_DEFAULT), a read-only property store is returned that includes properties for the file or item.
@@ -131,9 +108,6 @@ namespace Standard
     MASK_VALID = 0x000000FF,
   }
 
-  /// <summary>
-  /// KNOWNDESTCATEGORY.  KDC_*
-  /// </summary>
   internal enum KDC
   {
     FREQUENT = 1,
@@ -144,101 +118,49 @@ namespace Standard
   [Flags]
   internal enum SFGAO : uint
   {
-    /// <summary>Objects can be copied</summary>
-    /// <remarks>DROPEFFECT_COPY</remarks>
     CANCOPY = 0x1,
-    /// <summary>Objects can be moved</summary>
-    /// <remarks>DROPEFFECT_MOVE</remarks>
     CANMOVE = 0x2,
-    /// <summary>Objects can be linked</summary>
-    /// <remarks>
-    /// DROPEFFECT_LINK.
-    /// 
-    /// If this bit is set on an item in the shell folder, a
-    /// 'Create Shortcut' menu item will be added to the File
-    /// menu and context menus for the item.  If the user selects
-    /// that command, your IContextMenu::InvokeCommand() will be called
-    /// with 'link'.
-    /// That flag will also be used to determine if 'Create Shortcut'
-    /// should be added when the item in your folder is dragged to another
-    /// folder.
-    /// </remarks>
     CANLINK = 0x4,
-    /// <summary>supports BindToObject(IID_IStorage)</summary>
     STORAGE = 0x00000008,
-    /// <summary>Objects can be renamed</summary>
     CANRENAME = 0x00000010,
-    /// <summary>Objects can be deleted</summary>
     CANDELETE = 0x00000020,
-    /// <summary>Objects have property sheets</summary>
     HASPROPSHEET = 0x00000040,
 
     // unused = 0x00000080,
 
-    /// <summary>Objects are drop target</summary>
     DROPTARGET = 0x00000100,
     CAPABILITYMASK = 0x00000177,
     // unused = 0x00000200,
     // unused = 0x00000400,
     // unused = 0x00000800,
     // unused = 0x00001000,
-    /// <summary>Object is encrypted (use alt color)</summary>
     ENCRYPTED = 0x00002000,
-    /// <summary>'Slow' object</summary>
     ISSLOW = 0x00004000,
-    /// <summary>Ghosted icon</summary>
     GHOSTED = 0x00008000,
-    /// <summary>Shortcut (link)</summary>
     LINK = 0x00010000,
-    /// <summary>Shared</summary>
     SHARE = 0x00020000,
-    /// <summary>Read-only</summary>
     READONLY = 0x00040000,
-    /// <summary> Hidden object</summary>
     HIDDEN = 0x00080000,
     DISPLAYATTRMASK = 0x000FC000,
-    /// <summary> May contain children with SFGAO_FILESYSTEM</summary>
     FILESYSANCESTOR = 0x10000000,
-    /// <summary>Support BindToObject(IID_IShellFolder)</summary>
     FOLDER = 0x20000000,
-    /// <summary>Is a win32 file system object (file/folder/root)</summary>
     FILESYSTEM = 0x40000000,
-    /// <summary>May contain children with SFGAO_FOLDER (may be slow)</summary>
     HASSUBFOLDER = 0x80000000,
     CONTENTSMASK = 0x80000000,
-    /// <summary>Invalidate cached information (may be slow)</summary>
     VALIDATE = 0x01000000,
-    /// <summary>Is this removeable media?</summary>
     REMOVABLE = 0x02000000,
-    /// <summary> Object is compressed (use alt color)</summary>
     COMPRESSED = 0x04000000,
-    /// <summary>Supports IShellFolder, but only implements CreateViewObject() (non-folder view)</summary>
     BROWSABLE = 0x08000000,
-    /// <summary>Is a non-enumerated object (should be hidden)</summary>
     NONENUMERATED = 0x00100000,
-    /// <summary>Should show bold in explorer tree</summary>
     NEWCONTENT = 0x00200000,
-    /// <summary>Obsolete</summary>
     CANMONIKER = 0x00400000,
-    /// <summary>Obsolete</summary>
     HASSTORAGE = 0x00400000,
-    /// <summary>Supports BindToObject(IID_IStream)</summary>
     STREAM = 0x00400000,
-    /// <summary>May contain children with SFGAO_STORAGE or SFGAO_STREAM</summary>
     STORAGEANCESTOR = 0x00800000,
-    /// <summary>For determining storage capabilities, ie for open/save semantics</summary>
     STORAGECAPMASK = 0x70C50008,
-    /// <summary>
-    /// Attributes that are masked out for PKEY_SFGAOFlags because they are considered
-    /// to cause slow calculations or lack context
-    /// (SFGAO_VALIDATE | SFGAO_ISSLOW | SFGAO_HASSUBFOLDER and others)
-    /// </summary>
     PKEYSFGAOMASK = 0x81044000,
   }
 
-  /// <summary>
-  /// IShellFolder::EnumObjects grfFlags bits.  Also called SHCONT
-  /// </summary>
   internal enum SHCONTF
   {
     CHECKING_FOR_CHILDREN = 0x0010,   // hint that client is checking if (what) child items the folder contains - not all details (e.g. short file name) are needed
@@ -255,12 +177,6 @@ namespace Standard
     ENABLE_ASYNC = 0x8000,   // inform enumerator that client is listening for change notifications so enumerator does not need to be complete, items can be reported via change notifications
   }
 
-  /// <summary>
-  /// IShellFolder::GetDisplayNameOf/SetNameOf uFlags.  Also called SHGDNF.
-  /// </summary>
-  /// <remarks>
-  /// For compatibility with SIGDN, these bits must all sit in the LOW word.
-  /// </remarks>
   [Flags]
   internal enum SHGDN
   {
@@ -271,23 +187,14 @@ namespace Standard
     SHGDN_FORPARSING = 0x8000,  // parsing name for ParseDisplayName()
   }
 
-  /// <summary>
-  /// SHELLITEMCOMPAREHINTF.  SICHINT_*.
-  /// </summary>
   internal enum SICHINT : uint
   {
-    /// <summary>iOrder based on display in a folder view</summary>
     DISPLAY = 0x00000000,
-    /// <summary>exact instance compare</summary>
     ALLFIELDS = 0x80000000,
-    /// <summary>iOrder based on canonical name (better performance)</summary>
     CANONICAL = 0x10000000,
     TEST_FILESYSPATH_IF_NOT_EQUAL = 0x20000000,
   };
 
-  /// <summary>
-  /// ShellItem enum.  SIGDN_*.
-  /// </summary>
   internal enum SIGDN : uint
   {                                             // lower word (& with 0xFFFF)
     NORMALDISPLAY = 0x00000000, // SHGDN_NORMAL
@@ -301,24 +208,6 @@ namespace Standard
     PARENTRELATIVE = 0x80080001, // SHGDN_INFOLDER
   }
 
-  /// <summary>
-  /// STR_GPS_*
-  /// </summary>
-  /// <remarks>
-  /// When requesting a property store through IShellFolder, you can specify the equivalent of
-  /// GPS_DEFAULT by passing in a null IBindCtx parameter.
-  ///
-  /// You can specify the equivalent of GPS_READWRITE by passing a mode of STGM_READWRITE | STGM_EXCLUSIVE
-  /// in the bind context
-  ///
-  /// Here are the string versions of GPS_ flags, passed to IShellFolder::BindToObject() via IBindCtx::RegisterObjectParam()
-  /// These flags are valid when requesting an IPropertySetStorage or IPropertyStore handler
-  ///
-  /// The meaning of these flags are described above.
-  ///
-  /// There is no STR_ equivalent for GPS_TEMPORARY because temporary property stores
-  /// are provided by IShellItem2 only -- not by the underlying IShellFolder.
-  /// </remarks>
   internal static class STR_GPS
   {
     public const string HANDLERPROPERTIESONLY = "GPS_HANDLERPROPERTIESONLY";
@@ -336,9 +225,6 @@ namespace Standard
   [StructLayout( LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Unicode )]
   internal struct THUMBBUTTON
   {
-    /// <summary>
-    /// WPARAM value for a THUMBBUTTON being clicked.
-    /// </summary>
     public const int THBN_CLICKED = 0x1800;
 
     public THB dwMask;
@@ -354,9 +240,7 @@ namespace Standard
   [StructLayout( LayoutKind.Sequential, Pack = 4 )]
   internal struct PKEY
   {
-    /// <summary>fmtid</summary>
     private readonly Guid _fmtid;
-    /// <summary>pid</summary>
     private readonly uint _pid;
 
     public PKEY( Guid fmtid, uint pid )
@@ -365,17 +249,11 @@ namespace Standard
       _pid = pid;
     }
 
-    /// <summary>PKEY_Title</summary>
     public static readonly PKEY Title = new PKEY( new Guid( "F29F85E0-4FF9-1068-AB91-08002B27B3D9" ), 2 );
-    /// <summary>PKEY_AppUserModel_ID</summary>
     public static readonly PKEY AppUserModel_ID = new PKEY( new Guid( "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3" ), 5 );
-    /// <summary>PKEY_AppUserModel_IsDestListSeparator</summary>
     public static readonly PKEY AppUserModel_IsDestListSeparator = new PKEY( new Guid( "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3" ), 6 );
-    /// <summary>PKEY_AppUserModel_RelaunchCommand</summary>
     public static readonly PKEY AppUserModel_RelaunchCommand = new PKEY( new Guid( "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3" ), 2 );
-    /// <summary>PKEY_AppUserModel_RelaunchDisplayNameResource</summary>
     public static readonly PKEY AppUserModel_RelaunchDisplayNameResource = new PKEY( new Guid( "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3" ), 4 );
-    /// <summary>PKEY_AppUserModel_RelaunchIconResource</summary>
     public static readonly PKEY AppUserModel_RelaunchIconResource = new PKEY( new Guid( "9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3" ), 3 );
   }
 
@@ -424,7 +302,6 @@ namespace Standard
     IEnumObjects Clone();
   }
 
-  /// <summary>Unknown Object Array</summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),
@@ -564,9 +441,6 @@ namespace Standard
         [Out] out IntPtr ppidlOut );
   }
 
-  /// <summary>
-  /// Shell Namespace helper
-  /// </summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),
@@ -613,9 +487,6 @@ namespace Standard
     object EnumItems();
   }
 
-  /// <summary>
-  /// Shell Namespace helper 2
-  /// </summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),
@@ -712,33 +583,14 @@ namespace Standard
   ]
   internal interface ITaskbarList
   {
-    /// <summary>
-    /// This function must be called first to validate use of other members.
-    /// </summary>
     void HrInit();
 
-    /// <summary>
-    /// This function adds a tab for hwnd to the taskbar.
-    /// </summary>
-    /// <param name="hwnd">The HWND for which to add the tab.</param>
     void AddTab( IntPtr hwnd );
 
-    /// <summary>
-    /// This function deletes a tab for hwnd from the taskbar.
-    /// </summary>
-    /// <param name="hwnd">The HWND for which the tab is to be deleted.</param>
     void DeleteTab( IntPtr hwnd );
 
-    /// <summary>
-    /// This function activates the tab associated with hwnd on the taskbar.
-    /// </summary>
-    /// <param name="hwnd">The HWND for which the tab is to be actuvated.</param>
     void ActivateTab( IntPtr hwnd );
 
-    /// <summary>
-    /// This function marks hwnd in the taskbar as the active tab.
-    /// </summary>
-    /// <param name="hwnd">The HWND to activate.</param>
     void SetActiveAlt( IntPtr hwnd );
   }
 
@@ -757,18 +609,6 @@ namespace Standard
     new void SetActiveAlt( IntPtr hwnd );
     #endregion
 
-    /// <summary>
-    /// Marks a window as full-screen.
-    /// </summary>
-    /// <param name="hwnd">The handle of the window to be marked.</param>
-    /// <param name="fFullscreen">A Boolean value marking the desired full-screen status of the window.</param>
-    /// <remarks>
-    /// Setting the value of fFullscreen to true, the Shell treats this window as a full-screen window, and the taskbar
-    /// is moved to the bottom of the z-order when this window is active.  Setting the value of fFullscreen to false
-    /// removes the full-screen marking, but <i>does not</i> cause the Shell to treat the window as though it were
-    /// definitely not full-screen.  With a false fFullscreen value, the Shell depends on its automatic detection facility
-    /// to specify how the window should be treated, possibly still flagging the window as full-screen.
-    /// </remarks>
     void MarkFullscreenWindow( IntPtr hwnd, [MarshalAs( UnmanagedType.Bool )] bool fFullscreen );
   }
 
@@ -792,9 +632,6 @@ namespace Standard
     void RemoveAllDestinations();
   }
 
-  /// <summary>
-  /// Allows an application to retrieve the most recent and frequent documents opened in that app, as reported via SHAddToRecentDocs
-  /// </summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),
@@ -802,19 +639,8 @@ namespace Standard
   ]
   internal interface IApplicationDocumentLists
   {
-    /// <summary>
-    /// Set the App User Model ID for the application retrieving this list.  If an AppID is not provided via this method,
-    /// the system will use a heuristically determined ID.  This method must be called before GetList. 
-    /// </summary>
-    /// <param name="pszAppID">App Id.</param>
     void SetAppID( [MarshalAs( UnmanagedType.LPWStr )] string pszAppID );
 
-    /// <summary>
-    /// Retrieve an IEnumObjects or IObjectArray for IShellItems and/or IShellLinks. 
-    /// Items may appear in both the frequent and recent lists.  
-    /// </summary>
-    /// <param name="?"></param>
-    /// <returns></returns>
     [return: MarshalAs( UnmanagedType.IUnknown )]
     object GetList( [In] APPDOCLISTTYPE listtype, [In] uint cItemsDesired, [In] ref Guid riid );
   }
@@ -849,9 +675,6 @@ namespace Standard
     void AbortList();
   }
 
-  /// <summary>
-  /// Provides access to the App User Model ID on objects supporting this value.
-  /// </summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),
@@ -864,9 +687,6 @@ namespace Standard
     string GetAppID();
   };
 
-  /// <summary>
-  /// Provides access to the ProgID associated with an object 
-  /// </summary>
   [
       ComImport,
       InterfaceType( ComInterfaceType.InterfaceIsIUnknown ),

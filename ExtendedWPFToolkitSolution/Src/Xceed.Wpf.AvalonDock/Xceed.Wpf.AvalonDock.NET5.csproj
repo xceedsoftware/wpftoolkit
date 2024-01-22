@@ -242,6 +242,9 @@
     <Compile Include="..\Xceed.Wpf.Toolkit\Utils\Exceptions\ThrowException.cs">
       <Link>Utils\Exceptions\ThrowException.cs</Link>
     </Compile>
+    <Compile Include="..\Xceed.Wpf.Toolkit\Utils\Licensing\LicenseOrigin.cs">
+      <Link>Utils\Licensing\LicenseOrigin.cs</Link>
+    </Compile>
     <Compile Include="Win32Helper.cs" />
     <Compile Include="WindowHelper.cs" />
     <EmbeddedResource Include="Properties\Resources.ja-JP.resx">

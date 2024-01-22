@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -32,21 +32,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
   {
     #region Members
 
-    /// <summary>
-    /// Name constant for Text template part.
-    /// </summary>
     internal const string PART_TextBox = "PART_TextBox";
 
-    /// <summary>
-    /// Name constant for Spinner template part.
-    /// </summary>
     internal const string PART_Spinner = "PART_Spinner";
 
     internal bool _isTextChangedFromUI;
 
-    /// <summary>
-    /// Flags if the Text and Value properties are in the process of being sync'd
-    /// </summary>
     private bool _isSyncingTextAndValueProperties;
     private bool _internalValueSet;
 
@@ -386,16 +377,10 @@ UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
 
     #region MouseWheelActiveTrigger
 
-    /// <summary>
-    /// Identifies the MouseWheelActiveTrigger dependency property
-    /// </summary>
     public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof(
 
 MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.FocusedMouseOver ) );
 
-    /// <summary>
-    /// Get or set when the mouse wheel event should affect the value.
-    /// </summary>
     public MouseWheelActiveTrigger MouseWheelActiveTrigger
     {
       get
@@ -741,17 +726,21 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       if( e == null )
         throw new ArgumentNullException( "e" );
 
+      if( e.Direction == SpinDirection.Increase )
+      {
+        this.DoIncrement();
+      }
+      else
+      {
+        this.DoDecrement();
+      }
+
       // Raise the Spinned event to user
       EventHandler<SpinEventArgs> handler = this.Spinned;
       if( handler != null )
       {
         handler( this, e );
       }
-
-      if( e.Direction == SpinDirection.Increase )
-        DoIncrement();
-      else
-        DoDecrement();
     }
 
     protected virtual void RaiseValueChangedEvent( T oldValue, T newValue )
@@ -775,9 +764,6 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       this.SyncTextAndValueProperties( updateValueFromText, Text, !updateValueFromText );
     }
 
-    /// <summary>
-    /// Performs an increment if conditions allow it.
-    /// </summary>
     internal void DoDecrement()
     {
       if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Decrease ) == ValidSpinDirections.Decrease )
@@ -786,9 +772,6 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       }
     }
 
-    /// <summary>
-    /// Performs a decrement if conditions allow it.
-    /// </summary>
     internal void DoIncrement()
     {
       if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Increase ) == ValidSpinDirections.Increase )
@@ -928,30 +911,14 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
 
     #region Abstract
 
-    /// <summary>
-    /// Converts the formatted text to a value.
-    /// </summary>
     protected abstract T ConvertTextToValue( string text );
 
-    /// <summary>
-    /// Converts the value to formatted text.
-    /// </summary>
-    /// <returns></returns>
     protected abstract string ConvertValueToText();
 
-    /// <summary>
-    /// Called by OnSpin when the spin direction is SpinDirection.Increase.
-    /// </summary>
     protected abstract void OnIncrement();
 
-    /// <summary>
-    /// Called by OnSpin when the spin direction is SpinDirection.Descrease.
-    /// </summary>
     protected abstract void OnDecrement();
 
-    /// <summary>
-    /// Sets the valid spin directions.
-    /// </summary>
     protected abstract void SetValidSpinDirection();
 
     #endregion //Abstract

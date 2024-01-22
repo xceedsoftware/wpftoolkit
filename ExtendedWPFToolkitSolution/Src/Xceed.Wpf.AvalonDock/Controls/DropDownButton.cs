@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -36,16 +36,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region DropDownContextMenu
 
-    /// <summary>
-    /// DropDownContextMenu Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register( "DropDownContextMenu", typeof( ContextMenu ), typeof( DropDownButton ),
             new FrameworkPropertyMetadata( ( ContextMenu )null, new PropertyChangedCallback( OnDropDownContextMenuChanged ) ) );
 
-    /// <summary>
-    /// Gets or sets the DropDownContextMenu property.  This dependency property 
-    /// indicates drop down menu to show up when user click on an anchorable menu pin.
-    /// </summary>
     public ContextMenu DropDownContextMenu
     {
       get
@@ -58,17 +51,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
-    /// <summary>
-    /// Handles changes to the DropDownContextMenu property.
-    /// </summary>
     private static void OnDropDownContextMenuChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ( ( DropDownButton )d ).OnDropDownContextMenuChanged( e );
     }
 
-    /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the DropDownContextMenu property.
-    /// </summary>
     protected virtual void OnDropDownContextMenuChanged( DependencyPropertyChangedEventArgs e )
     {
       var oldContextMenu = e.OldValue as ContextMenu;
@@ -80,16 +67,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region DropDownContextMenuDataContext
 
-    /// <summary>
-    /// DropDownContextMenuDataContext Dependency Property
-    /// </summary>
     public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register( "DropDownContextMenuDataContext", typeof( object ), typeof( DropDownButton ),
             new FrameworkPropertyMetadata( ( object )null ) );
 
-    /// <summary>
-    /// Gets or sets the DropDownContextMenuDataContext property.  This dependency property 
-    /// indicates data context to set for drop down context menu.
-    /// </summary>
     public object DropDownContextMenuDataContext
     {
       get

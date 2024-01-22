@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -24,7 +41,7 @@
                  Title="PropertyGrid Multi-Selected Objects">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-            <Run>When many objects are assigned to a PropertyGrid, the PpropertyGrid will show all the common properties so that they can be changed simultaneously on each object.</Run>
+            <Run>When many objects are assigned to a PropertyGrid, the PropertyGrid will show all the common properties so that they can be changed simultaneously on each object.</Run>
             <LineBreak />
             <Run>This feature is only available in the "Plus" version.</Run>
             <LineBreak />

@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -225,9 +225,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Constructors
 
-    /// <summary>
-    /// Initializes static members of the <see cref="Magnifier"/> class.
-    /// </summary>
     static Magnifier()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( Magnifier ), new FrameworkPropertyMetadata( typeof( Magnifier ) ) );

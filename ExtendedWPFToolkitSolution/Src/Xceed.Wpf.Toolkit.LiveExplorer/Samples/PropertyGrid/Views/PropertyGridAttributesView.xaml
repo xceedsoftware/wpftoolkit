@@ -1,4 +1,21 @@
-﻿<!--**************************************************************************************
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2023 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<!--**************************************************************************************
 
    Toolkit for WPF
 
@@ -27,8 +44,8 @@
                 Title="Using Attributes">
     <local:DemoView.Description>
         <Paragraph FontSize="14" FontFamily="Segoe">
-          This sample expose how you can use Attributes to customize the display of the properties in the PropertyGrid.
-           With attributes you can, for each properties, customize their own category, display property, display name, display order, description, editor, editor combox items,
+          This sample shows how you can use Attributes to customize the display of the properties in the PropertyGrid.
+           With attributes you can, for each property, customize their own category, display property, display name, display order, description, editor, editor combox items,
            and expandability (drill down). Here is the list of all supported attributes:
          <LineBreak />
          <LineBreak />

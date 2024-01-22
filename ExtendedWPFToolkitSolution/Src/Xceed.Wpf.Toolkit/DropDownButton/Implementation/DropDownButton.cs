@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -464,9 +464,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Closes the drop down.
-    /// </summary>
     private void CloseDropDown( bool isFocusOnButton )
     {
       if( IsOpen )
@@ -487,18 +484,12 @@ namespace Xceed.Wpf.Toolkit
       RaiseCommand();
     }
 
-    /// <summary>
-    /// Raises routed events.
-    /// </summary>
     private void RaiseRoutedEvent( RoutedEvent routedEvent )
     {
       RoutedEventArgs args = new RoutedEventArgs( routedEvent, this );
       RaiseEvent( args );
     }
 
-    /// <summary>
-    /// Raises the command's Execute event.
-    /// </summary>
     private void RaiseCommand()
     {
       if( Command != null )
@@ -512,22 +503,12 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Unhooks a command from the Command property.
-    /// </summary>
-    /// <param name="oldCommand">The old command.</param>
-    /// <param name="newCommand">The new command.</param>
     private void UnhookCommand( ICommand oldCommand, ICommand newCommand )
     {
       EventHandler handler = CanExecuteChanged;
       oldCommand.CanExecuteChanged -= handler;
     }
 
-    /// <summary>
-    /// Hooks up a command to the CanExecuteChnaged event handler.
-    /// </summary>
-    /// <param name="oldCommand">The old command.</param>
-    /// <param name="newCommand">The new command.</param>
     private void HookUpCommand( ICommand oldCommand, ICommand newCommand )
     {
       EventHandler handler = new EventHandler( CanExecuteChanged );

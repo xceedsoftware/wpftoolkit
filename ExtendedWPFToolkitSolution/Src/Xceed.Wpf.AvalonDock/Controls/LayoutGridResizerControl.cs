@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -42,16 +42,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region BackgroundWhileDragging
 
-    /// <summary>
-    /// BackgroundWhileDragging Dependency Property
-    /// </summary>
     public static readonly DependencyProperty BackgroundWhileDraggingProperty = DependencyProperty.Register( "BackgroundWhileDragging", typeof( Brush ), typeof( LayoutGridResizerControl ),
             new FrameworkPropertyMetadata( ( Brush )Brushes.Black ) );
 
-    /// <summary>
-    /// Gets or sets the BackgroundWhileDragging property.  This dependency property 
-    /// indicates ....
-    /// </summary>
     public Brush BackgroundWhileDragging
     {
       get
@@ -68,16 +61,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region OpacityWhileDragging
 
-    /// <summary>
-    /// OpacityWhileDragging Dependency Property
-    /// </summary>
     public static readonly DependencyProperty OpacityWhileDraggingProperty = DependencyProperty.Register( "OpacityWhileDragging", typeof( double ), typeof( LayoutGridResizerControl ),
             new FrameworkPropertyMetadata( ( double )0.5 ) );
 
-    /// <summary>
-    /// Gets or sets the OpacityWhileDragging property.  This dependency property 
-    /// indicates ....
-    /// </summary>
     public double OpacityWhileDragging
     {
       get

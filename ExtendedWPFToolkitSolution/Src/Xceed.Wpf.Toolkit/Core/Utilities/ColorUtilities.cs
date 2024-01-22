@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2022 Xceed Software Inc.
+   Copyright (C) 2007-2023 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -51,13 +51,6 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       return colorProperties.ToDictionary( p => p.Name, p => ( Color )p.GetValue( null, null ) );
     }
 
-    /// <summary>
-    /// Converts an RGB color to an HSV color.
-    /// </summary>
-    /// <param name="r"></param>
-    /// <param name="g"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
     public static HsvColor ConvertRgbToHsv( int r, int g, int b )
     {
       double delta, min;
@@ -100,13 +93,6 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       };
     }
 
-    /// <summary>
-    ///  Converts an HSV color to an RGB color.
-    /// </summary>
-    /// <param name="h"></param>
-    /// <param name="s"></param>
-    /// <param name="v"></param>
-    /// <returns></returns>
     public static Color ConvertHsvToRgb( double h, double s, double v )
     {
       double r = 0, g = 0, b = 0;
@@ -185,10 +171,6 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
       return Color.FromArgb( 255, ( byte )( Math.Round( r * 255 ) ), ( byte )( Math.Round( g * 255 ) ), ( byte )( Math.Round( b * 255 ) ) );
     }
 
-    /// <summary>
-    /// Generates a list of colors with hues ranging from 0 360 and a saturation and value of 1. 
-    /// </summary>
-    /// <returns></returns>
     public static List<Color> GenerateHsvSpectrum()
     {
       var colorsList = new List<Color>();
