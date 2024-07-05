@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -137,15 +137,6 @@ namespace Xceed.Wpf.Toolkit.Core
             // Setup a suffix
             platformSuffix = ".NETCore";
           }
-#elif NET5
-          // If the assembly name doesn't already end with .NET5
-          if( !assemblyName.EndsWith( ".NET5", StringComparison.OrdinalIgnoreCase ) )
-          {
-            /* In the .NET version, all assembly names end with .NET5. */
-
-            // Setup a suffix
-            platformSuffix = ".NET5";
-          }
 #endif // NETCORE
 
       // If we have version information
@@ -179,15 +170,6 @@ namespace Xceed.Wpf.Toolkit.Core
 
             // Setup a suffix
             platformSuffix = ".NETCore";
-          }
-#elif NET5
-          // If the assembly name doesn't already end with .NET5
-          if( hasAssemblyName && !assemblyName.EndsWith( ".NET5", StringComparison.OrdinalIgnoreCase ) )
-          {
-            /* In the .NET version, all assembly names end with .NET5. */
-
-            // Setup a suffix
-            platformSuffix = ".NET5";
           }
 #endif // NETCORE
 

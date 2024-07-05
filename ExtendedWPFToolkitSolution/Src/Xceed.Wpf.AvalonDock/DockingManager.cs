@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -3031,20 +3031,27 @@ namespace Xceed.Wpf.AvalonDock
         }
       }
 
-      RenameWindowTitleForMultipleDockingManagerRunningInstances( fwc );
+      this.RenameWindowTitleForMultipleDockingManagerRunningInstances( fwc );
     }
 
     private void RenameWindowTitleForMultipleDockingManagerRunningInstances( LayoutFloatingWindowControl fwc )
     {
-      // Check if others applications run DockingManager
-      var exists = Process.GetProcessesByName( Path.GetFileNameWithoutExtension( Assembly.GetEntryAssembly().Location ) ).Count() > 1;
-
-      if( exists )
+      var entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly() ?? Assembly.GetCallingAssembly();
+      if( entryAssembly != null )
       {
-        var mainWindowTitle = Window.GetWindow( this ).Title;
-        if( !string.IsNullOrEmpty( mainWindowTitle ) )
+        var processName = Path.GetFileNameWithoutExtension( entryAssembly.Location );
+        var processes = Process.GetProcessesByName( processName );
+
+        // Check if others applications run DockingManager
+        var exists = processes.Length > 1;
+
+        if( exists )
         {
-          fwc.Title = mainWindowTitle + " - " + fwc.Title;
+          var mainWindowTitle = Window.GetWindow( this ).Title;
+          if( !string.IsNullOrEmpty( mainWindowTitle ) )
+          {
+            fwc.Title = mainWindowTitle + " - " + fwc.Title;
+          }
         }
       }
     }

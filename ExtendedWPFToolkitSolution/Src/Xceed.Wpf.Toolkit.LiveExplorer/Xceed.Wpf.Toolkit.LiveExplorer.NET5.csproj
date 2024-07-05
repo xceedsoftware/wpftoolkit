@@ -9,7 +9,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Xceed.Wpf.Toolkit.LiveExplorer</RootNamespace>
-    <AssemblyName>Xceed.Wpf.Toolkit.LiveExplorer.NET5</AssemblyName>
+    <AssemblyName>Xceed.Wpf.Toolkit.LiveExplorer</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>App.ico</ApplicationIcon>
@@ -1040,6 +1040,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Services.Client" Version="5.8.4" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="CodeFiles\AutoSelectTextboxView.xaml.cs.txt" />
@@ -1416,20 +1417,20 @@
     <Resource Include="Samples\DataGrid\OpenSourceImages\DataGrid.png" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero.NET5.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Aero\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.Aero.NET5.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Aero\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro.NET5.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Metro\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.Metro.NET5.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.Metro\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.NET5.dll">
-      <HintPath>..\Xceed.Wpf.AvalonDock\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.NET5.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock.dll">
+      <HintPath>..\Xceed.Wpf.AvalonDock\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit.NET5.dll">
-      <HintPath>..\Xceed.Wpf.Toolkit\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.Toolkit.NET5.dll</HintPath>
+    <Reference Include="Xceed.Wpf.Toolkit.dll">
+      <HintPath>..\Xceed.Wpf.Toolkit\bin\$(Configuration)\net5.0-windows\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="..\..\Libs\Xceed.Wpf.Samples.SampleData.dll" />
   </ItemGroup>

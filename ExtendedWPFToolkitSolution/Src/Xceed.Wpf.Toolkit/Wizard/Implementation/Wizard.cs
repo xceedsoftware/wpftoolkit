@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -23,6 +23,8 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using Xceed.Wpf.Toolkit.Core;
 using System.ComponentModel;
+using System.Windows.Media;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -190,7 +192,29 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnCurrentPageChanged( WizardPage oldValue, WizardPage newValue )
     {
-      RaiseRoutedEvent( Wizard.PageChangedEvent );
+      // Re-evaluate all binding errors for the new page.
+      if( (newValue != null) && newValue.Content is DependencyObject dependencyObject )
+      {
+        for( var i = 0; i < VisualTreeHelper.GetChildrenCount( dependencyObject ); i++ )
+        {
+          var childVisual = VisualTreeHelper.GetChild( dependencyObject, i );
+
+          var localPropertyValues = childVisual.GetLocalValueEnumerator();
+          while( localPropertyValues.MoveNext() )
+          {
+            if( localPropertyValues.Current.Value is BindingExpression bindingExpression )
+            {
+              if( bindingExpression.HasError )
+              {
+                Validation.ClearInvalid( bindingExpression );
+                bindingExpression.UpdateSource();
+              }
+            }
+          }
+        }
+      }
+
+      this.RaiseRoutedEvent( Wizard.PageChangedEvent );
     }
 
     #endregion //CurrentPage
@@ -311,6 +335,9 @@ namespace Xceed.Wpf.Toolkit
 
     public Wizard()
     {
+
+      Core.Message.ShowMessage();
+
       CommandBindings.Add( new CommandBinding( WizardCommands.Cancel, ExecuteCancelWizard, CanExecuteCancelWizard ) );
       CommandBindings.Add( new CommandBinding( WizardCommands.Finish, ExecuteFinishWizard, CanExecuteFinishWizard ) );
       CommandBindings.Add( new CommandBinding( WizardCommands.Help, ExecuteRequestHelp, CanExecuteRequestHelp ) );

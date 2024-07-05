@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -31,6 +31,8 @@ namespace Xceed.Wpf.Toolkit
 
     static Pie()
     {
+      Core.Message.ShowMessage();
+
       DefaultStyleKeyProperty.OverrideMetadata( typeof( Pie ), new FrameworkPropertyMetadata( typeof( Pie ) ) );
       // The default stretch mode of Pie is Fill
       Pie.StretchProperty.OverrideMetadata( typeof( Pie ), new FrameworkPropertyMetadata( Stretch.Fill ) );

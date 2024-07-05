@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -291,7 +291,8 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimePicker()
     {
-      EventManager.RegisterClassHandler( typeof( ListBoxItem ), PreviewMouseUpEvent, new RoutedEventHandler( PreviewMouseUpEventHandler ) );
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -479,6 +480,17 @@ namespace Xceed.Wpf.Toolkit
           _fireSelectionChangedEvent = true;
         }
       }
+
+      // Do not close calendar on Year/Month Selection. Close only on Day selection.
+      if( ( _timePicker != null )
+        && _timePicker.IsOpen
+        && this.AutoCloseCalendarOnTimeSelection 
+        && ( _calendar != null ) 
+        && ( _calendar.DisplayMode == CalendarMode.Month ) )
+      {
+        Mouse.Capture( null );
+        this.ClosePopup( true );
+      }
     }
 
     private void Calendar_SelectedDatesChanged( object sender, SelectionChangedEventArgs e )
@@ -569,22 +581,6 @@ namespace Xceed.Wpf.Toolkit
           // Set TimePicker.TempValue with current DateTimePicker.TextBox.Text.
           var initialDate = this.ConvertTextToValue( this.TextBox.Text );
           _timePicker.UpdateTempValue( initialDate );
-        }
-      }
-    }
-
-    private void PreviewMouseUpEventHandler( object sender, RoutedEventArgs e )
-    {
-      var item = sender as ListBoxItem;
-
-      if( ( item != null ) && ( item.Content is TimeItem ) )
-      {
-        Mouse.Capture( null );
-
-        // Do not close calendar on Year/Month Selection. Close only on Day selection.
-        if( AutoCloseCalendarOnTimeSelection && ( _calendar != null ) && ( _calendar.DisplayMode == CalendarMode.Month ) )
-        {
-          ClosePopup( true );
         }
       }
     }

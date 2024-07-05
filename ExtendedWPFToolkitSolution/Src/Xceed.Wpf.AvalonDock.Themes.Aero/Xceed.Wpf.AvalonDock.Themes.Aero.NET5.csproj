@@ -8,7 +8,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Xceed.Wpf.AvalonDock.Themes</RootNamespace>
-    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.Aero.NET5</AssemblyName>
+    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.Aero</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
   </PropertyGroup>

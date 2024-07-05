@@ -398,10 +398,10 @@
     <Compile Include="Core\Converters\TabItemSizeConverter.cs" />
     <Compile Include="Core\GenericTextBlock.cs" />
     <Compile Include="Core\ImageUriExtension.cs" />
+    <Compile Include="Core\Message.cs" />
     <Compile Include="Core\PackUriExtension.cs" />
     <Compile Include="Core\ResourceDictionary.cs" />
     <Compile Include="DateTimePicker\Implementation\Converters\BorderThicknessConverter.cs" />
-    <Compile Include="ExtendedTabControl\Implementation\TabItemEventArgs.cs" />
     <Compile Include="Primitives\SelectAllSelectorItem.cs" />
     <Compile Include="Primitives\SelectAllSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\CategoryPropertyOrderAttribute.cs" />

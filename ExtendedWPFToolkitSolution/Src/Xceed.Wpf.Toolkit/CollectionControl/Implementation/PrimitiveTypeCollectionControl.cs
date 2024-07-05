@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2023 Xceed Software Inc.
+   Copyright (C) 2007-2024 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -197,6 +197,8 @@ namespace Xceed.Wpf.Toolkit
 
     public PrimitiveTypeCollectionControl()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

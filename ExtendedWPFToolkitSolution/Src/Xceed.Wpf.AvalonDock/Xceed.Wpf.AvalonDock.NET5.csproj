@@ -8,7 +8,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Xceed.Wpf.AvalonDock</RootNamespace>
-    <AssemblyName>Xceed.Wpf.AvalonDock.NET5</AssemblyName>
+    <AssemblyName>Xceed.Wpf.AvalonDock</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
   </PropertyGroup>

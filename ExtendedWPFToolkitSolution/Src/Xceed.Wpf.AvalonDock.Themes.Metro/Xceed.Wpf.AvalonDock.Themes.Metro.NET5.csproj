@@ -8,7 +8,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Xceed.Wpf.AvalonDock.Themes.Metro</RootNamespace>
-    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.Metro.NET5</AssemblyName>
+    <AssemblyName>Xceed.Wpf.AvalonDock.Themes.Metro</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
