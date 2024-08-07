@@ -15,47 +15,43 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Data.Objects.DataClasses;
+using System.Data.Entity.Core.Objects.DataClasses;
 
 namespace Xceed.Wpf.DataGrid
 {
-  public class QueryEntityDetailsEventArgs : EventArgs
-  {
-    #region CONSTRUCTORS
-
-    internal QueryEntityDetailsEventArgs( EntityObject parentItem )
-      : base()
+    public class QueryEntityDetailsEventArgs : EventArgs
     {
-      if( parentItem == null )
-        throw new ArgumentNullException( "parentItem" );
+        #region CONSTRUCTORS
 
-      this.ParentItem = parentItem;
+        internal QueryEntityDetailsEventArgs(EntityObject parentItem)
+          : base()
+        {
+            if (parentItem == null)
+                throw new ArgumentNullException("parentItem");
+
+            this.ParentItem = parentItem;
+        }
+
+        #endregion CONSTRUCTORS
+
+        #region ParentItem Property
+
+        public EntityObject ParentItem
+        {
+            get;
+            private set;
+        }
+
+        #endregion ParentItem Property
+
+        #region Handled Property
+
+        public bool Handled
+        {
+            get;
+            set;
+        }
+
+        #endregion Handled Property
     }
-
-    #endregion CONSTRUCTORS
-
-    #region ParentItem Property
-
-    public EntityObject ParentItem
-    {
-      get;
-      private set;
-    }
-
-    #endregion ParentItem Property
-
-    #region Handled Property
-
-    public bool Handled
-    {
-      get;
-      set;
-    }
-
-    #endregion Handled Property
-  }
 }
