@@ -7,10 +7,31 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <!-- NUGET PACKAGE INFO-->
+    <Title>RenewedVision.Xceed.Wpf.Toolkit</Title>
+    <Version>3.4.0</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/renewedvision/wpftoolkit</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageId>RenewedVision.Xceed.Wpf.Toolkit</PackageId>
+    <Authors>Xceed, RenewedVision</Authors>
+    <PackageProjectUrl>https://github.com/renewedvision/wpftoolkit</PackageProjectUrl>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\license.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="MessageBox\Icons\Error48.png" />
