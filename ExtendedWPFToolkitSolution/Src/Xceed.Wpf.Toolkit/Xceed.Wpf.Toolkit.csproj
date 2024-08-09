@@ -1,145 +1,141 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWPF>true</UseWPF>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- NUGET PACKAGE INFO-->
-    <Title>RenewedVision.Xceed.Wpf.Toolkit</Title>
-    <Version>3.4.0</Version>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/renewedvision/wpftoolkit</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageId>RenewedVision.Xceed.Wpf.Toolkit</PackageId>
-    <Authors>Xceed, RenewedVision</Authors>
-    <PackageProjectUrl>https://github.com/renewedvision/wpftoolkit</PackageProjectUrl>
-    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
-  <ItemGroup>
-    <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\license.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MessageBox\Icons\Error48.png" />
-    <Resource Include="MessageBox\Icons\Information48.png" />
-    <Resource Include="MessageBox\Icons\Question48.png" />
-    <Resource Include="MessageBox\Icons\Warning48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\Bold16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\CenterAlign16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\Italic16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\JustifyAlign16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\LeftAlign16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\RightAlign16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\FontColorPicker16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\TextHighlightColorPicker16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="RichTextBoxFormatBar\Images\Bullets16.png" />
-    <Resource Include="RichTextBoxFormatBar\Images\Numbering16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\SortAscending16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Categorize16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\AdvancedProperties11.png" />
-    <Resource Include="PropertyGrid\Images\Inheritance11.png" />
-    <Resource Include="PropertyGrid\Images\Resource11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Database11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Local11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Style11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Zoombox\Resources\Zoom.cur" />
-    <Resource Include="Zoombox\Resources\ZoomRelative.cur" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="CollectionControl\Images\Delete16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Themes\Generic\Images\close_hover.png" />
-    <Resource Include="Themes\Generic\Images\close_inactive.png" />
-    <Resource Include="Themes\Generic\Images\close_normal.png" />
-    <Resource Include="Themes\Generic\Images\close_pressed.png" />
-    <Resource Include="Themes\Generic\Images\close_rounded_hover.png" />
-    <Resource Include="Themes\Generic\Images\close_rounded_inactive.png" />
-    <Resource Include="Themes\Generic\Images\close_rounded_normal.png" />
-    <Resource Include="Themes\Generic\Images\close_rounded_pressed.png" />
-    <Resource Include="Themes\Generic\Images\close_toolwindow_hover.png" />
-    <Resource Include="Themes\Generic\Images\close_toolwindow_inactive.png" />
-    <Resource Include="Themes\Generic\Images\close_toolwindow_normal.png" />
-    <Resource Include="Themes\Generic\Images\close_toolwindow_pressed.png" />
-    <Resource Include="Themes\Generic\Images\maximize_disabled.png" />
-    <Resource Include="Themes\Generic\Images\maximize_hover.png" />
-    <Resource Include="Themes\Generic\Images\maximize_inactive.png" />
-    <Resource Include="Themes\Generic\Images\maximize_normal.png" />
-    <Resource Include="Themes\Generic\Images\maximize_pressed.png" />
-    <Resource Include="Themes\Generic\Images\minimize_hover.png" />
-    <Resource Include="Themes\Generic\Images\minimize_inactive.png" />
-    <Resource Include="Themes\Generic\Images\minimize_normal.png" />
-    <Resource Include="Themes\Generic\Images\minimize_pressed.png" />
-    <Resource Include="Themes\Generic\Images\resize_grip.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Themes\Generic\Images\restore_disabled.png" />
-    <Resource Include="Themes\Generic\Images\restore_hover.png" />
-    <Resource Include="Themes\Generic\Images\restore_inactive.png" />
-    <Resource Include="Themes\Generic\Images\restore_normal.png" />
-    <Resource Include="Themes\Generic\Images\restore_pressed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="CollectionControl\Images\Duplicate.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+	</PropertyGroup>
+	<PropertyGroup>
+		<!-- NUGET PACKAGE INFO-->
+		<Title>RenewedVision.Xceed.Wpf.Toolkit</Title>
+		<Version>3.4.0</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/renewedvision/wpftoolkit</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageId>RenewedVision.Xceed.Wpf.Toolkit</PackageId>
+		<Authors>Xceed, RenewedVision</Authors>
+		<PackageProjectUrl>https://github.com/renewedvision/wpftoolkit</PackageProjectUrl>
+		<PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<AppDesigner Include="Properties\" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="MessageBox\Icons\Error48.png" />
+		<Resource Include="MessageBox\Icons\Information48.png" />
+		<Resource Include="MessageBox\Icons\Question48.png" />
+		<Resource Include="MessageBox\Icons\Warning48.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\Bold16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\CenterAlign16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\Italic16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\JustifyAlign16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\LeftAlign16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\RightAlign16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\Underline16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\FontColorPicker16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\TextHighlightColorPicker16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="RichTextBoxFormatBar\Images\Bullets16.png" />
+		<Resource Include="RichTextBoxFormatBar\Images\Numbering16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\SortAscending16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\Categorize16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\AdvancedProperties11.png" />
+		<Resource Include="PropertyGrid\Images\Inheritance11.png" />
+		<Resource Include="PropertyGrid\Images\Resource11.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\Database11.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\Local11.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\Style11.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="PropertyGrid\Images\ClearFilter16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="MultiLineTextEditor\Images\Notes16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Zoombox\Resources\Zoom.cur" />
+		<Resource Include="Zoombox\Resources\ZoomRelative.cur" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="CollectionControl\Images\Delete16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Themes\Generic\Images\close_hover.png" />
+		<Resource Include="Themes\Generic\Images\close_inactive.png" />
+		<Resource Include="Themes\Generic\Images\close_normal.png" />
+		<Resource Include="Themes\Generic\Images\close_pressed.png" />
+		<Resource Include="Themes\Generic\Images\close_rounded_hover.png" />
+		<Resource Include="Themes\Generic\Images\close_rounded_inactive.png" />
+		<Resource Include="Themes\Generic\Images\close_rounded_normal.png" />
+		<Resource Include="Themes\Generic\Images\close_rounded_pressed.png" />
+		<Resource Include="Themes\Generic\Images\close_toolwindow_hover.png" />
+		<Resource Include="Themes\Generic\Images\close_toolwindow_inactive.png" />
+		<Resource Include="Themes\Generic\Images\close_toolwindow_normal.png" />
+		<Resource Include="Themes\Generic\Images\close_toolwindow_pressed.png" />
+		<Resource Include="Themes\Generic\Images\maximize_disabled.png" />
+		<Resource Include="Themes\Generic\Images\maximize_hover.png" />
+		<Resource Include="Themes\Generic\Images\maximize_inactive.png" />
+		<Resource Include="Themes\Generic\Images\maximize_normal.png" />
+		<Resource Include="Themes\Generic\Images\maximize_pressed.png" />
+		<Resource Include="Themes\Generic\Images\minimize_hover.png" />
+		<Resource Include="Themes\Generic\Images\minimize_inactive.png" />
+		<Resource Include="Themes\Generic\Images\minimize_normal.png" />
+		<Resource Include="Themes\Generic\Images\minimize_pressed.png" />
+		<Resource Include="Themes\Generic\Images\resize_grip.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Themes\Generic\Images\restore_disabled.png" />
+		<Resource Include="Themes\Generic\Images\restore_hover.png" />
+		<Resource Include="Themes\Generic\Images\restore_inactive.png" />
+		<Resource Include="Themes\Generic\Images\restore_normal.png" />
+		<Resource Include="Themes\Generic\Images\restore_pressed.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="CollectionControl\Images\Duplicate.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+	</ItemGroup>
 </Project>
