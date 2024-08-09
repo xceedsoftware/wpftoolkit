@@ -50,12 +50,7 @@ jobs:
         id: build
         shell: powershell
         run: |
-          dotnet publish ExtendedWPFToolkitSolution/Xceed.Wpf.Toolkit.sln -restore -p:RestorePackagesConfig=true -p:Version="${{ steps.generate-version.outputs.semantic-version }}" -p:AssemblyVersion="${{ steps.generate-version.outputs.assembly-version }}" -t:Rebuild -p:Configuration=Release
-
-      - name: Package
-        id: package
-        run: |
-          dotnet pack -Version ${{ steps.generate-version.outputs.semantic-version }} -Properties NuGetBinaries=src\x64\release
+          dotnet build ExtendedWPFToolkitSolution/Xceed.Wpf.Toolkit.sln -p:Version="${{ steps.generate-version.outputs.semantic-version }}" -p:AssemblyVersion="${{ steps.generate-version.outputs.assembly-version }}" -t:Rebuild -c Release
 
       - name: Publish Nuget to GitHub registry
         shell: powershell
