@@ -5,9 +5,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+  </PropertyGroup>
+  <PropertyGroup>
 	<!-- NUGET PACKAGE INFO-->
 	<Title>RenewedVision.Xceed.Wpf.Toolkit</Title>
-    <Version>3.4.0</Version>
+    <Version>3.8.0</Version>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<RepositoryUrl>https://github.com/renewedvision/wpftoolkit</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>

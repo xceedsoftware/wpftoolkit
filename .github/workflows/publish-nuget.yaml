@@ -1,0 +1,60 @@
+name: publish
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+    
+
+jobs:
+  build-and-publish-nuget:
+    name: build and publish nuget
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # get full History to make sure tags are included an thus git-describe works
+
+      - name: Get version number
+        id: version
+        uses: PaulHatch/semantic-version@v5.2.1
+
+      - name: Generate semver version number
+        id: generate-version
+        shell: powershell
+        run: |
+          if("${{ steps.version.outputs.is_tagged }}" -eq "false")
+          {
+            $semver_version = "${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-beta.${{ steps.version.outputs.increment }}"
+          }
+          else
+          {
+            $semver_version = "${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}"
+          }
+
+          $assembly_version = "${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}.${{ steps.version.outputs.increment }}"
+
+          echo assembly-version=${assembly_version} >> $env:GITHUB_OUTPUT
+          echo semantic-version=${semver_version} >> $env:GITHUB_OUTPUT
+
+      - name: Setup .NET Core @ Latest
+        uses: actions/setup-dotnet@v3
+        with:
+          source-url: https://nuget.pkg.github.com/renewedvision/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}  
+
+      - name: Build and Package
+        id: build
+        shell: powershell
+        run: |
+          dotnet build ExtendedWPFToolkitSolution/Xceed.Wpf.Toolkit.sln -p:Version="${{ steps.generate-version.outputs.semantic-version }}" -p:AssemblyVersion="${{ steps.generate-version.outputs.assembly-version }}" -t:Rebuild -c Release
+
+      - name: Publish Nuget to GitHub registry
+        shell: powershell
+        run: |
+          foreach($file in (Get-ChildItem . -Recurse -Include *.nupkg)) {
+            dotnet nuget push $file --skip-duplicate
+          }
