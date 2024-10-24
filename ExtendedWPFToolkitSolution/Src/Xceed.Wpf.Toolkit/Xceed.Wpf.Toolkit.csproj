@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>net472;net8.0-windows</TargetFrameworks>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
@@ -11,12 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MessageBox\Icons\Error48.png" />
-    <Resource Include="MessageBox\Icons\Information48.png" />
-    <Resource Include="MessageBox\Icons\Question48.png" />
-    <Resource Include="MessageBox\Icons\Warning48.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="RichTextBoxFormatBar\Images\Bold16.png" />
@@ -50,37 +44,7 @@
     <Resource Include="RichTextBoxFormatBar\Images\Numbering16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="PropertyGrid\Images\SortAscending16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Categorize16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\AdvancedProperties11.png" />
-    <Resource Include="PropertyGrid\Images\Inheritance11.png" />
-    <Resource Include="PropertyGrid\Images\Resource11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Database11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Local11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\Style11.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PropertyGrid\Images\ClearFilter16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="MultiLineTextEditor\Images\Notes16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Zoombox\Resources\Zoom.cur" />
-    <Resource Include="Zoombox\Resources\ZoomRelative.cur" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="CollectionControl\Images\Delete16.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Themes\Generic\Images\close_hover.png" />
@@ -114,9 +78,6 @@
     <Resource Include="Themes\Generic\Images\restore_pressed.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="CollectionControl\Images\Duplicate.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Calculator\Implementation\Calculator.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
@@ -141,15 +102,6 @@
     <EmbeddedResource Include="ChildWindow\Implementation\ChildWindow.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CollectionControl\Implementation\CollectionControl.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CollectionControl\Implementation\CollectionControlButton.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="CollectionControl\Implementation\PrimitiveTypeCollectionControl.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="ColorCanvas\Implementation\ColorCanvas.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,12 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Magnifier\Implementation\Magnifier.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MaskedTextBox\Implementation\MaskedTextBox.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MessageBox\Implementation\MessageBox.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MultiLineTextEditor\Implementation\MultiLineTextEditor.Icon.bmp" />
@@ -231,9 +177,6 @@
     <EmbeddedResource Include="Primitives\WindowControl.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="PropertyGrid\Implementation\PropertyGrid.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="RangeSlider\Implementation\RangeSlider.Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
@@ -269,10 +212,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Wizard\Implementation\Wizard.Icon.bmp" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Zoombox\Zoombox.Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />

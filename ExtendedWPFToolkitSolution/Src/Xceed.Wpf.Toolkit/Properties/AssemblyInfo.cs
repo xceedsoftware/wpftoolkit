@@ -85,4 +85,7 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Zoombox")]
 [assembly: XmlnsDefinition("http://schemas.xceed.com/wpf/xaml/toolkit", "Xceed.Wpf.Toolkit.Panels")]
 
-
+#if NET
+[assembly: System.Runtime.Versioning.TargetPlatform("Windows")]
+[assembly: System.Runtime.Versioning.SupportedOSPlatform("Windows")]
+#endif
