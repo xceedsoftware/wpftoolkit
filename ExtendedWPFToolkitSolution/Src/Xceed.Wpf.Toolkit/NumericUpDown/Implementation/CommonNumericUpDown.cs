@@ -19,6 +19,7 @@ using System.Windows;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -262,7 +263,9 @@ namespace Xceed.Wpf.Toolkit
         return this.Value;
       }
 
-      result = this.ConvertTextToValueCore( currentValueText, text );
+      var cleanedText = Regex.Replace(text, "[^0-9.,]", "", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+
+      result = this.ConvertTextToValueCore( currentValueText, cleanedText );
 
       if( this.ClipValueToMinMax )
       {
