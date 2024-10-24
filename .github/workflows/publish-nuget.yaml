@@ -46,7 +46,7 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}  
 
-      - name: Build
+      - name: Build and Package
         id: build
         shell: powershell
         run: |

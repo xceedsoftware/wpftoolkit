@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -20,6 +20,7 @@ using System.Windows;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Input;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -33,6 +34,23 @@ namespace Xceed.Wpf.Toolkit
     #endregion
 
     #region Properties
+
+    #region AutoClipTimeParts
+
+    public static readonly DependencyProperty AutoClipTimePartsProperty = DependencyProperty.Register( "AutoClipTimeParts", typeof( bool ), typeof( DateTimeUpDown ), new UIPropertyMetadata( false ) );
+    public bool AutoClipTimeParts
+    {
+      get
+      {
+        return (bool)GetValue( AutoClipTimePartsProperty );
+      }
+      set
+      {
+        SetValue( AutoClipTimePartsProperty, value );
+      }
+    }
+
+    #endregion //AutoClipTimeParts
 
     #region Format
 
@@ -83,7 +101,7 @@ namespace Xceed.Wpf.Toolkit
       try
       {
         // Test the format string if it is used.
-        DateTime.MinValue.ToString( ( string )value, CultureInfo.CurrentCulture );
+        CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime.ToString( (string)value, CultureInfo.CurrentCulture );
       }
       catch
       {
@@ -164,6 +182,16 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Kind
 
+    #region TempValue (Internal)
+
+    internal DateTime? TempValue
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
     #region ContextNow (Private)
 
     internal DateTime ContextNow
@@ -183,8 +211,8 @@ namespace Xceed.Wpf.Toolkit
     static DateTimeUpDown()
     {
       DefaultStyleKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( typeof( DateTimeUpDown ) ) );
-      MaximumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MaxValue ) );
-      MinimumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( DateTime.MinValue ) );
+      MaximumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) );
+      MinimumProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime ) );
       UpdateValueOnEnterKeyProperty.OverrideMetadata( typeof( DateTimeUpDown ), new FrameworkPropertyMetadata( true ) );
     }
 
@@ -316,9 +344,11 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
         info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+      if( info == null )
+        info = _dateTimeInfoList[ 0 ];
 
-        //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
-        //but only if it is not null
+      //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
+      //but only if it is not null
       if( newValue != null )
         ParseValueIntoDateTimeInfo( this.Value );
 
@@ -663,6 +693,17 @@ namespace Xceed.Wpf.Toolkit
       throw new NotSupportedException( "DateTimeUpDown controls do not support modifying UpdateValueOnEnterKey property." );
     }
 
+    protected override void OnKeyDown( KeyEventArgs e )
+    {
+      if( e.Key == Key.Escape )
+      {
+        this.SyncTextAndValueProperties( false, null );
+        e.Handled = true;
+      }
+
+      base.OnKeyDown( e );
+    }
+
 
 #endregion //Base Class Overrides
 
@@ -710,6 +751,8 @@ namespace Xceed.Wpf.Toolkit
       if( currentValue.HasValue )
       {
         var newValue = this.UpdateDateTime( currentValue, step );
+        if( newValue == null )
+          return;
         this.TextBox.Text = newValue.Value.ToString( this.GetFormatString( this.Format ), this.CultureInfo );
       }
       else
@@ -725,6 +768,8 @@ namespace Xceed.Wpf.Toolkit
         //this only occurs when the user manually type in a value for the Value Property
         if( info == null )
           info = ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+        if( info == null )
+          info = _dateTimeInfoList[ 0 ];
 
         //whenever the value changes we need to parse out the value into out DateTimeInfo segments so we can keep track of the individual pieces
         this.ParseValueIntoDateTimeInfo( this.ConvertTextToValue( this.TextBox.Text ) );
@@ -830,6 +875,8 @@ namespace Xceed.Wpf.Toolkit
       //this only occurs when the user manually type in a value for the Value Property
       if( info == null )
         info = (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : _dateTimeInfoList[ 0 ];
+      if( info == null )
+        info = _dateTimeInfoList[ 0 ];
 
       DateTime? result = null;
 
@@ -904,11 +951,12 @@ namespace Xceed.Wpf.Toolkit
       DateTime current = this.ContextNow;
       try
       {
-        current = (this.Value.HasValue)
-                    ? this.Value.Value
-                    : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
+        // TempValue is used when Manipulating TextBox.Text while Value is not updated yet (used in DateTimePicker's TimePicker).
+        current = this.TempValue.HasValue
+                  ? this.TempValue.Value
+                  : this.Value.HasValue ? this.Value.Value : DateTime.Parse( this.ContextNow.ToString(), this.CultureInfo.DateTimeFormat );
 
-        isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, out result );
+        isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, this.AutoClipTimeParts, out result );
       }
       catch( FormatException )
       {

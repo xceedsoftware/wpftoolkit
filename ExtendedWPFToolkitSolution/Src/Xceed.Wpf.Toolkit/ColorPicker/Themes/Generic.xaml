@@ -1,14 +1,14 @@
 ﻿<!--***********************************************************************************
 
-   Extended WPF Toolkit
+   Toolkit for WPF
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -251,11 +251,13 @@
             Value="0" />
     <Setter Property="MaxHeight"
             Value="500" />
+    <!-- ConverterParameter is margin/Padding from Popup-->
+    <Setter Property="Width"
+            Value="{Binding MaxDropDownWidth, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
     <Setter Property="ItemsPanel">
       <Setter.Value>
         <ItemsPanelTemplate>
-          <!-- ConverterParameter is margin/Padding from Popup-->
-          <WrapPanel Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource AncestorType={x:Type local:ColorPicker}}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
+          <WrapPanel Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Converter={StaticResource AdditionConverter}, ConverterParameter=-4}" />
         </ItemsPanelTemplate>
       </Setter.Value>
     </Setter>
@@ -274,12 +276,12 @@
       <Border x:Name="mainBorder"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="1,1,1,0"
-              Background="#FFF0F0F0"
+              Background="{TemplateBinding Background}"
               Margin="0">
         <Border x:Name="innerBorder"
                 BorderBrush="#ACACAC"
                 BorderThickness="1,1,1,0"
-                Background="#FFF0F0F0"
+                Background="{TemplateBinding Background}"
                 Margin="-1"
                 Opacity="0" />
       </Border>
@@ -325,7 +327,22 @@
     <Setter Property="VerticalContentAlignment"
             Value="Center" />
     <Setter Property="MaxDropDownWidth"
-            Value="218" />
+            Value="250" />
+    <Setter Property="HeaderBackground"
+            Value="AliceBlue" />
+    <Setter Property="DropDownBackground">
+      <Setter.Value>
+        <LinearGradientBrush EndPoint="0.5,1"
+                              StartPoint="0.5,0">
+          <GradientStop Color="#FFFAFBFB"
+                        Offset="0" />
+          <GradientStop Color="#FFF4F4F4"
+                        Offset="1" />
+        </LinearGradientBrush>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="TabBackground"
+            Value="#FFF0F0F0" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:ColorPicker}">
@@ -373,7 +390,8 @@
                    HorizontalOffset="1"
                    VerticalOffset="1"
                    PopupAnimation="Slide"
-                   ToolTip="{x:Static sys:String.Empty}">
+                   ToolTip="{x:Static sys:String.Empty}"
+                   Width="{TemplateBinding MaxDropDownWidth}">
               <Popup.Resources>
                 <Style TargetType="ToolTip">
                   <Style.Triggers>
@@ -386,14 +404,16 @@
                 </Style>
               </Popup.Resources>
               <Border BorderThickness="1"
-                      Background="{StaticResource PopupBackgroundBrush}"
+                      Background="{TemplateBinding DropDownBackground}"
                       BorderBrush="{StaticResource ColorPickerDarkBorderBrush}"
                       Padding="3">
                 <TabControl x:Name="ColorPickerTabControl"
                             Background="Transparent"
                             SelectedIndex="{Binding ColorMode, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorModeToTabItemSelectedConverter}}">
                   <local:ColorPickerTabItem x:Name="StandardTabItem"
-                                            Header="{Binding StandardButtonHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Header="{Binding StandardTabHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Background="{TemplateBinding TabBackground}"
+                                            Foreground="{TemplateBinding TabForeground}"
                                             Template="{StaticResource TabItemTemplate}">
                     <Grid x:Name="_colorPaletteHost"
                           Margin="4">
@@ -413,7 +433,8 @@
                             <RowDefinition />
                           </Grid.RowDefinitions>
                           <TextBlock Text="{TemplateBinding AvailableColorsHeader}"
-                                     Background="AliceBlue"
+                                     Background="{TemplateBinding HeaderBackground}"
+                                     Foreground="{TemplateBinding HeaderForeground}"
                                      Padding="2"
                                      Margin="0,0,0,1" >
                           </TextBlock>
@@ -434,7 +455,8 @@
                             <RowDefinition Height="Auto" />
                           </Grid.RowDefinitions>
                           <TextBlock Text="{TemplateBinding StandardColorsHeader}"
-                                     Background="AliceBlue"
+                                     Background="{TemplateBinding HeaderBackground}"
+                                     Foreground="{TemplateBinding HeaderForeground}"
                                      Padding="2"
                                      Margin="0,1,0,1" >
                           </TextBlock>
@@ -456,7 +478,8 @@
                             <RowDefinition Height="22" />
                           </Grid.RowDefinitions>
                           <TextBlock Text="{TemplateBinding RecentColorsHeader}"
-                                     Background="AliceBlue"
+                                     Background="{TemplateBinding HeaderBackground}"
+                                     Foreground="{TemplateBinding HeaderForeground}"
                                      Padding="2"
                                      Margin="0,1,0,1" >
                           </TextBlock>
@@ -470,15 +493,22 @@
                     </Grid>
                   </local:ColorPickerTabItem>
                   <local:ColorPickerTabItem x:Name="AdvancedTabItem"
-                                            Header="{Binding AdvancedButtonHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Header="{Binding AdvancedTabHeader, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Background="{TemplateBinding TabBackground}"
+                                            Foreground="{TemplateBinding TabForeground}"
                                             Template="{StaticResource TabItemTemplate}">
                     <!-- ColorCanvas -->
-                    <Grid x:Name="_colorCanvasHost">
-                      <local:ColorCanvas Background="Transparent"
-                                         BorderThickness="0"
-                                         UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
-                                         SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"
-                                         Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}" />
+                    <!-- ConverterParameter is margin/Padding from Popup-->
+                    <Grid x:Name="_colorCanvasHost"
+                          Width="{Binding MaxDropDownWidth, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource AdditionConverter}, ConverterParameter=-18}">
+                      <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                    VerticalScrollBarVisibility="Hidden">
+                        <local:ColorCanvas Background="Transparent"
+                                           BorderThickness="0"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"
+                                           UsingAlphaChannel="{Binding UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}}"
+                                           SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}" />
+                      </ScrollViewer>
                     </Grid>
                   </local:ColorPickerTabItem>
                 </TabControl>

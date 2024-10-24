@@ -1,14 +1,14 @@
 ﻿/*************************************************************************************
+   
+   Toolkit for WPF
 
-   Extended WPF Toolkit
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2019 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at http://wpftoolkit.codeplex.com/license 
+   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
 
    For more features, controls, and fast professional support,
-   pick up the Plus Edition at http://xceed.com/wpf_toolkit
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
 
    Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
 
@@ -20,11 +20,27 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class TimeSpanUpDown : DateTimeUpDownBase<TimeSpan?>
   {
+    #region Private Members
+
+    private static int HoursInDay = 24;
+    private static int MinutesInDay = 1440;
+    private static int MinutesInHour = 60;    
+    private static int SecondsInDay = 86400;
+    private static int SecondsInHour = 3600;
+    private static int SecondsInMinute = 60;
+    private static int MilliSecondsInDay = TimeSpanUpDown.SecondsInDay * 1000;
+    private static int MilliSecondsInHour = TimeSpanUpDown.SecondsInHour * 1000;
+    private static int MilliSecondsInMinute = TimeSpanUpDown.SecondsInMinute * 1000;
+    private static int MilliSecondsInSecond = 1000;
+
+    #endregion
+
     #region Constructors
 
     static TimeSpanUpDown()
@@ -80,14 +96,39 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnFractionalSecondsDigitsCountChanged( int oldValue, int newValue )
     {
-      var value = this.UpdateValueOnEnterKey
-                  ? (this.TextBox != null) ? this.ConvertTextToValue( this.TextBox.Text ) : null
-                  : this.Value;
-      this.InitializeDateTimeInfoList( value );
-      this.SyncTextAndValueProperties( false, this.Text );
+      this.UpdateValue();
     }
 
     #endregion //FractionalSecondsDigitsCount
+
+    #region ShowDays
+
+    public static readonly DependencyProperty ShowDaysProperty = DependencyProperty.Register( "ShowDays", typeof( bool ), typeof( TimeSpanUpDown ), new UIPropertyMetadata( true, OnShowDaysChanged ) );
+    public bool ShowDays
+    {
+      get
+      {
+        return (bool)GetValue( ShowDaysProperty );
+      }
+      set
+      {
+        SetValue( ShowDaysProperty, value );
+      }
+    }
+
+    private static void OnShowDaysChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var timeSpanUpDown = o as TimeSpanUpDown;
+      if( timeSpanUpDown != null )
+        timeSpanUpDown.OnShowDaysChanged( (bool)e.OldValue, (bool)e.NewValue );
+    }
+
+    protected virtual void OnShowDaysChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateValue();
+    }
+
+    #endregion //ShowDays
 
     #region ShowSeconds
 
@@ -113,11 +154,7 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnShowSecondsChanged( bool oldValue, bool newValue )
     {
-      var value = this.UpdateValueOnEnterKey
-                  ? ( this.TextBox != null ) ? this.ConvertTextToValue( this.TextBox.Text ) : null
-                  : this.Value;
-      this.InitializeDateTimeInfoList( value );
-      this.SyncTextAndValueProperties( false, this.Text );
+      this.UpdateValue();
     }
 
     #endregion //ShowSeconds
@@ -125,6 +162,26 @@ namespace Xceed.Wpf.Toolkit
     #endregion
 
     #region BaseClass Overrides
+
+    public override bool CommitInput()
+    {
+      var sync = this.SyncTextAndValueProperties( true, Text );
+
+      if( this.UpdateValueOnEnterKey && ( _selectedDateTimeInfo != null ) && ( _dateTimeInfoList != null ) )
+      {
+        // Update SelectedDateTimeInfo and TextBox selection after sync is done.
+        var selectionInfo = _dateTimeInfoList.FirstOrDefault( x => ( x.Type == _selectedDateTimeInfo.Type ) && ( x.Type != DateTimePart.Other ) );
+        _selectedDateTimeInfo = ( selectionInfo != null ) ? selectionInfo : _dateTimeInfoList.FirstOrDefault( x => x.Type != DateTimePart.Other );
+        if( _selectedDateTimeInfo != null )
+        {
+          _fireSelectionChangedEvent = false;
+          this.TextBox.Select( _selectedDateTimeInfo.StartPosition, _selectedDateTimeInfo.Length );
+          _fireSelectionChangedEvent = true;
+        }
+      }
+
+      return sync;
+    }
 
     protected override void OnCultureInfoChanged( CultureInfo oldValue, CultureInfo newValue )
     {
@@ -166,7 +223,7 @@ namespace Xceed.Wpf.Toolkit
       if( this.Value == null )
         return string.Empty;
 
-      return this.ParseValueIntoTimeSpanInfo( this.Value );
+      return this.ParseValueIntoTimeSpanInfo( this.Value, true );
     }
 
     protected override TimeSpan? ConvertTextToValue( string text )
@@ -174,7 +231,74 @@ namespace Xceed.Wpf.Toolkit
       if( string.IsNullOrEmpty( text ) )
         return null;
 
-      TimeSpan timeSpan = TimeSpan.Parse( text );
+      var timeSpan = TimeSpan.MinValue;
+
+      var separators = text.Where( x => x == ':' || x == '.' ).ToList();
+      var stringValues = text.Split( new char[] { ':', '.' } );
+      if( ( stringValues.Count() <= 1 ) || stringValues.Any( x => string.IsNullOrEmpty( x ) ) )
+      {
+        return this.ResetToLastValidValue();
+      }
+
+      var intValues = new int[ stringValues.Count() ];
+      for( int i = 0; i < stringValues.Count(); ++i )
+      {
+        if( !int.TryParse( stringValues[ i ].Replace( "-", "" ), out intValues[ i ] ) )
+        {
+          return this.ResetToLastValidValue();
+        }
+      }
+
+      if( intValues.Count() >= 2 )
+      {
+        var haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
+        var haveDays = ( separators.Count() > 1 ) && ( separators.First() == '.' ) && ( intValues.Count() >= 3 );
+
+        if( this.ShowDays )
+        {
+          var days = haveDays ? intValues[ 0 ] : intValues[ 0 ] / 24;
+          if( days > TimeSpan.MaxValue.Days )
+            return this.ResetToLastValidValue();
+          var hours = haveDays ? intValues[ 1 ] : intValues[ 0 ] % 24;
+          if( ( ( days * TimeSpanUpDown.HoursInDay ) + hours ) > TimeSpan.MaxValue.TotalHours )
+            return this.ResetToLastValidValue();
+          var minutes = haveDays ? intValues[ 2 ] : intValues[ 1 ];
+          if( ( ( days * TimeSpanUpDown.MinutesInDay ) + ( hours * TimeSpanUpDown.MinutesInHour ) + minutes ) > TimeSpan.MaxValue.TotalMinutes )
+            return this.ResetToLastValidValue();
+          var seconds = this.ShowSeconds
+                        ? haveDays && ( intValues.Count() >= 4 ) ? intValues[ 3 ] : ( intValues.Count() >= 3 ) ? intValues[ 2 ] : 0
+                        : 0;
+          if( ( ( days * TimeSpanUpDown.SecondsInDay ) + ( hours * TimeSpanUpDown.SecondsInHour ) + ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
+            return this.ResetToLastValidValue();
+          var milliseconds = haveMS ? intValues.Last() : 0;
+          if( ( ( days * TimeSpanUpDown.MilliSecondsInDay ) + ( hours * TimeSpanUpDown.MilliSecondsInHour ) + ( minutes * TimeSpanUpDown.MilliSecondsInMinute ) + ( seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
+            return this.ResetToLastValidValue();
+
+          timeSpan = new TimeSpan( days, hours, minutes, seconds, milliseconds );
+        }
+        else
+        {
+          var hours = intValues[ 0 ];
+          if( hours > TimeSpan.MaxValue.TotalHours )
+            return this.ResetToLastValidValue();
+          var minutes = intValues[ 1 ];
+          if( ( ( hours * TimeSpanUpDown.MinutesInHour ) + minutes ) > TimeSpan.MaxValue.TotalMinutes )
+            return this.ResetToLastValidValue();
+          var seconds = this.ShowSeconds && ( intValues.Count() >= 3 ) ? intValues[ 2 ] : 0;
+          if( ( ( hours * TimeSpanUpDown.SecondsInHour ) + ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
+            return this.ResetToLastValidValue();
+          var milliseconds = haveMS ? intValues.Last() : 0;
+          if( ( ( hours * TimeSpanUpDown.MilliSecondsInHour ) + ( minutes * TimeSpanUpDown.MilliSecondsInMinute ) + ( seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
+            return this.ResetToLastValidValue();
+
+          timeSpan = new TimeSpan( 0, hours, minutes, seconds, milliseconds );
+        }
+
+        if( text.StartsWith( "-" ) )
+        {
+          timeSpan = timeSpan.Negate();
+        }
+      }
 
       if( this.ClipValueToMinMax )
       {
@@ -217,30 +341,61 @@ namespace Xceed.Wpf.Toolkit
 
       TimeSpan current = this.Value.HasValue ? this.Value.Value : new TimeSpan();
       TimeSpan result;
-      var success = TimeSpan.TryParse( currentValue, out result );
-      if( !success )
+      // Validate when more than 60 seconds (or more than 60 minutes, or more than 24 hours) are entered.
+      var separators = currentValue.Where( x => x == ':' || x == '.' ).ToList();
+      var stringValues = currentValue.Split( new char[] { ':', '.' } );
+      if( ( stringValues.Count() >= 2 ) && !stringValues.Any( x => string.IsNullOrEmpty( x ) ) )
       {
-        // Validate when more than 60 seconds (or more than 60 minutes, or more than 24 hours) are entered.
-        var separators = currentValue.Where( x => x == ':' || x == '.' ).ToList();
-        var values = currentValue.Split( new char[] { ':', '.' } );
-        if( ( values.Count() >= 2 ) && !values.Any( x => string.IsNullOrEmpty( x ) ) )
-        {
-          bool haveDays = separators.First() == '.';
-          bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
+        bool haveDays = (separators.First() == '.') && ( stringValues.Count() >= 3);
+        bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
 
-          result = new TimeSpan( haveDays ? int.Parse( values[ 0 ] ) : 0,  //Days
-                                 haveDays ? int.Parse( values[ 1 ] ) : int.Parse( values[ 0 ] ),  //Hours
-                                 haveDays ? int.Parse( values[ 2 ] ) : int.Parse( values[ 1 ] ),  //Minutes
-                                 ( haveDays && this.ShowSeconds ) ? int.Parse( values[ 3 ] ) : this.ShowSeconds ? int.Parse( values[ 2 ] ) : 0,  //Seconds
-                                 haveMS ? int.Parse( values.Last() ) : 0 );  //Milliseconds
+        var values = new int[ stringValues.Count() ];
+        for( int i = 0; i < stringValues.Count(); ++i )
+        {
+          if( !int.TryParse( stringValues[ i ], out values[ i ] ) )
+          {
+            return;
+          }
         }
+
+        var days = haveDays ? Math.Abs( values[ 0 ] ): 0;
+        if( days > TimeSpan.MaxValue.Days )
+          return;
+        var hours = haveDays ? Math.Abs( values[ 1 ] ) : Math.Abs( values[ 0 ] );
+        if( ( ( days * TimeSpanUpDown.HoursInDay ) + hours) > TimeSpan.MaxValue.TotalHours )
+          return;
+        var minutes = haveDays ? Math.Abs( values[ 2 ] ) : Math.Abs( values[ 1 ] );
+        if( ( ( days * TimeSpanUpDown.MinutesInDay ) + ( hours * TimeSpanUpDown.MinutesInHour ) + minutes ) > TimeSpan.MaxValue.TotalMinutes )
+          return;
+        var seconds = ( haveDays && this.ShowSeconds && ( values.Count() >= 4 ) ) ? Math.Abs( values[ 3 ] ) : this.ShowSeconds && ( values.Count() >= 3 ) ? Math.Abs( values[ 2 ] ) : 0;
+        if( ( ( days * TimeSpanUpDown.SecondsInDay ) + ( hours * TimeSpanUpDown.SecondsInHour ) + ( minutes * TimeSpanUpDown.SecondsInMinute ) + seconds ) > TimeSpan.MaxValue.TotalSeconds )
+          return;
+        var milliseconds = haveMS ? Math.Abs( values.Last() ) : 0;
+        if( ( ( days * TimeSpanUpDown.MilliSecondsInDay ) + ( hours * TimeSpanUpDown.MilliSecondsInHour ) + (minutes * TimeSpanUpDown.MilliSecondsInMinute ) + (seconds * TimeSpanUpDown.MilliSecondsInSecond ) + milliseconds ) > TimeSpan.MaxValue.TotalMilliseconds )
+          return;
+
+        result = new TimeSpan( days, hours, minutes, seconds, milliseconds );
+        if( values[ 0 ] < 0 )
+        {
+          result = result.Negate();
+        }
+
+        currentValue = result.ToString();
+      }
+      else
+      {
+        Debug.Assert( false, "Something went wrong when parsing TimeSpan." );
+        return;
       }
 
-      currentValue = result.ToString();
-
-      // When text is typed, if UpdateValueOnEnterKey is true, 
-      // Sync Value on Text only when Enter Key is pressed.
-      if( ( _isTextChangedFromUI && !this.UpdateValueOnEnterKey )
+      var previousValues = ( previousValue != null ) ? previousValue.Split( new char[] { ':', '.' } ) : null;
+      var currentValues = ( currentValue != null ) ? currentValue.Split( new char[] { ':', '.' } ) : null;
+      var canSync = ( previousValues != null ) 
+                    && ( currentValues != null )
+                    && ( previousValues.Length == currentValues.Length )  // same number of time parts.
+                    && ( currentValue.Length == previousValue.Length );   // same number of digits.
+      // When text is typed, Sync Value on Text only when UpdateValueOnEnterKey is false and time format is the same.
+      if( ( _isTextChangedFromUI && !this.UpdateValueOnEnterKey && canSync )
         || !_isTextChangedFromUI )
       {
         this.SyncTextAndValueProperties( true, currentValue );
@@ -263,10 +418,12 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void PerformMouseSelection()
     {
-      var value = this.UpdateValueOnEnterKey
-                  ? (this.TextBox != null) ? this.ConvertTextToValue( this.TextBox.Text ) : null
-                  : this.Value;
-      this.InitializeDateTimeInfoList( value );
+      if( !this.UpdateValueOnEnterKey )
+      {
+        this.CommitInput();
+        this.InitializeDateTimeInfoList( this.Value );
+      }
+
       base.PerformMouseSelection();
     }
 
@@ -291,36 +448,39 @@ namespace Xceed.Wpf.Toolkit
         }
       }
 
-      if( value.HasValue && value.Value.Days != 0 )
+      if( this.ShowDays )
       {
-        int dayLength = Math.Abs( value.Value.Days ).ToString().Length;
-        _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Day, Length = dayLength, Format = "dd" } );
-        _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ".", IsReadOnly = true } );
-
-        if( this.TextBox != null )
+        if( value.HasValue && value.Value.Days != 0 )
         {
-          //number of digits for days has changed when selection is not on date part, move TextBox.Selection to keep it on current DateTimeInfo
-          if( hasDay && (dayLength != lastDayInfo.Length) && (_selectedDateTimeInfo.Type != DateTimePart.Day) )
+          int dayLength = Math.Abs( value.Value.Days ).ToString().Length;
+          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Day, Length = dayLength, Format = "dd" } );
+          _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Other, Length = 1, Content = ".", IsReadOnly = true } );
+
+          if( this.TextBox != null )
           {
-            _fireSelectionChangedEvent = false;
-            this.TextBox.SelectionStart = Math.Max( 0, this.TextBox.SelectionStart + (dayLength - lastDayInfo.Length) );
-            _fireSelectionChangedEvent = true;
-          }
-          // Day has been added, move TextBox.Selection to keep it on current DateTimeInfo
-          else if( !hasDay )
-          {
-            _fireSelectionChangedEvent = false;
-            this.TextBox.SelectionStart += (dayLength + 1);
-            _fireSelectionChangedEvent = true;
+            //number of digits for days has changed when selection is not on date part, move TextBox.Selection to keep it on current DateTimeInfo
+            if( hasDay && ( dayLength != lastDayInfo.Length ) && ( _selectedDateTimeInfo.Type != DateTimePart.Day ) )
+            {
+              _fireSelectionChangedEvent = false;
+              this.TextBox.SelectionStart = Math.Max( 0, this.TextBox.SelectionStart + ( dayLength - lastDayInfo.Length ) );
+              _fireSelectionChangedEvent = true;
+            }
+            // Day has been added, move TextBox.Selection to keep it on current DateTimeInfo
+            else if( !hasDay )
+            {
+              _fireSelectionChangedEvent = false;
+              this.TextBox.SelectionStart += ( dayLength + 1 );
+              _fireSelectionChangedEvent = true;
+            }
           }
         }
-      }
-      // Day has been removed, move TextBox.Selection to keep it on current DateTimeInfo
-      else if( hasDay )
-      {
-        _fireSelectionChangedEvent = false;
-        this.TextBox.SelectionStart = Math.Max( hasNegative ? 1 : 0, this.TextBox.SelectionStart - (lastDayInfo.Length + 1) );
-        _fireSelectionChangedEvent = true;
+        // Day has been removed, move TextBox.Selection to keep it on current DateTimeInfo
+        else if( hasDay )
+        {
+          _fireSelectionChangedEvent = false;
+          this.TextBox.SelectionStart = Math.Max( hasNegative ? 1 : 0, this.TextBox.SelectionStart - ( lastDayInfo.Length + 1 ) );
+          _fireSelectionChangedEvent = true;
+        }
       }
 
       _dateTimeInfoList.Add( new DateTimeInfo() { Type = DateTimePart.Hour24, Length = 2, Format = "hh" } );
@@ -346,7 +506,7 @@ namespace Xceed.Wpf.Toolkit
 
       if( value.HasValue )
       {
-        this.ParseValueIntoTimeSpanInfo( value );
+        this.ParseValueIntoTimeSpanInfo( value, true );
       }
     }
 
@@ -366,12 +526,53 @@ namespace Xceed.Wpf.Toolkit
       return (value1.Value > value2.Value);
     }
 
+    internal override void Select( DateTimeInfo info )
+    {
+      if( this.UpdateValueOnEnterKey )
+      {
+        if( ( info != null ) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null ) && !string.IsNullOrEmpty( this.TextBox.Text ) )
+        {
+          var separatorToSkipCount = _dateTimeInfoList.IndexOf( info ) / 2;
+          if( separatorToSkipCount < 0 )
+          {
+            base.Select( info );
+          }
+          else
+          {
+            var textValues = this.Text.Split( new char[] { ':', '.' } );
+            var selectionStart = textValues.Take( separatorToSkipCount ).Sum( x => x.Length ) + separatorToSkipCount;
+            var selectionLength = textValues[ separatorToSkipCount ].Length;
+            // Do not select the "-" sign when moving selection with arrows.
+            if( ( separatorToSkipCount == 0 ) && ( textValues.First().StartsWith( "-" ) ) )
+            {
+              selectionStart += 1;
+              selectionLength -= 1;
+            }
+
+            _fireSelectionChangedEvent = false;
+            this.TextBox.Select( selectionStart, selectionLength );
+            _fireSelectionChangedEvent = true;
+            _selectedDateTimeInfo = info;
+#if VS2008
+        this.CurrentDateTimePart = info.Type;
+#else
+            this.SetCurrentValue( DateTimeUpDownBase<TimeSpan?>.CurrentDateTimePartProperty, info.Type );
+#endif
+          }
+        }
+      }
+      else
+      {
+        base.Select( info );
+      }
+    }
+
 
     #endregion
 
     #region Methods
 
-    private string ParseValueIntoTimeSpanInfo( TimeSpan? value )
+    private string ParseValueIntoTimeSpanInfo( TimeSpan? value, bool modifyInfo )
     {
       string text = string.Empty;
 
@@ -379,50 +580,68 @@ namespace Xceed.Wpf.Toolkit
       {
         if( info.Format == null )
         {
-          info.StartPosition = text.Length;
-          info.Length = info.Content.Length;
+          if( modifyInfo )
+          {
+            info.StartPosition = text.Length;
+            info.Length = info.Content.Length;
+          }
           text += info.Content;
         }
         else
         {
           TimeSpan span = TimeSpan.Parse( value.ToString() );
-          info.StartPosition = text.Length;
+          if( modifyInfo )
+          {
+            info.StartPosition = text.Length;
+          }
+          var content = "";
 #if VS2008
           switch (info.Format)
           {
               case "hh":
-                  info.Content = span.Hours.ToString("00");
+                  // Display days and hours or totalHours
+                  content = ( !this.ShowDays && ( span.Days != 0 ) && ( info.Format == "hh" ) )
+                            ? Math.Truncate( Math.Abs( span.TotalHours ) ).ToString("00")
+                            : span.Hours.ToString("00");
                   break;
               case "mm":
-                  info.Content = span.Minutes.ToString("00");
+                  content = span.Minutes.ToString("00");
                   break;
               case "ss":
-                  info.Content = span.Seconds.ToString("00");
+                 content = span.Seconds.ToString("00");
                   break;
               case "dd":
-                  info.Content = span.Days.ToString();
+                  content = span.Days.ToString();
                   break;
               case "%f":
-                  info.Content = (span.Milliseconds / 100).ToString();
+                  content = (span.Milliseconds / 100).ToString();
                   break;
               case "ff":
-                  info.Content = (span.Milliseconds / 10).ToString();
+                 content = (span.Milliseconds / 10).ToString();
                   break;
               case "fff":
-                  info.Content = span.Milliseconds.ToString();
+                 content = span.Milliseconds.ToString();
                   break;
               default:
                   throw new InvalidOperationException("Wrong TimeSpan format");
           }
 #else
-          info.Content = span.ToString( info.Format, this.CultureInfo.DateTimeFormat );
+          // Display days and hours or totalHours
+          content = ( !this.ShowDays && ( span.Days != 0 ) && ( info.Format == "hh" ) )
+                    ? Math.Truncate( Math.Abs( span.TotalHours ) ).ToString()
+                    : span.ToString( info.Format, this.CultureInfo.DateTimeFormat );
 #endif
-          if( info.Format == "dd" )
+
+          if( modifyInfo )
           {
-            info.Content = Convert.ToInt32( info.Content ).ToString();
+            if( info.Format == "dd" )
+            {
+              content = Convert.ToInt32( content ).ToString();
+            }
+            info.Content = content;
+            info.Length = info.Content.Length;
           }
-          info.Length = info.Content.Length;
-          text += info.Content;
+          text += content;
         }
       } );
 
@@ -439,6 +658,8 @@ namespace Xceed.Wpf.Toolkit
         info = (this.CurrentDateTimePart != DateTimePart.Other)
                ? this.GetDateTimeInfo( this.CurrentDateTimePart )
                : (_dateTimeInfoList[ 0 ].Content != "-") ? _dateTimeInfoList[ 0 ] : _dateTimeInfoList[ 1 ]; //Skip negative sign
+        if( info == null )
+          info = _dateTimeInfoList[ 0 ];
       }
 
       TimeSpan? result = null;
@@ -500,21 +721,84 @@ namespace Xceed.Wpf.Toolkit
       // Sync Value on Text only when Enter Key is pressed.
       if( this.UpdateValueOnEnterKey )
       {
+        var newTextBoxContent = string.Empty;
         var currentValue = this.ConvertTextToValue( this.TextBox.Text );
         var newValue = currentValue.HasValue
                        ? this.UpdateTimeSpan( currentValue, step )
                        : this.DefaultValue ?? TimeSpan.Zero;
 
-        if( newValue != null )
+        if( newValue != null && ( _dateTimeInfoList != null) )
         {
-          this.InitializeDateTimeInfoList( newValue );
-          var selectionStart = this.TextBox.SelectionStart;
-          var selectionLength = this.TextBox.SelectionLength;
-#if VS2008
-          this.TextBox.Text = newValue.Value.ToString();
-#else
-          this.TextBox.Text = newValue.Value.ToString( this.GetTimeSpanFormat() );
-#endif
+          var selectionStart = 0;
+          var selectionLength = 0;
+
+          // Start with a negative sign.
+          if( ( newValue.Value.TotalMilliseconds < 0 ) && ( _dateTimeInfoList[ 0 ].Content != "-" ) )
+          {
+            newTextBoxContent = "-";
+          }
+          for( int i = 0; i < _dateTimeInfoList.Count; ++i )
+          {
+            var timePart = _dateTimeInfoList[ i ];
+            // Current timePart is the selected timePart, TextBox selection will start here.
+            if( ( _selectedDateTimeInfo != null ) && ( timePart.Type == _selectedDateTimeInfo.Type ) )
+            {
+              selectionStart = newTextBoxContent.Length;
+            }
+            // Adjust time part start and length.
+            switch( timePart.Type )
+            {
+              case DateTimePart.Day:
+                var dayText = Math.Abs( newValue.Value.Days ).ToString( new string( '0', timePart.Content.Length ) );
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = dayText.Length;
+                newTextBoxContent += dayText;
+                break;
+              case DateTimePart.Hour24:
+                var hourText = ( i <= 1 ) 
+                                ? Math.Truncate( Math.Abs( newValue.Value.TotalHours ) ).ToString( new string( '0', timePart.Content.Length ) ) 
+                                : Math.Abs( newValue.Value.Hours) .ToString( new string( '0', timePart.Content.Length ) );
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = hourText.Length;
+                newTextBoxContent += hourText;
+                break;
+              case DateTimePart.Minute:
+                var minuteText = ( i <= 1 ) 
+                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalMinutes ) ).ToString( new string( '0', timePart.Content.Length ) ) 
+                                  : Math.Abs( newValue.Value.Minutes ).ToString( new string( '0', timePart.Content.Length ) );
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = minuteText.Length;
+                newTextBoxContent += minuteText;
+                break;
+              case DateTimePart.Second:
+                var secondText = ( i <= 1 ) 
+                                  ? Math.Truncate( Math.Abs( newValue.Value.TotalSeconds ) ).ToString( new string( '0', timePart.Content.Length ) ) 
+                                  : Math.Abs( newValue.Value.Seconds ).ToString( new string( '0', timePart.Content.Length ) );
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = secondText.Length;
+                newTextBoxContent += secondText;
+                break;
+              case DateTimePart.Millisecond:
+                var millisecondText = ( i <= 1 )
+                                      ? Math.Truncate( Math.Abs( newValue.Value.TotalMilliseconds ) ).ToString( new string( '0', timePart.Content.Length ) ) 
+                                      : Math.Abs( newValue.Value.Milliseconds ).ToString( new string( '0', timePart.Content.Length ) );
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = millisecondText.Length;
+                newTextBoxContent += millisecondText;
+                break;
+              case DateTimePart.Other:
+                var otherText = ( ( i == 0 ) && ( newValue.Value.TotalMilliseconds >= 0 ) ) ? "" : timePart.Content;
+                timePart.StartPosition = newTextBoxContent.Length;
+                timePart.Length = otherText.Length;
+                newTextBoxContent += otherText;
+                break;
+            }
+            if( ( _selectedDateTimeInfo != null ) && ( timePart.Type == _selectedDateTimeInfo.Type ) )
+            {
+              selectionLength = newTextBoxContent.Length - selectionStart;
+            }
+          }
+          this.TextBox.Text = newTextBoxContent;
           this.TextBox.Select( selectionStart, selectionLength );
         }
       }
@@ -539,27 +823,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-#if !VS2008
-    private string GetTimeSpanFormat()
-    {
-      //use this format : "d.hh\:mm\:ss\.fff"
-      var formatParts = _dateTimeInfoList.Select( part =>
-      {
-        if( part.Format == null )
-          return '\\' + part.Content;
-
-        if( part.Format.Contains( 'd' ) )
-        {
-          var dayInfo = _dateTimeInfoList.FirstOrDefault( info => info.Type == DateTimePart.Day );
-          part.Format = string.Join( "", Enumerable.Repeat( "d", dayInfo.Length ) );
-        }
-        return part.Format;
-      } ).ToList();
-
-      return string.Join( "", formatParts );
-    }
-#endif
-
     private bool IsNumber( string str )
     {
       foreach( char c in str )
@@ -569,6 +832,22 @@ namespace Xceed.Wpf.Toolkit
       }
 
       return true;
+    }
+
+    private void UpdateValue()
+    {
+      var value = this.UpdateValueOnEnterKey
+                  ? ( this.TextBox != null ) ? this.ConvertTextToValue( this.TextBox.Text ) : null
+                  : this.Value;
+      this.InitializeDateTimeInfoList( value );
+      this.SyncTextAndValueProperties( false, this.Text );
+    }
+
+    private TimeSpan? ResetToLastValidValue()
+    {
+      // Reset DateTimeInfoList with last valid value.
+      this.InitializeDateTimeInfoList( this.Value );
+      return this.Value;
     }
 
     #endregion
