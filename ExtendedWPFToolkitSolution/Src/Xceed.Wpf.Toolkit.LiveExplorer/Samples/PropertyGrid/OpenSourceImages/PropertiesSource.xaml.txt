@@ -1,5 +1,0 @@
-﻿
-<xctk:PropertyGrid PropertiesSource="{Binding MyDataList}"
-                   PropertyNameBinding="{Binding MyName}"
-                   PropertyValueBinding="{Binding MyValue}" />
-
