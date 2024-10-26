@@ -174,7 +174,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
-      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
       var items = this.ItemsCollection.Cast<object>();
 
       // Have a faster selection when there are more than 200 items.
@@ -195,7 +195,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void UnSelectAll()
     {
-      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
 
       this.SelectedItems.Clear();
 
