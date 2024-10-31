@@ -263,7 +263,7 @@ namespace Xceed.Wpf.Toolkit
         return this.Value;
       }
 
-      var cleanedText = Regex.Replace(text, "[^0-9.,]", "", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+      var cleanedText = Regex.Replace(text, "[^-0-9.,]", "", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
       result = this.ConvertTextToValueCore( currentValueText, cleanedText );
 
