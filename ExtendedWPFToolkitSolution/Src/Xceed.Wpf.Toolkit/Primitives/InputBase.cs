@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -139,6 +139,25 @@ namespace Xceed.Wpf.Toolkit.Primitives
     }
 
     #endregion //IsUndoEnabled
+
+    #region CaretBrush
+
+    public static readonly DependencyProperty CaretBrushProperty = DependencyProperty.Register( "CaretBrush", typeof( System.Windows.Media.Brush ),
+                                                                            typeof( InputBase ), new UIPropertyMetadata( null ) );
+
+    public System.Windows.Media.Brush CaretBrush
+    {
+        get 
+        { 
+           return ( System.Windows.Media.Brush )GetValue( CaretBrushProperty ); 
+        }
+        set 
+        { 
+           SetValue( CaretBrushProperty, value ); 
+        }
+    }
+
+    #endregion
 
     #region Text
 

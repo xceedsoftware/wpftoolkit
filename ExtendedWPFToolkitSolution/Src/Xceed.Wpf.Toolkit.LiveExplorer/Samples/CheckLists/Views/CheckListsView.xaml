@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -19,7 +19,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -47,13 +47,13 @@
   </local:DemoView.Description>
 
   <local:DemoView.Resources>
-    <x:Array x:Key="personProperties"
+        <x:Array x:Key="personProperties"
              Type="s:String">
-      <s:String>ID</s:String>
-      <s:String>FirstName</s:String>
-      <s:String>LastName</s:String>
-    </x:Array>
-  </local:DemoView.Resources>
+            <s:String>ID</s:String>
+            <s:String>FirstName</s:String>
+            <s:String>LastName</s:String>
+        </x:Array>
+    </local:DemoView.Resources>
 
   <Grid>
     <Grid.RowDefinitions>
@@ -291,7 +291,10 @@
                           SelectAllContent="{Binding ElementName=_selectAllContent, Path=Text}"
                           IsEditable="False"
                           IsDropDownOpen="false"
-                          MaxDropDownHeight="100" />
+                          MaxDropDownHeight="100" 
+                          Watermark="Select items..."
+                          WatermarkTemplate="{x:Null}"
+                          />
     </Grid>
   </Grid>
 </local:DemoView>

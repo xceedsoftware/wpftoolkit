@@ -1,0 +1,63 @@
+﻿<!--***********************************************************************************
+
+   Toolkit for WPF
+
+   Copyright (C) 2007-2025 Xceed Software Inc.
+
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
+
+   For more features, controls, and fast professional support,
+   pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
+
+   Stay informed: follow @datagrid on Twitter or Like http://facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Xceed.Wpf.Toolkit" 
+                    xmlns:converters="clr-namespace:Xceed.Wpf.Toolkit.PropertyGrid.Implementation.Converters">
+
+    <converters:IsStringNullOrEmptyConverter x:Key="StringNullOrEmptyConv"/>
+
+    <DataTemplate x:Key="DefaultWatermarkTemplate">
+        <ContentControl Content="{Binding}" 
+                      Focusable="False"
+                      Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+    </DataTemplate>
+
+    <Style TargetType="local:MaskedTextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:MaskedTextBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <ContentPresenter x:Name="WatermarkPresenter"
+                                              Content="{Binding Watermark, RelativeSource={RelativeSource AncestorType={x:Type local:MaskedTextBox}}}"
+                                              ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:MaskedTextBox}}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              IsHitTestVisible="False"
+                                              Margin="5,0"
+                                              Visibility="Collapsed"/>
+                        </Grid> 
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiDataTrigger >
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RawText, RelativeSource={RelativeSource Self}, Converter={StaticResource StringNullOrEmptyConv}}" Value="True"/>
+                                <Condition Binding="{Binding Watermark, RelativeSource={RelativeSource Self}, Converter={StaticResource StringNullOrEmptyConv}}" Value="False"/>
+                                <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource Self}}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="WatermarkPresenter" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="PART_ContentHost" Property="Opacity" Value="0"/>
+                        </MultiDataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

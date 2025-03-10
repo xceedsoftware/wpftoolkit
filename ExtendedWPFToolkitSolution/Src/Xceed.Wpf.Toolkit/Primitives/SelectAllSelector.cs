@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -174,7 +174,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
-      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
       var items = this.ItemsCollection.Cast<object>();
 
       // Have a faster selection when there are more than 200 items.
@@ -195,7 +195,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void UnSelectAll()
     {
-      var currentSelectedItems = new List<object>( this.SelectedItems as IEnumerable<object> );
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
 
       this.SelectedItems.Clear();
 

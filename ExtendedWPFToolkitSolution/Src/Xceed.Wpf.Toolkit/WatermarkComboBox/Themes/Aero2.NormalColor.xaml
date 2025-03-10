@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -113,7 +113,7 @@
                             HorizontalAlignment="Right"
                             Margin="0"
                             SnapsToDevicePixels="True"
-                            Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                            Width="17">
                       <Path x:Name="Arrow"
                             Data="F1M0,0L2.667,2.66665 5.3334,0 5.3334,-1.78168 2.6667,0.88501 0,-1.78168 0,0z"
                             Fill="#FF606060"

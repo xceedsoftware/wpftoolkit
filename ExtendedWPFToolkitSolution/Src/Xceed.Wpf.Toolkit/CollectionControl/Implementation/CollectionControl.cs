@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -57,7 +57,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( bool )GetValue( IsReadOnlyProperty );
+        return (bool)GetValue( IsReadOnlyProperty );
       }
       set
       {
@@ -74,7 +74,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( ObservableCollection<object> )GetValue( ItemsProperty );
+        return (ObservableCollection<object>)GetValue( ItemsProperty );
       }
       set
       {
@@ -91,7 +91,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( IEnumerable )GetValue( ItemsSourceProperty );
+        return (IEnumerable)GetValue( ItemsSourceProperty );
       }
       set
       {
@@ -101,9 +101,9 @@ namespace Xceed.Wpf.Toolkit
 
     private static void OnItemsSourceChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      var CollectionControl = ( CollectionControl )d;
+      var CollectionControl = (CollectionControl)d;
       if( CollectionControl != null )
-        CollectionControl.OnItemSourceChanged( ( IEnumerable )e.OldValue, ( IEnumerable )e.NewValue );
+        CollectionControl.OnItemSourceChanged( (IEnumerable)e.OldValue, (IEnumerable)e.NewValue );
     }
 
     public void OnItemSourceChanged( IEnumerable oldValue, IEnumerable newValue )
@@ -152,7 +152,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( Type )GetValue( ItemsSourceTypeProperty );
+        return (Type)GetValue( ItemsSourceTypeProperty );
       }
       set
       {
@@ -169,7 +169,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( IList<Type> )GetValue( NewItemTypesProperty );
+        return (IList<Type>)GetValue( NewItemTypesProperty );
       }
       set
       {
@@ -186,7 +186,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( PropertiesLabelProperty );
+        return (object)GetValue( PropertiesLabelProperty );
       }
       set
       {
@@ -203,7 +203,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( SelectedItemProperty );
+        return (object)GetValue( SelectedItemProperty );
       }
       set
       {
@@ -220,7 +220,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( TypeSelectionLabelProperty );
+        return (object)GetValue( TypeSelectionLabelProperty );
       }
       set
       {
@@ -237,7 +237,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( EditorDefinitionCollection )GetValue( EditorDefinitionsProperty );
+        return (EditorDefinitionCollection)GetValue( EditorDefinitionsProperty );
       }
       set
       {
@@ -461,7 +461,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void AddNew( object sender, ExecutedRoutedEventArgs e )
     {
-      var newItem = this.CreateNewItem( ( Type )e.Parameter );
+      var newItem = this.CreateNewItem( (Type)e.Parameter );
 
       this.AddNewCore( newItem );
     }
@@ -543,7 +543,7 @@ namespace Xceed.Wpf.Toolkit
       var newItemType = baseItem.GetType();
 
       if( typeof( ICloneable ).IsAssignableFrom( newItemType ) )
-        return ( ( ICloneable )baseItem ).Clone();
+        return ( (ICloneable)baseItem ).Clone();
 
       var newItem = this.CreateNewItem( newItemType );
 
@@ -619,7 +619,7 @@ namespace Xceed.Wpf.Toolkit
       if( collection is IDictionary )
       {
         //For a Dictionary, we need to parse the list of EditableKeyValuePair and add KeyValuePair to the Dictionary.
-        var dict = ( IDictionary )collection;
+        var dict = (IDictionary)collection;
         //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
         dict.Clear();
 
@@ -636,7 +636,7 @@ namespace Xceed.Wpf.Toolkit
       //IList
       else if( collection is IList )
       {
-        var list = ( IList )collection;
+        var list = (IList)collection;
 
         //the easiest way to persist changes to the source is to just clear the source list and then add all items to it.
         list.Clear();
@@ -659,8 +659,55 @@ namespace Xceed.Wpf.Toolkit
       }
       else
       {
-        //ICollection<T> (or IList<T>)
+        //IDictionary<T,V>
         var collectionType = collection.GetType();
+        var dictionaryType = collectionType.DeclaringType;
+        if( dictionaryType != null )
+        {
+          var genericArguments = dictionaryType.GetGenericArguments();
+          if( genericArguments.Length == 2 )
+          {
+            var keyType = genericArguments[ 0 ];
+            var valueType = genericArguments[ 1 ];
+
+#if NET5
+            var dictionaryField = collectionType.GetField( "_dictionary", BindingFlags.NonPublic | BindingFlags.Instance );
+#else
+            var dictionaryField = collectionType.GetField( "dictionary", BindingFlags.NonPublic | BindingFlags.Instance );
+#endif
+            if( dictionaryField != null )
+            {
+              var dictionaryAsIDictionary = dictionaryField.GetValue( collection ) as IDictionary;
+              if( dictionaryAsIDictionary != null )
+              {
+                var keysProperty = dictionaryAsIDictionary.GetType().GetProperty( "Keys" );
+                var keys = (IEnumerable)keysProperty.GetValue( dictionaryAsIDictionary, null );
+
+                var keysList = new List<object>();
+                foreach( var key in keys )
+                {
+                  keysList.Add( key );
+                }
+
+                dictionaryAsIDictionary.Clear();
+
+                var valueEnumerator = ( (IEnumerable)sourceList ).GetEnumerator();
+                var keyEnumerator = keysList.GetEnumerator();
+
+                while( keyEnumerator.MoveNext() && valueEnumerator.MoveNext() )
+                {
+                  var key = keyEnumerator.Current;
+                  var value = valueEnumerator.Current;
+
+                  dictionaryAsIDictionary.Add( key, value );
+                }
+                return;
+              }
+            }
+          }
+        }
+
+        //ICollection<T> (or IList<T>)
         var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && ( x.GetGenericTypeDefinition() == typeof( ICollection<> ) ) );
         if( iCollectionOfTInterface != null )
         {
@@ -690,7 +737,7 @@ namespace Xceed.Wpf.Toolkit
         var constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
         if( constructor != null )
         {
-          collection = ( IEnumerable )constructor.Invoke( null );
+          collection = (IEnumerable)constructor.Invoke( null );
         }
         else if( ItemsSourceType.IsArray )
         {
@@ -714,6 +761,6 @@ namespace Xceed.Wpf.Toolkit
       return ItemsSource;
     }
 
-    #endregion //Methods
+#endregion //Methods
   }
 }

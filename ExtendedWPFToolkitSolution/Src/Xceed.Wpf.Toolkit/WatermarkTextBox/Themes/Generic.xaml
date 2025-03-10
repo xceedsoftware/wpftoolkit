@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -98,7 +98,8 @@
                     Background="{TemplateBinding Background}">
               <Grid>
                 <ScrollViewer x:Name="PART_ContentHost"
-                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" >
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                              InputScope="{TemplateBinding InputScope}">
                 </ScrollViewer>
                 <ContentPresenter x:Name="PART_WatermarkHost"
                                   Content="{TemplateBinding Watermark}"

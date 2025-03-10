@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -36,6 +36,7 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.IO;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace Xceed.Wpf.AvalonDock
 {
@@ -48,7 +49,7 @@ namespace Xceed.Wpf.AvalonDock
     private ResourceDictionary currentThemeResourceDictionary; // = null
     private AutoHideWindowManager _autoHideWindowManager;
     private FrameworkElement _autohideArea;
-    private List<LayoutFloatingWindowControl> _fwList = new List<LayoutFloatingWindowControl>();
+    private ObservableCollection<LayoutFloatingWindowControl> _fwList = new ObservableCollection<LayoutFloatingWindowControl>();
     private OverlayWindow _overlayWindow = null;
     private List<IDropArea> _areas = null;
     private bool _insideInternalSetActiveContent = false;
@@ -82,6 +83,7 @@ namespace Xceed.Wpf.AvalonDock
 #endif
       this.Loaded += new RoutedEventHandler( DockingManager_Loaded );
       this.Unloaded += new RoutedEventHandler( DockingManager_Unloaded );
+      this._fwList.CollectionChanged += OnFloatingWindowsCollectionChanged;
     }
 
     #endregion
@@ -1509,6 +1511,10 @@ namespace Xceed.Wpf.AvalonDock
         if( e.IsDown && Keyboard.IsKeyDown( Key.F10 ) )
         {
           var current = this.ActiveContent as DependencyObject;
+          if( current is LayoutContent )
+          {
+            current = ( (LayoutContent)current ).Content as DependencyObject;
+          }
           while( current != null )
           {
             current = VisualTreeHelper.GetParent( current );
@@ -1773,7 +1779,7 @@ namespace Xceed.Wpf.AvalonDock
           if( startDrag )
             fwc.AttachDrag();
           fwc.Show();
-        } ), DispatcherPriority.Send );
+        } ), DispatcherPriority.Input );  //Using Input priority so that floating window goes over main Window.
       }
     }
 
@@ -2902,22 +2908,29 @@ namespace Xceed.Wpf.AvalonDock
 
       parentPane.RemoveChildAt( contentModelParentChildrenIndex );
 
-      while( ( parentPane != null ) && ( parentPane.ChildrenCount == 0 ) )
+      while( parentPane != null && parentPane.ChildrenCount == 0 )
       {
-        var grandParent = parentPane.Parent as ILayoutPane;
-        if( grandParent != null )
+        var grandParentPane = parentPane.Parent as ILayoutPane;
+
+        if( grandParentPane != null )
         {
-          var greatGrandParent = grandParent.Parent;
-          // Case 2934 - Do not remove the Last Parent in the LayoutRoot in order to keep the view of the LayoutRoot by default
-          if( greatGrandParent != null && greatGrandParent == this.Layout.RootPanel && greatGrandParent.ChildrenCount == 1 )
+          var greatGrandParent = grandParentPane.Parent;
+
+          // Case 2934 - Ensure the last parent in the LayoutRoot is not removed, so that the default view of the LayoutRoot is preserved.
+          // Case 3257 - Consider scenarios where there are multiple pane controls.
+          bool isLastParentInLayoutRoot = greatGrandParent != null &&
+                                          greatGrandParent == this.Layout.RootPanel &&
+                                          greatGrandParent.ChildrenCount >= 1;
+
+          if( isLastParentInLayoutRoot )
           {
             break;
           }
 
-          grandParent.RemoveChild( parentPane );
+          grandParentPane.RemoveChild( parentPane );
         }
 
-        parentPane = grandParent;
+        parentPane = grandParentPane;
       }
 
       double fwWidth = contentModel.FloatingWidth;
@@ -3149,6 +3162,16 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
+    private void OnFloatingWindowsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
+    {
+      var evargs = new LayoutFloatingWindowControlCollectionChangedEventArgs( e );
+
+      if( LayoutFloatingWindowControlCollectionChanged != null )
+      {
+        LayoutFloatingWindowControlCollectionChanged( this, evargs );
+      }
+    }
+
     #endregion
 
     #region Events
@@ -3162,6 +3185,8 @@ namespace Xceed.Wpf.AvalonDock
     public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
 
     public event EventHandler ActiveContentChanged;
+
+    public event EventHandler<LayoutFloatingWindowControlCollectionChangedEventArgs> LayoutFloatingWindowControlCollectionChanged;
 
     #endregion
 

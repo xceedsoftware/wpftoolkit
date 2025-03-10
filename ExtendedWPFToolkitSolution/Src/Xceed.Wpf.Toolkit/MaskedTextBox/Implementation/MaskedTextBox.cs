@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -32,7 +32,7 @@ using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class MaskedTextBox : ValueRangeTextBox
+  public class MaskedTextBox : ValueRangeTextBox , INotifyPropertyChanged
   {
     #region STATIC MEMBERS
 
@@ -159,7 +159,10 @@ namespace Xceed.Wpf.Toolkit
 
     static MaskedTextBox()
     {
-      MaskedTextBox.TextProperty.OverrideMetadata( typeof( MaskedTextBox ),
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( MaskedTextBox ),
+        new FrameworkPropertyMetadata( typeof( MaskedTextBox ) ) );
+
+        MaskedTextBox.TextProperty.OverrideMetadata( typeof( MaskedTextBox ),
         new FrameworkPropertyMetadata(
         null,
         new CoerceValueCallback( MaskedTextBox.TextCoerceValueCallback ) ) );
@@ -926,11 +929,55 @@ namespace Xceed.Wpf.Toolkit
         this.SetIsMaskFull( m_maskedTextProvider.MaskFull );
       }
 
+      this.RaisePropertyChange( "RawText" );
       base.OnTextChanged( e );
     }
 
     #endregion Text Property
 
+    #region RawText Property
+    public string RawText
+    {
+        get 
+        {
+             return this.GetRawText();
+        }
+    }
+    #endregion
+
+    #region Watermark
+
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register( "Watermark", typeof( string ), typeof( MaskedTextBox ), new UIPropertyMetadata( null ) );
+        public string Watermark
+        {
+            get
+            {
+                return ( string ) GetValue( WatermarkProperty );
+            }
+            set
+            {
+                SetValue( WatermarkProperty, value );
+            }
+        }
+
+        #endregion //Watermark
+
+    #region WatermarkTemplate
+
+        public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register( "WatermarkTemplate", typeof( DataTemplate ), typeof(MaskedTextBox), new UIPropertyMetadata( null ) );
+        public DataTemplate WatermarkTemplate
+        {
+            get
+            {
+                return ( DataTemplate )GetValue( WatermarkTemplateProperty );
+            }
+            set
+            {
+                SetValue( WatermarkTemplateProperty, value);
+            }
+        }
+
+    #endregion //WatermarkBackground
 
     #region COMMANDS
 
@@ -1704,6 +1751,12 @@ namespace Xceed.Wpf.Toolkit
 
     public event EventHandler<AutoCompletingMaskEventArgs> AutoCompletingMask;
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void RaisePropertyChange(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     private bool PlaceCharCore( MaskedTextProvider provider, char ch, int startPosition, int length, bool overwrite, out int caretPosition )
     {

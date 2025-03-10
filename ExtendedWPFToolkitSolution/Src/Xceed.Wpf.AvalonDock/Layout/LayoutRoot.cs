@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -687,9 +687,18 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       this.FloatingWindows.Clear();
       var floatingWindows = this.ReadElementList( reader, true );
-      foreach( var floatingWindow in floatingWindows )
+
+      if( floatingWindows != null )
       {
-        this.FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
+        foreach( var floatingWindow in floatingWindows )
+        {
+          this.FloatingWindows.Add( ( LayoutFloatingWindow )floatingWindow );
+        }
+      }
+
+      if( reader.LocalName == "FloatingWindows" && reader.NodeType == XmlNodeType.EndElement )
+      {
+        reader.Read();
       }
 
       this.Hidden.Clear();
@@ -851,7 +860,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 element.Parent.RemoveChild( element );
               element.Parent = this;
             }
-
           }
         }
       }
@@ -935,24 +943,34 @@ namespace Xceed.Wpf.AvalonDock.Layout
       if( reader.LocalName.Equals( "RootPanel" ) )
       {
         orientation = ( reader.GetAttribute( "Orientation" ) == "Vertical" ) ? Orientation.Vertical : Orientation.Horizontal;
+
+        // Check if the element is self-closing
+        bool isEmptyElement = reader.IsEmptyElement;
+
+        // Move to the next node
         reader.Read();
 
-        while( true )
+        if( !isEmptyElement )
         {
-          //Read all RootPanel children
-          var element = ReadElement( reader ) as ILayoutPanelElement;
-          if( element != null )
+          while( true )
           {
-            result.Add( element );
+            var element = ReadElement( reader ) as ILayoutPanelElement;
+
+            if( element != null )
+            {
+              result.Add( element );
+            }
+            else if( reader.NodeType == XmlNodeType.EndElement )
+            {
+              // Exit the loop when we reach the end of the RootPanel element
+              break;
+            }
           }
-          else if( reader.NodeType == XmlNodeType.EndElement )
-          {
-            break;
-          }
+
+          // Read the RootPanel end element after processing all children
+          reader.ReadEndElement();
         }
       }
-
-      reader.ReadEndElement();
 
       return result;
     }

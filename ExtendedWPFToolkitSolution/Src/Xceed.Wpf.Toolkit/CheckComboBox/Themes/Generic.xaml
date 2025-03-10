@@ -2,7 +2,7 @@
 
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -27,6 +27,12 @@
 
   <SolidColorBrush x:Key="ButtonNormalBorder"
                    Color="#FF707070" />
+
+  <DataTemplate x:Key="DefaultWatermarkTemplate">
+    <ContentControl Content="{Binding}"
+                    Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                    Focusable="False" />
+  </DataTemplate>
 
   <Geometry x:Key="DownArrowGeometry">M 0,1 C0,1 0,0 0,0 0,0 3,0 3,0 3,0 3,1 3,1 3,1 4,1 4,1 4,1 4,0 4,0 4,0 7,0 7,0 7,0 7,1 7,1 7,1 6,1 6,1 6,1 6,2 6,2 6,2 5,2 5,2 5,2 5,3 5,3 5,3 4,3 4,3 4,3 4,4 4,4 4,4 3,4 3,4 3,4 3,3 3,3 3,3 2,3 2,3 2,3 2,2 2,2 2,2 1,2 1,2 1,2 1,1 1,1 1,1 0,1 0,1 z</Geometry>
 
@@ -60,7 +66,7 @@
               </Grid.ColumnDefinitions>
 
               <TextBox x:Name="TextBox"
-                       Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                       Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                        Foreground="{TemplateBinding Foreground}"
                        IsReadOnly="True"
                        Focusable="False"
@@ -76,13 +82,12 @@
                        VerticalScrollBarVisibility="Hidden" >
               </TextBox>
               <Grid Grid.Column="1"
-                    HorizontalAlignment="Right"
-                    Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                    HorizontalAlignment="Right">
                 <Path x:Name="Arrow"
                       Data="{StaticResource DownArrowGeometry}"
                       Fill="Black"
                       HorizontalAlignment="Center"
-                      Margin="3,0,3,0"
+                      Margin="5,0,5,0"
                       VerticalAlignment="Center" />
               </Grid>
             </Grid>
@@ -215,7 +220,21 @@
                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                           IsHitTestVisible="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}" >
             </ToggleButton>
+            <ContentPresenter x:Name="WatermarkHost"
+                          Content="{TemplateBinding Watermark}"
+                          ContentTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkTemplate}}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          IsHitTestVisible="False"
+                          Margin="{TemplateBinding Padding}"
+                          Visibility="Collapsed" />
+
           </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="Text" Value="" >
+              <Setter Property="Visibility" Value="Visible" TargetName="WatermarkHost"/>
+            </Trigger>
+         </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

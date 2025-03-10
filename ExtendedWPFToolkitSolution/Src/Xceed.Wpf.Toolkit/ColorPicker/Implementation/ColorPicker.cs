@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -24,6 +24,8 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Threading;
+
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -127,9 +129,12 @@ namespace Xceed.Wpf.Toolkit
       ListCollectionView lcv = ( ListCollectionView )( CollectionViewSource.GetDefaultView( this.AvailableColors ) );
       if( lcv != null )
       {
-        lcv.CustomSort = ( AvailableColorsSortingMode == ColorSortingMode.HueSaturationBrightness )
-                          ? new ColorSorter()
-                          : null;
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+        {
+          lcv.CustomSort = ( AvailableColorsSortingMode == ColorSortingMode.HueSaturationBrightness )
+                            ? new ColorSorter()
+                            : null;
+        } ) );
       }
     }
 

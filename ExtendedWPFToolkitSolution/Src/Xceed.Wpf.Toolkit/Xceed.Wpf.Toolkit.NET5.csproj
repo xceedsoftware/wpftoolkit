@@ -124,6 +124,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MaskedTextBox\Themes\Aero2.NormalColor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MaskedTextBox\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MaskedTextBox\Themes\HighContrast.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Primitives\Themes\Aero2\SelectorItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -374,6 +383,7 @@
     <Compile Include="Primitives\SelectAllSelectorItem.cs" />
     <Compile Include="Primitives\SelectAllSelector.cs" />
     <Compile Include="PropertyGrid\Implementation\Attributes\CategoryPropertyOrderAttribute.cs" />
+    <Compile Include="PropertyGrid\Implementation\Converters\IsStringNullOrEmptyConverter.cs" />
     <Compile Include="PropertyGrid\Implementation\Converters\PropertyItemEditorConverter.cs" />
     <Compile Include="Core\LocationEnum.cs" />
     <Compile Include="IconButton\Implementation\IconButton.cs" />

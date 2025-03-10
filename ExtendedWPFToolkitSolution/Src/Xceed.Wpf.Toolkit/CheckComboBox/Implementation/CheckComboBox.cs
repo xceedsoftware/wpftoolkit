@@ -2,7 +2,7 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2024 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
    This program is provided to you under the terms of the XCEED SOFTWARE, INC.
    COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
@@ -24,6 +24,8 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.ComponentModel;
+
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -183,6 +185,42 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion
+
+
+    #region Watermark
+
+    public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register( "Watermark", typeof( object ), typeof( CheckComboBox ), new UIPropertyMetadata( null ) );
+    public object Watermark
+    {
+        get
+        {
+            return ( object )GetValue( WatermarkProperty );
+        }
+        set
+        {
+            SetValue( WatermarkProperty, value );
+        }
+    }
+
+    #endregion //Watermark
+
+    #region Watermark Template
+
+    public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(CheckComboBox), new UIPropertyMetadata(null));
+
+    public DataTemplate WatermarkTemplate
+    {
+        get
+        {
+            return (DataTemplate)GetValue(WatermarkTemplateProperty);
+        }
+        set
+        {
+            SetValue(WatermarkTemplateProperty, value);
+        }
+    }
+
+    #endregion //Watermark Template
 
     #endregion //Properties
 

@@ -117,6 +117,7 @@
     <Compile Include="DocumentClosingEventArgs.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="LayoutEventArgs.cs" />
+    <Compile Include="LayoutFloatingWindowControlCollectionChangedEventArgs.cs" />
     <Compile Include="Layout\AnchorableShowStrategy.cs" />
     <Compile Include="Layout\AnchorSide.cs" />
     <Compile Include="Controls\DockingManagerDropTarget.cs" />
