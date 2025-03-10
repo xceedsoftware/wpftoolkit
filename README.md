@@ -8,6 +8,10 @@ Starting at v4.0.0, this free toolkit is provided under the [Xceed Community Lic
 
 ## Latest news
 
+**March 10, 2025** v4.7.0 released with [19 bug fixes and improvements](../../wiki/Improvements-in-v4.7.0). 
+
+*February 3, 2025* v4.7.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [21 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus470)
+
 **July 5, 2024** v4.6.1 released with [7 bug fixes and improvements](../../wiki/Improvements-in-v4.6.1). 
 
 *March 4, 2024* v4.6.1 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [8 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus461)
