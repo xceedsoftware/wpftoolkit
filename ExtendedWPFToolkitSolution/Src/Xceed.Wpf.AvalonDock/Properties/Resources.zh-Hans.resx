@@ -178,6 +178,6 @@
     <value>最大化</value>
   </data>
   <data name="Window_Restore" xml:space="preserve">
-    <value>恢复</value>
+    <value>还原</value>
   </data>
 </root>
