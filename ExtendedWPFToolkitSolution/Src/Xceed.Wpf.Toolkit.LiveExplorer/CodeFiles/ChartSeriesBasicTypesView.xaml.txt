@@ -75,8 +75,9 @@
             <Grid.RowDefinitions>
                <RowDefinition Height="Auto" />
                <RowDefinition Height="Auto" />
-               <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                <ColumnDefinition Width="Auto" />
                <ColumnDefinition Width="Auto" />
@@ -88,23 +89,25 @@
 
             <!-- 1st column-->
             <TextBlock Text="Layout: " VerticalAlignment="Center" />
-            <ComboBox x:Name="_layoutComboBox" Grid.Column="1" SelectedValue="{Binding Layout, ElementName=_series, Converter={StaticResource LayoutEngineToPredefinedLayoutConverter}}" SelectedValuePath="Content" ItemContainerStyle="{StaticResource ComboBoxItemStyle}" SelectionChanged="OnLayoutSelectionChanged" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
+            <ComboBox x:Name="_layoutComboBox" Grid.Column="1" SelectedValue="{Binding Layout, ElementName=_series, Converter={StaticResource LayoutEngineToPredefinedLayoutConverter}}" SelectedValuePath="Content" ItemContainerStyle="{StaticResource ComboBoxItemStyle}" SelectionChanged="OnLayoutSelectionChanged" Width="85" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
                <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Area}" />
+               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Doughnut}" />
                <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Column}" />
                <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Line}" />
-               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Pie}" />
+               <ComboBoxItem Content="{x:Static xctk:PredefinedLayoutTypes.Pie}" />               
             </ComboBox>
             <TextBlock Grid.Row="1" Text="Title: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_title}"/>
-            <TextBox x:Name="_title" Grid.Row="1" Grid.Column="1" Text="{Binding Title, ElementName=_series, UpdateSourceTrigger=PropertyChanged}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=title}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
+            <TextBox x:Name="_title" Grid.Row="1" Grid.Column="1" Text="{Binding Title, ElementName=_series, UpdateSourceTrigger=PropertyChanged}" Width="85" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=title}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
             <TextBlock Grid.Row="2" Text="Default Interior: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_defaultInterior}"/>
-            <xctk:ColorPicker x:Name="_defaultInterior" Grid.Row="2" Grid.Column="1"  SelectedColor="{Binding DefaultInterior, ElementName=_series, Converter={StaticResource SolidColorBrushToColorConverter}}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=defaultInterior}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
+            <xctk:ColorPicker x:Name="_defaultInterior" Grid.Row="2" Grid.Column="1"  SelectedColor="{Binding DefaultInterior, ElementName=_series, Converter={StaticResource SolidColorBrushToColorConverter}}" Width="85" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=defaultInterior}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
             
             <!-- 2nd column-->
             <TextBlock Grid.Column="2" Text="Show Hint Labels: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_showHintLabels}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
             <CheckBox x:Name="_showHintLabels" Grid.Column="3" IsChecked="{Binding ShowHintLabels, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=showHintLabels}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
             <TextBlock Grid.Row="1" Grid.Column="2" Text="Show Points in Legend: " IsEnabled="{Binding IsEnabled, ElementName=_showPointsInLegend}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
-            <CheckBox x:Name="_showPointsInLegend" Grid.Row="1" Grid.Column="3" IsChecked="{Binding ShowPointsInLegend, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=showPointsInLegend}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />         
-            
+            <CheckBox x:Name="_showPointsInLegend" Grid.Row="1" Grid.Column="3" IsChecked="{Binding ShowPointsInLegend, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=showPointsInLegend}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="Is Smooth: " IsEnabled="{Binding IsEnabled, ElementName=_isSmooth}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}" />
+            <CheckBox x:Name="_isSmooth" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding IsSmooth, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=smooth}" Margin="5" />
             <!-- 3rd column-->
             <TextBlock Grid.Column="4" Text="Hint Line Length: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_hintLineLength}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
             <xctk:IntegerUpDown x:Name="_hintLineLength" Grid.Column="5" Minimum="0" Maximum="200" Value="{Binding HintLineLength, ElementName=_series}" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5">
@@ -117,18 +120,27 @@
             </xctk:IntegerUpDown>
             <TextBlock Grid.Row="1" Grid.Column="4" Text="Spacing: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_spacing}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}"/>
             <xctk:IntegerUpDown x:Name="_spacing" Grid.Row="1" Grid.Column="5" Minimum="0" Maximum="100" Value="{Binding Spacing, ElementName=_series}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=spacing}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
-        </Grid>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="Use Gradient Background: " IsEnabled="{Binding IsEnabled, ElementName=_useGradient}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}" />
+            <CheckBox x:Name="_useGradient" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding UseGradientBackground, ElementName=_series}" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=gradient}" Margin="5" />
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="Inner Radius: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_innerRadius}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}" />
+            <xctk:IntegerUpDown x:Name="_innerRadius" Grid.Row="2" Grid.Column="5" Minimum="0" Maximum="90" Value="{Binding Layout.InnerRadius, ElementName=_series}" Width="75" IsEnabled="{Binding SelectedItem, ElementName=_layoutComboBox, Converter={StaticResource PredefinedLayoutToPropertyEnabledConverter}, ConverterParameter=inner_radius}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Grid.Row="3" Grid.Column="4" Text="Use Animations: " VerticalAlignment="Center" IsEnabled="{Binding IsEnabled, ElementName=_useAnimations}" Margin="10,0,0,0" Style="{StaticResource DisableGrayText}" />
+            <CheckBox x:Name="_useAnimations" Grid.Row="3" Grid.Column="5" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding UseAnimations, ElementName=_series}" Margin="5" />
+          </Grid>
       </GroupBox>
       
       <TextBlock  Grid.Row="1" Text="Usage:" Style="{StaticResource Header}" Margin="10"/>
 
       <xctk:Chart Grid.Row="2" MinHeight="200">
             <xctk:Chart.Areas>
-               <xctk:Area x:Name="_area1" Title="Area #1">
-                  <xctk:Area.Series>
-                        <xctk:Series x:Name="_series"
-                                    DefaultInterior="BlueViolet"
+                 <xctk:Area x:Name="_area1" Title="Area #1">
+          <xctk:Area.Series>
+            <xctk:Series x:Name="_series"
+                                    DefaultInterior="#5470C6"
                                     Spacing="20"
+                                    IsSmooth="False"
+                                    UseGradientBackground="False"
+                                    UseAnimations="False"
                                     Title="Average"
                                     ShowPointsInLegend="false"
                                     ShowHintLabels="false"

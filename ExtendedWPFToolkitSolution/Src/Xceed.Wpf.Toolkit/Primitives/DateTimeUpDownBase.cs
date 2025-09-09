@@ -60,7 +60,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return ( DateTimePart )GetValue( CurrentDateTimePartProperty );
+        return (DateTimePart)GetValue( CurrentDateTimePartProperty );
       }
       set
       {
@@ -72,7 +72,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       DateTimeUpDownBase<T> dateTimeUpDownBase = o as DateTimeUpDownBase<T>;
       if( dateTimeUpDownBase != null )
-        dateTimeUpDownBase.OnCurrentDateTimePartChanged( ( DateTimePart )e.OldValue, ( DateTimePart )e.NewValue );
+        dateTimeUpDownBase.OnCurrentDateTimePartChanged( (DateTimePart)e.OldValue, (DateTimePart)e.NewValue );
     }
 
     protected virtual void OnCurrentDateTimePartChanged( DateTimePart oldValue, DateTimePart newValue )
@@ -90,7 +90,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       get
       {
-        return ( int )GetValue( StepProperty );
+        return (int)GetValue( StepProperty );
       }
       set
       {
@@ -102,7 +102,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       var dateTimeUpDownBase = o as DateTimeUpDownBase<T>;
       if( dateTimeUpDownBase != null )
-        dateTimeUpDownBase.OnStepChanged( ( int )e.OldValue, ( int )e.NewValue );
+        dateTimeUpDownBase.OnStepChanged( (int)e.OldValue, (int)e.NewValue );
     }
 
     protected virtual void OnStepChanged( int oldValue, int newValue )
@@ -207,7 +207,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void TextBox_SelectionChanged( object sender, RoutedEventArgs e )
     {
       if( _fireSelectionChangedEvent )
+      {
         this.PerformMouseSelection();
+      }
       else
         _fireSelectionChangedEvent = true;
     }
@@ -232,19 +234,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void PerformMouseSelection()
     {
-      var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
-      if( ( dateTimeInfo != null ) && ( dateTimeInfo.Type == DateTimePart.Other ) )
+      // Due to case 3424 - TimePicker/DateTimePicker : Selecting any time part always increments the first part
+      // Using DispatcherPriority.ApplicationIdle ensures that PerformMouseSelection() runs after any base class has finished handling the mouse click.
+      this.Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, new Action( () =>
       {
-        this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
-        {
-          // Select the next dateTime part
-          this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
-        }
-        ) );
-        return;
-      }
+        var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
 
-      this.Select( dateTimeInfo );
+        if( ( dateTimeInfo != null ) && ( dateTimeInfo.Type == DateTimePart.Other ) )
+        {
+          this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
+          {
+            this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
+          } ) );
+          return;
+        }
+
+        this.Select( dateTimeInfo );
+      } ) );
     }
 
     protected virtual bool IsLowerThan( T value1, T value2 )

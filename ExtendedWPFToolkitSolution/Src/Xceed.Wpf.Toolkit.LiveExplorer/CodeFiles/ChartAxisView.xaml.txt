@@ -386,6 +386,17 @@
                   HorizontalAlignment="Left"
                   VerticalAlignment="Center"
                   Margin="3" />
+        <TextBlock Text="Show Axis Pointer: "
+                   Grid.Row="6"
+                   Grid.Column="4"
+                   VerticalAlignment="Center"
+                   Margin="10,0,0,0" />
+        <CheckBox Grid.Row="6"
+                  Grid.Column="5"
+                  IsChecked="{Binding SelectedAxis.ShowAxisPointer, ElementName=_demo}"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  Margin="3" />
       </Grid>
     </GroupBox>
 

@@ -398,12 +398,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyVersionInfo.cs" />
-    <Compile Include="AssemblyVersionInfoCommon.cs" />
     <Compile Include="AutoSelectTextBox\Implementation\AutoSelectBehaviorEnum.cs" />
     <Compile Include="AutoSelectTextBox\Implementation\AutoSelectTextBox.cs" />
     <Compile Include="AutoSelectTextBox\Implementation\QueryMoveFocusEventArgs.cs" />
     <Compile Include="BusyIndicator\Implementation\BusyIndicator.cs" />
     <Compile Include="BusyIndicator\Implementation\Converters\ProgressBarWidthConverter.cs" />
+    <Compile Include="Chart\Converters\BooleanToTimeSpanConverter.cs" />
+    <Compile Include="Chart\Converters\InverseBooleanToDoubleConverter.cs" />
     <Compile Include="ColorPicker\Implementation\ColorPickerTabItem.cs" />
     <Compile Include="Core\Converters\ColorModeToTabItemSelectedConverter.cs" />
     <Compile Include="Core\Converters\PrintableFontFamilyConverter.cs" />

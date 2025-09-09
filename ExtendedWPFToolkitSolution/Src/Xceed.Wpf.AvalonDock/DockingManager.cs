@@ -2855,6 +2855,7 @@ namespace Xceed.Wpf.AvalonDock
         Top = fwTop,
         Left = fwLeft
       };
+      fwc.Resources = this.Resources;
 
       this.ShowInTaskbar( fwc );
 
@@ -2980,6 +2981,7 @@ namespace Xceed.Wpf.AvalonDock
           Left = contentModel.FloatingLeft,
           Top = contentModel.FloatingTop
         };
+        fwc.Resources = this.Resources;
       }
       else
       {
@@ -3002,7 +3004,7 @@ namespace Xceed.Wpf.AvalonDock
           Left = contentModel.FloatingLeft,
           Top = contentModel.FloatingTop
         };
-
+        fwc.Resources = this.Resources;
       }
 
       this.ShowInTaskbar( fwc );

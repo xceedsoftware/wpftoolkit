@@ -98,7 +98,7 @@ namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Chart.Views
 
     private void AddDefaultSeries()
     {
-      if( _series.Layout.LayoutType != PredefinedLayoutTypes.Pie )
+      if(( _series.Layout.LayoutType != PredefinedLayoutTypes.Pie) && (_series.Layout.LayoutType != PredefinedLayoutTypes.Doughnut) )
       {
         if( _pieSeries == null )
         {
