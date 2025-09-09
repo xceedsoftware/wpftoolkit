@@ -188,6 +188,8 @@ A commercial license can be purchased at [Xceed](https://xceed.com).
 
 ## Release history
 
+* **September 9, 2025 v5.0.0 released with [3 bug fixes and improvements](../../wiki/Improvements-in-v5.0.0).**
+* * April 28, 2025, released v5.0.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [15 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus500).
 * **March 10, 2025 v4.7.0 released with [19 bug fixes and improvements](../../wiki/Improvements-in-v4.7.0).**
 * February 3, 2025, released v4.7.0 of the [Plus Edition](../../wiki/Xceed-Toolkit-Plus-for-WPF) released with [21 bug fixes and improvements](../../wiki/Improvements-in-v3.5.0#Plus470).
 * **July 5, 2024 v4.6.1 released with [7 bug fixes and improvements](../../wiki/Improvements-in-v4.6.1).**
