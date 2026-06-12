@@ -37,6 +37,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     internal const string PART_Spinner = "PART_Spinner";
 
     internal bool _isTextChangedFromUI;
+    private T _initialValueOnFocus;
 
     private bool _isSyncingTextAndValueProperties;
     private bool _internalValueSet;
@@ -800,7 +801,13 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
 
     private void UpDownBase_IsKeyboardFocusWithinChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      if( !( bool )e.NewValue )
+      if( ( bool )e.NewValue )
+      {
+        // Save the current value when focus is gained so we can restore it 
+        // if the user enters an out-of-range value with ClipValueToMinMax=false.
+        _initialValueOnFocus = this.Value;
+      }
+      else
       {
         this.CommitInput();
       }
@@ -862,6 +869,14 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
               // From the UI, just allow any input.
               if( !_isTextChangedFromUI )
               {
+                // If ClipValueToMinMax is disabled, restore the original value
+                // when the user enters an out-of-range value, instead of 
+                // silently truncating digits to fit the range.
+                if( !this.ClipValueToMinMax )
+                {
+                  this.SetValueInternal( _initialValueOnFocus );
+                }
+
                 // This call may throw an exception. 
                 // See RaiseInputValidationError() implementation.
                 this.RaiseInputValidationError( e );
